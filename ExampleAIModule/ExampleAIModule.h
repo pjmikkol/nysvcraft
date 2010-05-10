@@ -28,4 +28,5 @@ public:
   virtual void onUnitRenegade(BWAPI::Unit* unit);
 private:
   BWAPI::Position center;
+  void drawUnitInfo();
 };

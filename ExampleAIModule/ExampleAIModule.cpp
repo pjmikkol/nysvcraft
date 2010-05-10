@@ -21,7 +21,43 @@ void ExampleAIModule::onEnd(bool isWinner)
     //log win to file
   }
 }
+
 void ExampleAIModule::onFrame()
+{
+	drawUnitInfo();
+
+	std::map< Unit*, int > * attacking = new std::map< Unit*, int >();
+
+	for(std::set<Unit*>::const_iterator u = Broodwar->getAllUnits().begin();
+		u != Broodwar->getAllUnits().end();
+		u++)
+	{
+		Unit* unit = *u;
+
+		if (unit->getPlayer() == Broodwar->self())
+			continue;
+			
+		Unit* target = unit->getOrderTarget();
+
+		if (target) {
+			std::map<Unit*, int>::iterator iter = attacking->find(target);
+
+			if (iter != attacking->end())
+				(*iter).second++;
+			else
+				attacking->insert(std::make_pair(target,1));
+		}
+	}
+
+	for (std::map<Unit*, int>::const_iterator iter = attacking->begin(); iter != attacking->end(); iter++) {
+		Position pos = iter->first->getPosition();
+		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 26, "%d", iter->second);
+	}
+
+	delete attacking;
+}
+
+void ExampleAIModule::drawUnitInfo()
 {
 	for(std::set<Unit*>::const_iterator i=Broodwar->self()->getUnits().begin();i!=Broodwar->self()->getUnits().end();i++)
 	{
