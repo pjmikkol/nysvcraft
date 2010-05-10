@@ -6,15 +6,12 @@ void ExampleAIModule::onStart()
   // Enable some cheat flags
   Broodwar->enableFlag(Flag::UserInput);
 
-
   this->center = Position((Broodwar->mapWidth() * TILE_SIZE)/2 , (Broodwar->mapHeight() * TILE_SIZE)/2 );
 
-  for(std::set<Unit*>::const_iterator i=Broodwar->self()->getUnits().begin();i!=Broodwar->self()->getUnits().end();i++)
-  {
-	(*i)->attackMove(this->center);
-	Position pos = (*i)->getPosition();
-	Broodwar->printf("Position: (%d,%d)", pos.x(), pos.y());
-  }
+  for(std::set<Unit*>::const_iterator i = Broodwar->self()->getUnits().begin();
+	  i != Broodwar->self()->getUnits().end();
+	  i++)
+	(*i)->attackMove(this->center);  
 }
 
 void ExampleAIModule::onEnd(bool isWinner)
@@ -26,7 +23,22 @@ void ExampleAIModule::onEnd(bool isWinner)
 }
 void ExampleAIModule::onFrame()
 {
+	for(std::set<Unit*>::const_iterator i=Broodwar->self()->getUnits().begin();i!=Broodwar->self()->getUnits().end();i++)
+	{
+		Position pos = (*i)->getPosition();
+		Unit* targetUnit = (*i)->getOrderTarget();
+		Position target = (*i)->getTargetPosition();
+		Color color;
 
+		if (targetUnit)
+			color = Color(Colors::Red);
+		else
+			color = Color(Colors::Green);
+			
+		Broodwar->drawLineMap(pos.x(), pos.y(), target.x(), target.y(), color);
+
+		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 16, "\x05(%d, %d)", pos.x(), pos.y());
+  }
 }
 
 void ExampleAIModule::onUnitCreate(BWAPI::Unit* unit)

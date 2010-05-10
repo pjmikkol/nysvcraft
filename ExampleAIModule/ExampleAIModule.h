@@ -3,6 +3,13 @@
 #include <BWTA.h>
 #include <windows.h>
 
+enum State { flee, find_enemy, fight };
+
+typedef struct UnitData {
+	State state;
+	
+} UnitData;
+
 
 class ExampleAIModule : public BWAPI::AIModule
 {
@@ -19,10 +26,6 @@ public:
   virtual void onUnitShow(BWAPI::Unit* unit);
   virtual void onUnitHide(BWAPI::Unit* unit);
   virtual void onUnitRenegade(BWAPI::Unit* unit);
-  void drawStats(); //not part of BWAPI::AIModule
-  void showPlayers();
-  void showForces();
-  bool show_visibility_data;
 private:
   BWAPI::Position center;
 };
