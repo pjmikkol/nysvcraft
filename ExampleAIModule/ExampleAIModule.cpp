@@ -15,6 +15,10 @@ void ExampleAIModule::onStart()
   analysis_just_finished=false;
   show_visibility_data=false;
 
+  Position center((Broodwar->mapWidth() * TILE_SIZE)/2 , (Broodwar->mapHeight() * TILE_SIZE)/2 );
+
+
+
   if (Broodwar->isReplay())
   {
     Broodwar->printf("The following players are in this replay:");
@@ -65,6 +69,13 @@ void ExampleAIModule::onStart()
       }
     }
   }
+  for(std::set<Unit*>::const_iterator i=Broodwar->self()->getUnits().begin();i!=Broodwar->self()->getUnits().end();i++)
+    {
+		
+		(*i)->attackMove(center);
+		Position pos = (*i)->getPosition();
+		Broodwar->printf("Position: (%d,%d)", pos.x(), pos.y());
+	}
 }
 void ExampleAIModule::onEnd(bool isWinner)
 {
@@ -93,6 +104,8 @@ void ExampleAIModule::onFrame()
       }
     }
   }
+
+	
 
   if (Broodwar->isReplay())
     return;
