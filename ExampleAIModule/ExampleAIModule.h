@@ -3,12 +3,6 @@
 #include <BWTA.h>
 #include <windows.h>
 
-static bool analyzed;
-static bool analysis_just_finished;
-static BWAPI::Position center;
-static BWTA::Region* home;
-static BWTA::Region* enemy_base;
-DWORD WINAPI AnalyzeThread();
 
 class ExampleAIModule : public BWAPI::AIModule
 {
@@ -29,4 +23,6 @@ public:
   void showPlayers();
   void showForces();
   bool show_visibility_data;
+private:
+  BWAPI::Position center;
 };
