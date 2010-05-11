@@ -40,12 +40,18 @@ void ExampleAIModule::onFrame()
 		Unit* target = unit->getOrderTarget();
 
 		if (target) {
-			std::map<Unit*, int>::iterator iter = attacking->find(target);
+			double distance = unit->getDistance(target);
 
-			if (iter != attacking->end())
-				(*iter).second++;
-			else
-				attacking->insert(std::make_pair(target,1));
+			Broodwar->drawTextMap(unit->getPosition().x() - 16, unit->getPosition().y() - 26, "%f", distance);
+
+			if (distance <= unit->getType().groundWeapon()->maxRange()) {
+				std::map<Unit*, int>::iterator iter = attacking->find(target);
+
+				if (iter != attacking->end())
+					(*iter).second++;
+				else
+					attacking->insert(std::make_pair(target,1));
+			}
 		}
 	}
 
