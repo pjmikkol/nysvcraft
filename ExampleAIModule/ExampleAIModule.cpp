@@ -25,17 +25,18 @@ void ExampleAIModule::onStart()
 
 	this->center = Position((Broodwar->mapWidth() * TILE_SIZE)/2 , (Broodwar->mapHeight() * TILE_SIZE)/2 );
 	this->unitData = map< Unit*, UnitData >();
-	this->groupData = map<int, GroupInfo>();
+	this->groupData = map<int, Group>();
 
 	// Calculate the center of group nro 1 in this loop,
 	// In this version always start with single group.
 	Position groupCenter = Position(0, 0);
-	int unitsInGroup = 0;
+	Group startGroup = Group(1);
 	for(set<Unit*>::const_iterator i = Broodwar->self()->getUnits().begin();
 	    i != Broodwar->self()->getUnits().end();
 	    i++) {
 		
 		Unit* unit = *i;
+		// Do something clever here, formation?
 		unit->attackMove(this->center);  
 		UnitData unitData;
 		unitData.state = default_state;
@@ -43,12 +44,20 @@ void ExampleAIModule::onStart()
 		unitData.group = 1;
 		this->unitData.insert(make_pair(unit, unitData));
 
-		unitsInGroup++;
+		startGroup.add(unit);
 		groupCenter += unit->getPosition();
 		Broodwar->printf("Initial hit points: %d", unit->getType().maxHitPoints());
 	}
+	int unitsInGroup = startGroup.getSize();
+	this->groupData.insert(make_pair(startGroup.getId(), startGroup));
+	/* TODO: Group AI initialization */
 	groupCenter = Position(groupCenter.x()/unitsInGroup, groupCenter.y()/unitsInGroup);
 	Unit* boss = getClosestUnitFrom(groupCenter, Broodwar->self()->getUnits());
+	Broodwar->printf("Size of the group 1: %d", unitsInGroup);
+	/* Testing that the functions work correctly: */
+	Group g = this->groupData.find(1)->second;
+	g.remove(boss);
+	Broodwar->printf("Size of the group 1: %d", g.getSize() );
 }
 
 void ExampleAIModule::onEnd(bool isWinner)

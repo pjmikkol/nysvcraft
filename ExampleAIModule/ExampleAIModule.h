@@ -2,11 +2,19 @@
 #include <BWAPI.h>
 #include <BWTA.h>
 #include <windows.h>
+#include "Group.h"
+#include "Formation.h"
 
 using namespace std;
 using namespace BWAPI;
 
-enum State { flee, default_state, fight };
+/*States are:
+	flee			- for running away from enemy
+	default_state	- for ?
+	fight			- kicking ass
+	formation		- when moving in formation finding enemy or doing something
+*/
+enum State { flee, default_state, fight, formation };
 
 
 struct UnitData {
@@ -15,8 +23,12 @@ struct UnitData {
 	int group; // Which group the unit belongs?
 };
 
+
 struct GroupInfo { 
+	int groupNro;
 	Unit* leader; // "Leader" this group. The group moves according to this guy
+	int units; // How many units belong to this group
+	Formation* form; // The formation of group
 };
 
 class ExampleAIModule : public AIModule
@@ -36,10 +48,11 @@ public:
 	virtual void onUnitRenegade(Unit* unit);
 private:
 	Position center;
-	map< int, GroupInfo > groupData;
-	void drawUnitInfo();
-	map< Unit*, int > * ExampleAIModule::getAttackerCount();
+	map< int, Group> groupData;
 	map< Unit*, UnitData > unitData;
+
+	map< Unit*, int > * ExampleAIModule::getAttackerCount();
+	void drawUnitInfo();
 	UnitData getUnitData(Unit* unit);
 	bool ExampleAIModule::isAttackingEnemy(Unit* unit);
 	void ExampleAIModule::printAttackerInfo(map<Unit*, int>* attacking);
