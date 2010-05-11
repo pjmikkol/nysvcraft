@@ -1,4 +1,5 @@
 #include "ExampleAIModule.h"
+#include <limits>
 
 using namespace BWAPI;
 using namespace std;
@@ -9,8 +10,10 @@ string stateName(State state) {
 			return "flee";
 		case fight:
 			return "fight";
-		case find_enemy:
-			return "find_enemy";
+		case default_state:
+			return "default_state";
+		default:
+			return "penis";
 	}
 }
 
@@ -30,7 +33,8 @@ void ExampleAIModule::onStart()
 		Unit* unit = *i;
 		unit->attackMove(this->center);  
 		UnitData unitData;
-		unitData.state = find_enemy;
+		unitData.state = default_state;
+		unitData.fleeCounter = 0;
 		this->unitData.insert(make_pair(unit, unitData));
 		
 		Broodwar->printf("Initial hit points: %d", unit->getType().maxHitPoints());
@@ -56,30 +60,78 @@ void ExampleAIModule::onFrame()
 		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 26, "%d", iter->second);
 	}
 
-	for (map<Unit*, int>::const_iterator iter = attacking->begin(); iter != attacking->end(); iter++) {		
-		Unit* unit = iter->first;
-		int attackers = iter->second;		
+	for(set<Unit*>::const_iterator u = Broodwar->getAllUnits().begin();
+		u != Broodwar->getAllUnits().end();
+		u++) {
+		Unit* unit = *u;
+		int attackers = (*attacking)[unit];
 
-		map<Unit*, UnitData>::iterator dataIter = this->unitData.find(unit);
+		UnitData data = this->unitData[unit];
 
-		UnitData data = dataIter->second;
-
-		if (data.state == flee)
-			continue;
+		if (data.state == flee) {
+			if (data.fleeCounter > 0) {
+				data.fleeCounter--;
+				continue;
+			}
+			else {
+				data.state = default_state;
+			}
+		}
 
 		if (5 * unit->getHitPoints() < unit->getType().maxHitPoints()) {
 			TilePosition current = unit->getTilePosition();			
 			TilePosition runTo = current - TilePosition(5, 5);
 			
 			data.state = flee;
+			data.fleeCounter = 25;
 
-			this->unitData.insert(make_pair(unit, data));
+			this->unitData[unit] = data;
 
 			unit->rightClick(runTo);
-		}			
+		}
+
+		//TODO: units on low HP should assist some other unit,
+		//i.e. pick closest friendly unit and attack its target
+		if (data.state == default_state && !isAttackingEnemy(unit)) {
+			set<Unit*> enemies = enemiesInSight();
+
+			if (!enemies.empty()) {
+				Unit* closestEnemy = NULL;
+				double minDistance = numeric_limits<double>::infinity();
+				for (set<Unit*>::const_iterator iter = enemies.begin(); iter != enemies.end(); iter++) {
+					Unit* enemy = *iter;
+					double distance = unit->getDistance(enemy);
+					if (distance < minDistance) {
+						minDistance = distance;
+						closestEnemy = enemy;
+					}
+				}
+				unit->attackUnit(closestEnemy);
+			}
+			else {
+				//TODO: figure out where to move
+			}
+		}
+
 	}
 
 	delete attacking;
+}
+
+set<Unit*> ExampleAIModule::enemiesInSight() {
+	set<Unit*> enemies = set<Unit*>();
+	set<Unit*> allUnits = Broodwar->getAllUnits();
+	for (set<Unit*>::const_iterator iter = allUnits.begin(); iter != allUnits.end(); iter++) {
+		Unit* unit = *iter;
+		if (unit->getPlayer() == Broodwar->enemy())
+			enemies.insert(unit);
+	}
+	return enemies;
+}
+
+bool ExampleAIModule::isAttackingEnemy(Unit* unit) {
+	Unit* other = unit->getOrderTarget();
+	return other && other->getPlayer() == Broodwar->enemy();
 }
 
 map< Unit*, int > * ExampleAIModule::getAttackerCount() {

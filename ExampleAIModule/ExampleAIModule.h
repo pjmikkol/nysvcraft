@@ -3,10 +3,11 @@
 #include <BWTA.h>
 #include <windows.h>
 
-enum State { flee, find_enemy, fight };
+enum State { flee, default_state, fight };
 
 struct UnitData {
 	State state;
+	int fleeCounter;
 };
 
 
@@ -31,4 +32,6 @@ private:
   std::map< BWAPI::Unit*, int > * ExampleAIModule::getAttackerCount();
   std::map< BWAPI::Unit*, UnitData > unitData;
   UnitData getUnitData(BWAPI::Unit* unit);
+  std::set< BWAPI::Unit* > ExampleAIModule::enemiesInSight();
+  bool ExampleAIModule::isAttackingEnemy(BWAPI::Unit* unit);
 };
