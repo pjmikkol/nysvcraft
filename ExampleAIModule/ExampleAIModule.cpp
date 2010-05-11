@@ -78,28 +78,26 @@ void ExampleAIModule::decideActions(map<Unit*, int>* attacking) {
 }
 
 void ExampleAIModule::handleFlee(Unit* unit, map<Unit*, int>* attacking) {
-	UnitData data = this->unitData[unit];
+	UnitData* data = &unitData[unit];
 
-	if (data.state == flee) {
-		if (data.fleeCounter > 0) {
-			data.fleeCounter--;
+	if (data->state == flee) {
+		if (data->fleeCounter > 0) {
+			data->fleeCounter--;
 			return;
 		}
 		else {
-			data.state = default_state;
+			data->state = default_state;
 		}
 	}
 
 	// TODO add smarter flee
-	// 
-	if (5 * unit->getHitPoints() < unit->getType().maxHitPoints()) {
-		TilePosition current = unit->getTilePosition();			
-		TilePosition runTo = current - TilePosition(5, 5); 
+	// Parameterize on unit type
+	if ((*attacking)[unit] > 1) {
+		TilePosition current = unit->getTilePosition();
+		TilePosition runTo = current - TilePosition(5, 5);
 		
-		data.state = flee;
-		data.fleeCounter = 25;
-
-		this->unitData[unit] = data;
+		data->state = flee;
+		data->fleeCounter = 25;
 
 		unit->rightClick(runTo);
 	}
@@ -110,6 +108,7 @@ void ExampleAIModule::handleAttack(Unit* unit) {
 
 	//TODO: units on low HP should assist some other unit,
 	//i.e. pick closest friendly unit and attack its target
+	//TODO: attack weakest enemy in range?
 	if (data.state == default_state && !isAttackingEnemy(unit)) {		
 		set<Unit*> enemies = Broodwar->enemy()->getUnits();
 
@@ -118,6 +117,7 @@ void ExampleAIModule::handleAttack(Unit* unit) {
 	}
 	else {
 		//TODO: figure out where to move
+		//more global AI should deside movement related issues
 	}	
 }
 
