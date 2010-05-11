@@ -111,7 +111,7 @@ void ExampleAIModule::handleAttack(Unit* unit) {
 	//TODO: units on low HP should assist some other unit,
 	//i.e. pick closest friendly unit and attack its target
 	if (data.state == default_state && !isAttackingEnemy(unit)) {		
-		set<Unit*> enemies = enemiesInSight();
+		set<Unit*> enemies = Broodwar->enemy()->getUnits();
 
 		if (!enemies.empty())
 			unit->attackUnit(getClosestEnemy(unit, enemies));
@@ -136,20 +136,6 @@ Unit* ExampleAIModule::getClosestEnemy(Unit* unit, set<Unit*> enemies) {
 	}
 
 	return closestEnemy;	
-}
-
-//TODO: return pointer
-set<Unit*> ExampleAIModule::enemiesInSight() {
-	set<Unit*> enemies = set<Unit*>();
-	set<Unit*> allUnits = Broodwar->getAllUnits();
-
-	for (set<Unit*>::const_iterator iter = allUnits.begin(); iter != allUnits.end(); iter++) {
-		Unit* unit = *iter;
-		if (unit->getPlayer() == Broodwar->enemy())
-			enemies.insert(unit);
-	}
-
-	return enemies;
 }
 
 bool ExampleAIModule::isAttackingEnemy(Unit* unit) {

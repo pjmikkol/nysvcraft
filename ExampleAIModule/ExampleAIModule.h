@@ -35,7 +35,6 @@ private:
 	map< Unit*, int > * ExampleAIModule::getAttackerCount();
 	map< Unit*, UnitData > unitData;
 	UnitData getUnitData(Unit* unit);
-	set< Unit* > ExampleAIModule::enemiesInSight();
 	bool ExampleAIModule::isAttackingEnemy(Unit* unit);
 	void ExampleAIModule::printAttackerInfo(map<Unit*, int>* attacking);
 	void ExampleAIModule::decideActions(map<Unit*, int>* attacking);
