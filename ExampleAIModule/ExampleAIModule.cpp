@@ -55,77 +55,100 @@ void ExampleAIModule::onFrame()
 
 	map< Unit*, int > * attacking = this->getAttackerCount();
 	
-	for (map<Unit*, int>::const_iterator iter = attacking->begin(); iter != attacking->end(); iter++) {
-		Position pos = iter->first->getPosition();
-		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 26, "%d", iter->second);
-	}
-
-	for(set<Unit*>::const_iterator u = Broodwar->getAllUnits().begin();
-		u != Broodwar->getAllUnits().end();
-		u++) {
-		Unit* unit = *u;
-		int attackers = (*attacking)[unit];
-
-		UnitData data = this->unitData[unit];
-
-		if (data.state == flee) {
-			if (data.fleeCounter > 0) {
-				data.fleeCounter--;
-				continue;
-			}
-			else {
-				data.state = default_state;
-			}
-		}
-
-		if (5 * unit->getHitPoints() < unit->getType().maxHitPoints()) {
-			TilePosition current = unit->getTilePosition();			
-			TilePosition runTo = current - TilePosition(5, 5);
-			
-			data.state = flee;
-			data.fleeCounter = 25;
-
-			this->unitData[unit] = data;
-
-			unit->rightClick(runTo);
-		}
-
-		//TODO: units on low HP should assist some other unit,
-		//i.e. pick closest friendly unit and attack its target
-		if (data.state == default_state && !isAttackingEnemy(unit)) {
-			set<Unit*> enemies = enemiesInSight();
-
-			if (!enemies.empty()) {
-				Unit* closestEnemy = NULL;
-				double minDistance = numeric_limits<double>::infinity();
-				for (set<Unit*>::const_iterator iter = enemies.begin(); iter != enemies.end(); iter++) {
-					Unit* enemy = *iter;
-					double distance = unit->getDistance(enemy);
-					if (distance < minDistance) {
-						minDistance = distance;
-						closestEnemy = enemy;
-					}
-				}
-				unit->attackUnit(closestEnemy);
-			}
-			else {
-				//TODO: figure out where to move
-			}
-		}
-
-	}
+	this->printAttackerInfo(attacking);
+	this->decideActions(attacking);
 
 	delete attacking;
 }
 
+void ExampleAIModule::printAttackerInfo(map<Unit*, int>* attacking) {
+	for (map<Unit*, int>::const_iterator iter = attacking->begin(); iter != attacking->end(); iter++) {
+		Position pos = iter->first->getPosition();
+		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 26, "%d", iter->second);
+	}
+}
+
+void ExampleAIModule::decideActions(map<Unit*, int>* attacking) {
+	for(set<Unit*>::const_iterator u = Broodwar->getAllUnits().begin(); u != Broodwar->getAllUnits().end(); u++) {
+		Unit* unit = *u;
+
+		this->handleFlee(unit, attacking);
+		this->handleAttack(unit);
+	}
+}
+
+void ExampleAIModule::handleFlee(Unit* unit, map<Unit*, int>* attacking) {
+	UnitData data = this->unitData[unit];
+
+	if (data.state == flee) {
+		if (data.fleeCounter > 0) {
+			data.fleeCounter--;
+			return;
+		}
+		else {
+			data.state = default_state;
+		}
+	}
+
+	// TODO add smarter flee
+	// 
+	if (5 * unit->getHitPoints() < unit->getType().maxHitPoints()) {
+		TilePosition current = unit->getTilePosition();			
+		TilePosition runTo = current - TilePosition(5, 5); 
+		
+		data.state = flee;
+		data.fleeCounter = 25;
+
+		this->unitData[unit] = data;
+
+		unit->rightClick(runTo);
+	}
+}
+
+void ExampleAIModule::handleAttack(Unit* unit) {
+	UnitData data = this->unitData[unit];
+
+	//TODO: units on low HP should assist some other unit,
+	//i.e. pick closest friendly unit and attack its target
+	if (data.state == default_state && !isAttackingEnemy(unit)) {		
+		set<Unit*> enemies = enemiesInSight();
+
+		if (!enemies.empty())
+			unit->attackUnit(getClosestEnemy(unit, enemies));
+	}
+	else {
+		//TODO: figure out where to move
+	}	
+}
+
+Unit* ExampleAIModule::getClosestEnemy(Unit* unit, set<Unit*> enemies) {		
+	Unit* closestEnemy = NULL;
+	double minDistance = numeric_limits<double>::infinity();
+	
+	for (set<Unit*>::const_iterator iter = enemies.begin(); iter != enemies.end(); iter++) {
+		Unit* enemy = *iter;
+		double distance = unit->getDistance(enemy);
+				
+		if (distance < minDistance) {
+			minDistance = distance;
+			closestEnemy = enemy;
+		}
+	}
+
+	return closestEnemy;	
+}
+
+//TODO: return pointer
 set<Unit*> ExampleAIModule::enemiesInSight() {
 	set<Unit*> enemies = set<Unit*>();
 	set<Unit*> allUnits = Broodwar->getAllUnits();
+
 	for (set<Unit*>::const_iterator iter = allUnits.begin(); iter != allUnits.end(); iter++) {
 		Unit* unit = *iter;
 		if (unit->getPlayer() == Broodwar->enemy())
 			enemies.insert(unit);
 	}
+
 	return enemies;
 }
 
@@ -137,35 +160,30 @@ bool ExampleAIModule::isAttackingEnemy(Unit* unit) {
 map< Unit*, int > * ExampleAIModule::getAttackerCount() {
 	map< Unit*, int > * attacking = new map< Unit*, int >();
 
-	for(set<Unit*>::const_iterator u = Broodwar->getAllUnits().begin();
-		u != Broodwar->getAllUnits().end();
-		u++)
-	{
-		Unit* unit = *u;
+	set<Unit*> myUnits = Broodwar->self()->getUnits();
 
-		if (unit->getPlayer() == Broodwar->self())
-			continue;
-			
+	for (set<Unit*>::const_iterator iter = myUnits.begin(); iter != myUnits.end(); iter++) {
+		Unit* u = *iter;
+		(*attacking)[u] = 0;
+	}
+
+	set<Unit*> enemyUnits = Broodwar->enemy()->getUnits();
+
+	for(set<Unit*>::const_iterator u = enemyUnits.begin(); u != enemyUnits.end(); u++) {
+		Unit* unit = *u;							
 		Unit* target = unit->getOrderTarget();
 
-		if (target) {
-			double distance = unit->getDistance(target);
-
-			Broodwar->drawTextMap(unit->getPosition().x() - 16, unit->getPosition().y() - 26, "%f", distance);
-
-			if (distance <= unit->getType().groundWeapon()->maxRange()) {
-				map<Unit*, int>::iterator iter = attacking->find(target);
-
-				if (iter != attacking->end())
-					(*iter).second++;
-				else
-					attacking->insert(make_pair(target,1));
-			}
-		}
+		if (target && target->getPlayer() == Broodwar->self() && this->isInAttackRange(unit, target))
+			(*attacking)[target]++;								
 	}
 
 	return attacking;
 }
+
+bool ExampleAIModule::isInAttackRange(Unit* attacker, Unit* target) {
+	return attacker->getDistance(target) <= attacker->getType().groundWeapon()->maxRange();
+}	
+
 
 void ExampleAIModule::drawUnitInfo()
 {
