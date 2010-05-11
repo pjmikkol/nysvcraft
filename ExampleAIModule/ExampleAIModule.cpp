@@ -48,7 +48,7 @@ void ExampleAIModule::onStart()
 		Broodwar->printf("Initial hit points: %d", unit->getType().maxHitPoints());
 	}
 	groupCenter = Position(groupCenter.x()/unitsInGroup, groupCenter.y()/unitsInGroup);
-	Unit* boss = getClosestUnit(groupCenter, Broodwar->self()->getUnits());
+	Unit* boss = getClosestUnitFrom(groupCenter, Broodwar->self()->getUnits());
 }
 
 void ExampleAIModule::onEnd(bool isWinner)
@@ -156,14 +156,14 @@ Unit* ExampleAIModule::getClosestUnitFrom(Position &pos, set<Unit*> units) {
 	
 	for (set<Unit*>::const_iterator iter = units.begin(); iter != units.end(); iter++) {
 		Unit* unit = *iter;
-		double distance = unit->getPosition->getDistance(pos);
+		double distance = unit->getPosition().getDistance(pos);
 				
 		if (distance < minDistance) {
 			minDistance = distance;
 			closest = unit;
 		}
 	}
-	return unit;
+	return closest;
 }
 
 bool ExampleAIModule::isAttackingEnemy(Unit* unit) {
