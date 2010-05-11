@@ -1,17 +1,40 @@
 #include "ExampleAIModule.h"
+
 using namespace BWAPI;
+using namespace std;
+
+string stateName(State state) {
+	switch (state) {
+		case flee:
+			return "flee";
+		case fight:
+			return "fight";
+		case find_enemy:
+			return "find_enemy";
+	}
+}
+
 void ExampleAIModule::onStart()
 {
-  Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
-  // Enable some cheat flags
-  Broodwar->enableFlag(Flag::UserInput);
+	Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
+	// Enable some cheat flags
+	Broodwar->enableFlag(Flag::UserInput);
 
-  this->center = Position((Broodwar->mapWidth() * TILE_SIZE)/2 , (Broodwar->mapHeight() * TILE_SIZE)/2 );
+	this->center = Position((Broodwar->mapWidth() * TILE_SIZE)/2 , (Broodwar->mapHeight() * TILE_SIZE)/2 );
+	this->unitData = map< Unit*, UnitData >();
 
-  for(std::set<Unit*>::const_iterator i = Broodwar->self()->getUnits().begin();
-	  i != Broodwar->self()->getUnits().end();
-	  i++)
-	(*i)->attackMove(this->center);  
+	for(set<Unit*>::const_iterator i = Broodwar->self()->getUnits().begin();
+	    i != Broodwar->self()->getUnits().end();
+	    i++) {
+		
+		Unit* unit = *i;
+		unit->attackMove(this->center);  
+		UnitData unitData;
+		unitData.state = find_enemy;
+		this->unitData.insert(make_pair(unit, unitData));
+		
+		Broodwar->printf("Initial hit points: %d", unit->getType().maxHitPoints());
+	}
 }
 
 void ExampleAIModule::onEnd(bool isWinner)
@@ -26,9 +49,43 @@ void ExampleAIModule::onFrame()
 {
 	drawUnitInfo();
 
-	std::map< Unit*, int > * attacking = new std::map< Unit*, int >();
+	map< Unit*, int > * attacking = this->getAttackerCount();
+	
+	for (map<Unit*, int>::const_iterator iter = attacking->begin(); iter != attacking->end(); iter++) {
+		Position pos = iter->first->getPosition();
+		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 26, "%d", iter->second);
+	}
 
-	for(std::set<Unit*>::const_iterator u = Broodwar->getAllUnits().begin();
+	for (map<Unit*, int>::const_iterator iter = attacking->begin(); iter != attacking->end(); iter++) {		
+		Unit* unit = iter->first;
+		int attackers = iter->second;		
+
+		map<Unit*, UnitData>::iterator dataIter = this->unitData.find(unit);
+
+		UnitData data = dataIter->second;
+
+		if (data.state == flee)
+			continue;
+
+		if (5 * unit->getHitPoints() < unit->getType().maxHitPoints()) {
+			TilePosition current = unit->getTilePosition();			
+			TilePosition runTo = current - TilePosition(5, 5);
+			
+			data.state = flee;
+
+			this->unitData.insert(make_pair(unit, data));
+
+			unit->rightClick(runTo);
+		}			
+	}
+
+	delete attacking;
+}
+
+map< Unit*, int > * ExampleAIModule::getAttackerCount() {
+	map< Unit*, int > * attacking = new map< Unit*, int >();
+
+	for(set<Unit*>::const_iterator u = Broodwar->getAllUnits().begin();
 		u != Broodwar->getAllUnits().end();
 		u++)
 	{
@@ -45,27 +102,22 @@ void ExampleAIModule::onFrame()
 			Broodwar->drawTextMap(unit->getPosition().x() - 16, unit->getPosition().y() - 26, "%f", distance);
 
 			if (distance <= unit->getType().groundWeapon()->maxRange()) {
-				std::map<Unit*, int>::iterator iter = attacking->find(target);
+				map<Unit*, int>::iterator iter = attacking->find(target);
 
 				if (iter != attacking->end())
 					(*iter).second++;
 				else
-					attacking->insert(std::make_pair(target,1));
+					attacking->insert(make_pair(target,1));
 			}
 		}
 	}
 
-	for (std::map<Unit*, int>::const_iterator iter = attacking->begin(); iter != attacking->end(); iter++) {
-		Position pos = iter->first->getPosition();
-		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 26, "%d", iter->second);
-	}
-
-	delete attacking;
+	return attacking;
 }
 
 void ExampleAIModule::drawUnitInfo()
 {
-	for(std::set<Unit*>::const_iterator i=Broodwar->self()->getUnits().begin();i!=Broodwar->self()->getUnits().end();i++)
+	for(set<Unit*>::const_iterator i=Broodwar->self()->getUnits().begin();i!=Broodwar->self()->getUnits().end();i++)
 	{
 		Position pos = (*i)->getPosition();
 		Unit* targetUnit = (*i)->getOrderTarget();
@@ -80,7 +132,13 @@ void ExampleAIModule::drawUnitInfo()
 		Broodwar->drawLineMap(pos.x(), pos.y(), target.x(), target.y(), color);
 
 		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 16, "\x05(%d, %d)", pos.x(), pos.y());
+
+		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 26, "%s", stateName(this->getUnitData(*i).state).c_str());
   }
+}
+
+UnitData ExampleAIModule::getUnitData(Unit* unit) {
+	return this->unitData.find(unit)->second;
 }
 
 void ExampleAIModule::onUnitCreate(BWAPI::Unit* unit)
@@ -123,7 +181,7 @@ void ExampleAIModule::onNukeDetect(BWAPI::Position target)
 
 }
 
-bool ExampleAIModule::onSendText(std::string text)
+bool ExampleAIModule::onSendText(string text)
 {
   if (text=="/show players")
   {

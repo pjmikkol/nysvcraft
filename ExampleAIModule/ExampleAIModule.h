@@ -5,10 +5,9 @@
 
 enum State { flee, find_enemy, fight };
 
-typedef struct UnitData {
+struct UnitData {
 	State state;
-	
-} UnitData;
+};
 
 
 class ExampleAIModule : public BWAPI::AIModule
@@ -29,4 +28,7 @@ public:
 private:
   BWAPI::Position center;
   void drawUnitInfo();
+  std::map< BWAPI::Unit*, int > * ExampleAIModule::getAttackerCount();
+  std::map< BWAPI::Unit*, UnitData > unitData;
+  UnitData getUnitData(BWAPI::Unit* unit);
 };
