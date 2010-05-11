@@ -8,11 +8,16 @@ using namespace BWAPI;
 
 enum State { flee, default_state, fight };
 
+
 struct UnitData {
 	State state;
 	int fleeCounter;
+	int group; // Which group the unit belongs?
 };
 
+struct GroupInfo { 
+	Unit* leader; // "Leader" this group. The group moves according to this guy
+};
 
 class ExampleAIModule : public AIModule
 {
@@ -31,6 +36,7 @@ public:
 	virtual void onUnitRenegade(Unit* unit);
 private:
 	Position center;
+	map< int, GroupInfo > groupData;
 	void drawUnitInfo();
 	map< Unit*, int > * ExampleAIModule::getAttackerCount();
 	map< Unit*, UnitData > unitData;
@@ -41,5 +47,6 @@ private:
 	void ExampleAIModule::handleFlee(Unit* unit, map<Unit*, int>* attacking);
 	void ExampleAIModule::handleAttack(Unit* unit);
 	Unit* ExampleAIModule::getClosestEnemy(Unit* unit, set<Unit*> enemies);
+	Unit* ExampleAIModule::getClosestUnitFrom(Position &pos, set<Unit*> units);
 	bool ExampleAIModule::isInAttackRange(Unit* attacker, Unit* target);
 };

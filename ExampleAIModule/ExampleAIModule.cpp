@@ -25,7 +25,12 @@ void ExampleAIModule::onStart()
 
 	this->center = Position((Broodwar->mapWidth() * TILE_SIZE)/2 , (Broodwar->mapHeight() * TILE_SIZE)/2 );
 	this->unitData = map< Unit*, UnitData >();
+	this->groupData = map<int, GroupInfo>();
 
+	// Calculate the center of group nro 1 in this loop,
+	// In this version always start with single group.
+	Position groupCenter = Position(0, 0);
+	int unitsInGroup = 0;
 	for(set<Unit*>::const_iterator i = Broodwar->self()->getUnits().begin();
 	    i != Broodwar->self()->getUnits().end();
 	    i++) {
@@ -35,10 +40,15 @@ void ExampleAIModule::onStart()
 		UnitData unitData;
 		unitData.state = default_state;
 		unitData.fleeCounter = 0;
+		unitData.group = 1;
 		this->unitData.insert(make_pair(unit, unitData));
-		
+
+		unitsInGroup++;
+		groupCenter += unit->getPosition();
 		Broodwar->printf("Initial hit points: %d", unit->getType().maxHitPoints());
 	}
+	groupCenter = Position(groupCenter.x()/unitsInGroup, groupCenter.y()/unitsInGroup);
+	Unit* boss = getClosestUnit(groupCenter, Broodwar->self()->getUnits());
 }
 
 void ExampleAIModule::onEnd(bool isWinner)
@@ -122,6 +132,8 @@ void ExampleAIModule::handleAttack(Unit* unit) {
 }
 
 Unit* ExampleAIModule::getClosestEnemy(Unit* unit, set<Unit*> enemies) {		
+	return getClosestUnitFrom(unit->getPosition(), enemies);
+
 	Unit* closestEnemy = NULL;
 	double minDistance = numeric_limits<double>::infinity();
 	
@@ -136,6 +148,22 @@ Unit* ExampleAIModule::getClosestEnemy(Unit* unit, set<Unit*> enemies) {
 	}
 
 	return closestEnemy;	
+}
+
+Unit* ExampleAIModule::getClosestUnitFrom(Position &pos, set<Unit*> units) {
+	Unit* closest = 0;
+	double minDistance = numeric_limits<double>::infinity();
+	
+	for (set<Unit*>::const_iterator iter = units.begin(); iter != units.end(); iter++) {
+		Unit* unit = *iter;
+		double distance = unit->getPosition->getDistance(pos);
+				
+		if (distance < minDistance) {
+			minDistance = distance;
+			closest = unit;
+		}
+	}
+	return unit;
 }
 
 bool ExampleAIModule::isAttackingEnemy(Unit* unit) {
