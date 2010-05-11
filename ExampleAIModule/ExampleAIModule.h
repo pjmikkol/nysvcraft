@@ -11,6 +11,7 @@ enum State { flee, default_state, fight };
 struct UnitData {
 	State state;
 	int fleeCounter;
+	int attackCounter;
 };
 
 
@@ -42,4 +43,6 @@ private:
 	void ExampleAIModule::handleAttack(Unit* unit);
 	Unit* ExampleAIModule::getClosestEnemy(Unit* unit, set<Unit*> enemies);
 	bool ExampleAIModule::isInAttackRange(Unit* attacker, Unit* target);
+	Unit* ExampleAIModule::weakestEnemyInRange(Unit* unit, set<Unit*> enemies);
+	void ExampleAIModule::calculateTarget(Unit* unit, set<Unit*> enemies);
 };
