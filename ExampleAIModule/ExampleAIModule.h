@@ -45,13 +45,13 @@ private:
 	map< int, Group> groupData;
 	map< Unit*, UnitData > unitData;
 
-	map< Unit*, int > * ExampleAIModule::getAttackerCount();
+	map< Unit*, set<Unit*> > * getAttackerCount();
 	void drawUnitInfo();
 	UnitData getUnitData(Unit* unit);
 	bool isAttackingEnemy(Unit* unit);
-	void printAttackerInfo(map<Unit*, int>* attacking);
-	void decideActions(map<Unit*, int>* attacking);
-	void handleFlee(Unit* unit, map<Unit*, int>* attacking);
+	void printAttackerInfo(map<Unit*, set<Unit*> >* attacking);
+	void decideActions(map<Unit*, set<Unit*> >* attacking);
+	void handleFlee(Unit* unit, map<Unit*, set<Unit*> >* attacking);
 	void handleAttack(Unit* unit);
 	bool isInAttackRange(Unit* attacker, Unit* target);
 	Unit* getClosestEnemy(Unit* unit, set<Unit*> enemies);

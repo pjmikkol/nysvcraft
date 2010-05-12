@@ -73,31 +73,31 @@ void ExampleAIModule::onFrame()
 {
 	drawUnitInfo();
 
-	map< Unit*, int > * attacking = this->getAttackerCount();
+	map< Unit*, set<Unit*> > * attackedBy = this->getAttackerCount();
 	
-	this->printAttackerInfo(attacking);
-	this->decideActions(attacking);
+	this->printAttackerInfo(attackedBy);
+	this->decideActions(attackedBy);
 
-	delete attacking;
+	delete attackedBy;
 }
 
-void ExampleAIModule::printAttackerInfo(map<Unit*, int>* attacking) {
-	for (map<Unit*, int>::const_iterator iter = attacking->begin(); iter != attacking->end(); iter++) {
+void ExampleAIModule::printAttackerInfo(map<Unit*, set<Unit*> >* attackedBy) {
+	for (map<Unit*, set<Unit*> >::const_iterator iter = attackedBy->begin(); iter != attackedBy->end(); iter++) {
 		Position pos = iter->first->getPosition();
-		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 26, "%d", iter->second);
+		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 26, "%d", iter->second.size());
 	}
 }
 
-void ExampleAIModule::decideActions(map<Unit*, int>* attacking) {
+void ExampleAIModule::decideActions(map<Unit*, set<Unit*> >* attackedBy) {
 	for(set<Unit*>::const_iterator u = Broodwar->getAllUnits().begin(); u != Broodwar->getAllUnits().end(); u++) {
 		Unit* unit = *u;
 
-		this->handleFlee(unit, attacking);
+		this->handleFlee(unit, attackedBy);
 		this->handleAttack(unit);
 	}
 }
 
-void ExampleAIModule::handleFlee(Unit* unit, map<Unit*, int>* attacking) {
+void ExampleAIModule::handleFlee(Unit* unit, map<Unit*, set<Unit*> >* attackedBy) {
 	UnitData* data = &unitData[unit];
 
 	if (data->state == flee) {
@@ -112,8 +112,9 @@ void ExampleAIModule::handleFlee(Unit* unit, map<Unit*, int>* attacking) {
 
 	// TODO add smarter flee
 	// Parameterize on unit type
-	if ((*attacking)[unit] > 1) {
+	if ((*attackedBy)[unit].size() > 1) {
 		TilePosition current = unit->getTilePosition();
+		//TODO: calculate better flee direction
 		TilePosition runTo = current - TilePosition(5, 5);
 		
 		data->state = flee;
@@ -190,34 +191,34 @@ Unit* ExampleAIModule::getClosestEnemy(Unit* unit, set<Unit*> enemies) {
 			closestEnemy = enemy;
 		}
 	}
-
+	return closestEnemy;
+}
 
 bool ExampleAIModule::isAttackingEnemy(Unit* unit) {
 	Unit* other = unit->getOrderTarget();
 	return other && other->getPlayer() == Broodwar->enemy();
 }
 
-map< Unit*, int > * ExampleAIModule::getAttackerCount() {
-	map< Unit*, int > * attacking = new map< Unit*, int >();
+map< Unit*, set<Unit*> > * ExampleAIModule::getAttackerCount() {
+	map< Unit*, set<Unit*> > * attackedBy = new map< Unit*, set<Unit*> >();
 
 	set<Unit*> myUnits = Broodwar->self()->getUnits();
 
 	for (set<Unit*>::const_iterator iter = myUnits.begin(); iter != myUnits.end(); iter++) {
 		Unit* u = *iter;
-		(*attacking)[u] = 0;
+		(*attackedBy)[u] = set<Unit*>();
 	}
 
 	set<Unit*> enemyUnits = Broodwar->enemy()->getUnits();
 
-	for(set<Unit*>::const_iterator u = enemyUnits.begin(); u != enemyUnits.end(); u++) {
-		Unit* unit = *u;							
-		Unit* target = unit->getOrderTarget();
+	for(set<Unit*>::const_iterator iter = enemyUnits.begin(); iter != enemyUnits.end(); iter++) {
+		Unit* enemy = *iter;							
+		Unit* target = enemy->getOrderTarget();
 
-		if (target && target->getPlayer() == Broodwar->self() && this->isInAttackRange(unit, target))
-			(*attacking)[target]++;								
+		if (target && target->getPlayer() == Broodwar->self() && this->isInAttackRange(enemy, target))
+			(*attackedBy)[target].insert(enemy);					
 	}
-
-	return attacking;
+	return attackedBy;
 }
 
 bool ExampleAIModule::isInAttackRange(Unit* attacker, Unit* target) {
