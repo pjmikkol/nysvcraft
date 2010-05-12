@@ -1,3 +1,4 @@
+#include <assert.h>
 #include "ExampleAIModule.h"
 
 using namespace BWAPI;
@@ -19,7 +20,7 @@ string stateName(State state) {
 
 void ExampleAIModule::onStart()
 {
-	Broodwar->setLocalSpeed(20);
+	Broodwar->setLocalSpeed(50);
 	Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
 	// Enable some cheat flags
 	Broodwar->enableFlag(Flag::UserInput);
@@ -124,6 +125,51 @@ void ExampleAIModule::handleFlee(Unit* unit, map<Unit*, set<Unit*> >* attackedBy
 
 		unit->rightClick(runTo);
 	}
+}
+
+Position ExampleAIModule::fleeTo(Unit* unit, const set<Unit*>* attackers) {
+	assert(attackers->size() > 0);
+
+	set<double>* angles = calculateAngles(unit, attackers);
+	double mid = midAngle(angles);
+	double direction = reverseAngle(mid);
+}
+
+set<double> calculateAngles(Unit* unit, const set<Unit*>* attackers) {
+	set<double>* angles = new set<double>();
+	for (set<Unit*>::const_iterator iter = attackers->begin(); iter != attackers->end(); iter++) {
+		Unit* enemy = *iter;
+		angles->insert(calculateAngle(unit, enemy));
+	}
+	return angles;
+}
+
+double calculateAngle(Unit* unit, Unit* enemy) {
+	Position enemyVec = enemy->getPosition() - unit->getPosition();
+	Position neutralVec = Position(1, 0);
+	return angleBetween(enemyVec, neutralVec);
+}
+	
+
+double midAngle(set<double>* angles) {
+	double sum = sum(angles);
+	if (sum != 0)
+		return sum / angles->size();
+	else
+		return -1;
+}
+
+double sum(set<double>* nums) {
+	double sum = 0.0;
+	for (set<double>::const_iterator iter = nums->begin(); iter != nums->end(); iter++) {
+		sum += *iter;
+	}
+	return sum;
+}
+
+double reverseAngle(double angle) {
+	//TODO: FIX
+	return angle;
 }
 
 void ExampleAIModule::handleAttack(Unit* unit) {
