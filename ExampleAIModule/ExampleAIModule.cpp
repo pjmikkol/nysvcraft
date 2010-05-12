@@ -186,7 +186,7 @@ Unit* ExampleAIModule::weakestEnemyInRange(Unit* unit, set<Unit*> enemies) {
 	return weakest;
 }
 
-map< Unit*, set<Unit*> > * ExampleAIModule::getAttackerCount() {
+map< Unit*, set<Unit*> > * ExampleAIModule::getAttackers() {
 	map< Unit*, set<Unit*> > * attackedBy = new map< Unit*, set<Unit*> >();
 
 	set<Unit*> myUnits = Broodwar->self()->getUnits();
