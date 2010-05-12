@@ -54,7 +54,6 @@ private:
 	void handleFlee(Unit* unit, map<Unit*, set<Unit*> >* attacking);
 	void handleAttack(Unit* unit);
 	bool isInAttackRange(Unit* attacker, Unit* target);
-	Unit* getClosestEnemy(Unit* unit, set<Unit*> enemies);
 	Unit* weakestEnemyInRange(Unit* unit, set<Unit*> enemies);
 	void calculateTarget(Unit* unit, set<Unit*> enemies);
 };

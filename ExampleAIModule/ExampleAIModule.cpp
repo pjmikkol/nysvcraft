@@ -179,22 +179,6 @@ Unit* ExampleAIModule::weakestEnemyInRange(Unit* unit, set<Unit*> enemies) {
 	return weakest;
 }
 
-Unit* ExampleAIModule::getClosestEnemy(Unit* unit, set<Unit*> enemies) {		
-	Unit* closestEnemy = NULL;
-	double minDistance = numeric_limits<double>::infinity();
-	
-	for (set<Unit*>::const_iterator iter = enemies.begin(); iter != enemies.end(); iter++) {
-		Unit* enemy = *iter;
-		double distance = unit->getDistance(enemy);
-				
-		if (distance < minDistance) {
-			minDistance = distance;
-			closestEnemy = enemy;
-		}
-	}
-	return closestEnemy;
-}
-
 bool ExampleAIModule::isAttackingEnemy(Unit* unit) {
 	Unit* other = unit->getOrderTarget();
 	return other && other->getPlayer() == Broodwar->enemy();
