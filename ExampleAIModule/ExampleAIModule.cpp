@@ -128,9 +128,6 @@ void ExampleAIModule::handleFlee(Unit* unit, map<Unit*, set<Unit*> >* attackedBy
 void ExampleAIModule::handleAttack(Unit* unit) {
 	UnitData* data = &unitData[unit];
 
-	//TODO: units on low HP should assist some other unit,
-	//i.e. pick closest friendly unit and attack its target
-	//TODO: attack weakest enemy in range?
 	if (data->state == fight) {
 		set<Unit*> enemies = Broodwar->enemy()->getUnits();
 		if (!isAttackingEnemy(unit)) {
@@ -155,7 +152,10 @@ void ExampleAIModule::calculateTarget(Unit* unit, set<Unit*> enemies) {
 
 	if (4 * unit->getHitPoints() < unit->getType().maxHitPoints()) {
 		set<Unit*> attackingAllies = getAttackingAllies();
-		target = getClosestUnitFrom(unit->getPosition(), attackingAllies)->getOrderTarget();
+		Unit* ally = getClosestUnitFrom(unit->getPosition(), attackingAllies);
+		if (ally) {
+			target = ally->getOrderTarget();
+		}
 	}
 	else {
 		target = weakestEnemyInRange(unit, enemies);
