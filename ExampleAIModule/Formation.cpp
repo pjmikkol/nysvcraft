@@ -14,7 +14,15 @@ Formation::Formation(Formations f, std::set<BWAPI::Unit*>* units)
 	switch(f) {
 		case parabola:
 			this->p1 = 0.2;
+			this->distances = BWAPI::TILE_SIZE;
+			this->angle = 0;
 		default:
-			this->distances = this->p1 = this->angle;
+			this->distances = this->p1 = this->angle = 0;
 	}
+}
+
+void Formation::moveInFormation(BWAPI::Position to)
+{
+	
+
 }

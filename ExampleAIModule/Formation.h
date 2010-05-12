@@ -9,6 +9,7 @@ class Formation
 public:
 	Formation(void);
 	Formation(Formations f, std::set<BWAPI::Unit*>* units);
+	void moveInFormation(BWAPI::Position to);
 
 private:
 	Formations form;
@@ -18,5 +19,6 @@ private:
 	double angle;
 	double distances; //Parameter which controls the distances between the units
 	double p1; //first parameter to control formation
+
 	std::set<BWAPI::Unit*>* units;
 };
