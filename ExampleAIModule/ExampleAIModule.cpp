@@ -42,6 +42,7 @@ void ExampleAIModule::onStart()
 		unitData.state = default_state;
 		unitData.fleeCounter = 0;
 		unitData.group = 1;
+		unitData.attackCounter = 0;
 		this->unitData.insert(make_pair(unit, unitData));
 
 		startGroup.add(unit);
@@ -123,23 +124,72 @@ void ExampleAIModule::handleFlee(Unit* unit, map<Unit*, int>* attacking) {
 }
 
 void ExampleAIModule::handleAttack(Unit* unit) {
-	UnitData data = this->unitData[unit];
+	UnitData* data = &unitData[unit];
 
 	//TODO: units on low HP should assist some other unit,
 	//i.e. pick closest friendly unit and attack its target
 	//TODO: attack weakest enemy in range?
-	if (data.state == default_state && !isAttackingEnemy(unit)) {		
+	if (data->state == default_state) {
 		set<Unit*> enemies = Broodwar->enemy()->getUnits();
-
-		if (!enemies.empty())
-			unit->attackUnit(getClosestEnemy(unit, enemies));
+		if (!isAttackingEnemy(unit)) {
+			calculateTarget(unit, enemies);
+		}
+		else {
+			if (data->attackCounter > 0) {
+				data->attackCounter--;
+			} else {
+				calculateTarget(unit, enemies);
+			}
+		}
 	}
 	else {
 		//TODO: figure out where to move
-		//more global AI should deside movement related issues
 	}	
 }
 
+void ExampleAIModule::calculateTarget(Unit* unit, set<Unit*> enemies) {
+	UnitData* data = &unitData[unit];
+	
+	Unit* target = weakestEnemyInRange(unit, enemies);
+
+	if (!target && !enemies.empty())
+		target = getClosestEnemy(unit, enemies);
+	if (target) {
+		unit->attackUnit(target);
+		data->attackCounter = 50;
+	}
+}
+
+Unit* ExampleAIModule::weakestEnemyInRange(Unit* unit, set<Unit*> enemies) {
+	Unit* weakest = NULL;
+	for (set<Unit*>::const_iterator iter = enemies.begin(); iter != enemies.end(); iter++) {
+		Unit* current = *iter;
+		if (!isInAttackRange(current, unit))
+			continue;
+		
+		if (!weakest)
+			weakest = current;
+		else {
+			if (weakest->getHitPoints() > current->getHitPoints())
+				weakest = current;
+		}
+	}
+	return weakest;
+}
+
+Unit* ExampleAIModule::getClosestEnemy(Unit* unit, set<Unit*> enemies) {		
+	Unit* closestEnemy = NULL;
+	double minDistance = numeric_limits<double>::infinity();
+	
+	for (set<Unit*>::const_iterator iter = enemies.begin(); iter != enemies.end(); iter++) {
+		Unit* enemy = *iter;
+		double distance = unit->getDistance(enemy);
+				
+		if (distance < minDistance) {
+			minDistance = distance;
+			closestEnemy = enemy;
+		}
+	}
 
 
 bool ExampleAIModule::isAttackingEnemy(Unit* unit) {
