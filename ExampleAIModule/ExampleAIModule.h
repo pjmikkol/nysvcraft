@@ -9,6 +9,8 @@
 using namespace std;
 using namespace BWAPI;
 
+
+
 /*States are:
 	flee			- for running away from enemy
 	fight			- kicking ass
@@ -24,6 +26,9 @@ struct UnitData {
 	int attackCounter;
 };
 
+// Global information about units and groups
+map< int, Group> groupData;
+map< Unit*, UnitData > unitData;
 
 class ExampleAIModule : public AIModule
 {
@@ -42,8 +47,6 @@ public:
 	virtual void onUnitRenegade(Unit* unit);
 private:
 	Position center;
-	map< int, Group> groupData;
-	map< Unit*, UnitData > unitData;
 
 	map< Unit*, set<Unit*> > * getAttackers();
 	void drawUnitInfo();

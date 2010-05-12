@@ -24,9 +24,12 @@ void ExampleAIModule::onStart()
 	// Enable some cheat flags
 	Broodwar->enableFlag(Flag::UserInput);
 
+	//extern map<Unit*, UnitData> unitData;
+	//extern map<int, Group>() groupData;
+
 	this->center = Position((Broodwar->mapWidth() * TILE_SIZE)/2 , (Broodwar->mapHeight() * TILE_SIZE)/2 );
-	this->unitData = map< Unit*, UnitData >();
-	this->groupData = map<int, Group>();
+	unitData = map< Unit*, UnitData >();
+	groupData = map<int, Group>();
 
 	// Calculate the center of group nro 1 in this loop,
 	// In this version always start with single group.
@@ -39,25 +42,25 @@ void ExampleAIModule::onStart()
 		Unit* unit = *i;
 		// Do something clever here, formation?
 		unit->attackMove(this->center);  
-		UnitData unitData;
-		unitData.state = fight;
-		unitData.fleeCounter = 0;
-		unitData.group = 1;
-		unitData.attackCounter = 0;
-		this->unitData.insert(make_pair(unit, unitData));
+		UnitData unitD;
+		unitD.state = fight;
+		unitD.fleeCounter = 0;
+		unitD.group = 1;
+		unitD.attackCounter = 0;
+		unitData.insert(make_pair(unit, unitD));
 
 		startGroup.add(unit);
 		groupCenter += unit->getPosition();
 		Broodwar->printf("Initial hit points: %d", unit->getType().maxHitPoints());
 	}
 	int unitsInGroup = startGroup.getSize();
-	this->groupData.insert(make_pair(startGroup.getId(), startGroup));
+	groupData.insert(make_pair(startGroup.getId(), startGroup));
 	/* TODO: Group AI initialization */
 	groupCenter = Position(groupCenter.x()/unitsInGroup, groupCenter.y()/unitsInGroup);
 	Unit* boss = getClosestUnitFrom(groupCenter, Broodwar->self()->getUnits());
 	Broodwar->printf("Size of the group 1: %d", unitsInGroup);
 	/* Testing that the functions work correctly: */
-	Group g = this->groupData.find(1)->second;
+	Group g = groupData.find(1)->second;
 	g.setFormation(parabola);
 	g.remove(boss);
 	Broodwar->printf("Size of the group 1: %d", g.getSize() );
@@ -238,6 +241,7 @@ void ExampleAIModule::drawUnitInfo()
 UnitData ExampleAIModule::getUnitData(Unit* unit) {
 	return this->unitData.find(unit)->second;
 }
+
 
 void ExampleAIModule::onUnitCreate(BWAPI::Unit* unit)
 {
