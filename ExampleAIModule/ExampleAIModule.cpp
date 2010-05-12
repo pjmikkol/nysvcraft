@@ -31,7 +31,7 @@ void ExampleAIModule::onStart()
 	// Calculate the center of group nro 1 in this loop,
 	// In this version always start with single group.
 	Position groupCenter = Position(0, 0);
-	Group startGroup = Group(1);
+	Group startGroup = Group(1, &this->unitData);
 	for(set<Unit*>::const_iterator i = Broodwar->self()->getUnits().begin();
 	    i != Broodwar->self()->getUnits().end();
 	    i++) {

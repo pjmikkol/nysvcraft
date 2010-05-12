@@ -2,10 +2,11 @@
 
 using namespace std;
 
-Group::Group(int id)
+Group::Group(int id, map< BWAPI::Unit*, UnitData >* unitData)
 {
 	this->groupId = id;
 	this->units = set<BWAPI::Unit*>();
+	this->unitData = unitData;
 }
 
 int Group::getId()
