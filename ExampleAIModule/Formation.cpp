@@ -1,9 +1,6 @@
 #include "Formation.h"
 
-Formation::Formation(void)
+Formation::Formation(Formations f, std::set<BWAPI::Unit*>* units)
 {
-}
 
-Formation::~Formation(void)
-{
 }

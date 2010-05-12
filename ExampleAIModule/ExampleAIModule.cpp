@@ -1,8 +1,8 @@
 #include "ExampleAIModule.h"
-#include <limits>
 
 using namespace BWAPI;
 using namespace std;
+using namespace helpers;
 
 string stateName(State state) {
 	switch (state) {
@@ -140,40 +140,7 @@ void ExampleAIModule::handleAttack(Unit* unit) {
 	}	
 }
 
-Unit* ExampleAIModule::getClosestEnemy(Unit* unit, set<Unit*> enemies) {		
-	return getClosestUnitFrom(unit->getPosition(), enemies);
 
-	Unit* closestEnemy = NULL;
-	double minDistance = numeric_limits<double>::infinity();
-	
-	for (set<Unit*>::const_iterator iter = enemies.begin(); iter != enemies.end(); iter++) {
-		Unit* enemy = *iter;
-		double distance = unit->getDistance(enemy);
-				
-		if (distance < minDistance) {
-			minDistance = distance;
-			closestEnemy = enemy;
-		}
-	}
-
-	return closestEnemy;	
-}
-
-Unit* ExampleAIModule::getClosestUnitFrom(Position &pos, set<Unit*> units) {
-	Unit* closest = 0;
-	double minDistance = numeric_limits<double>::infinity();
-	
-	for (set<Unit*>::const_iterator iter = units.begin(); iter != units.end(); iter++) {
-		Unit* unit = *iter;
-		double distance = unit->getPosition().getDistance(pos);
-				
-		if (distance < minDistance) {
-			minDistance = distance;
-			closest = unit;
-		}
-	}
-	return closest;
-}
 
 bool ExampleAIModule::isAttackingEnemy(Unit* unit) {
 	Unit* other = unit->getOrderTarget();

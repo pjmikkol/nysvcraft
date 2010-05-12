@@ -4,6 +4,7 @@
 #include <windows.h>
 #include "Group.h"
 #include "Formation.h"
+#include "Helpers.h"
 
 using namespace std;
 using namespace BWAPI;
@@ -23,13 +24,6 @@ struct UnitData {
 	int group; // Which group the unit belongs?
 };
 
-
-struct GroupInfo { 
-	int groupNro;
-	Unit* leader; // "Leader" this group. The group moves according to this guy
-	int units; // How many units belong to this group
-	Formation* form; // The formation of group
-};
 
 class ExampleAIModule : public AIModule
 {
@@ -54,12 +48,10 @@ private:
 	map< Unit*, int > * ExampleAIModule::getAttackerCount();
 	void drawUnitInfo();
 	UnitData getUnitData(Unit* unit);
-	bool ExampleAIModule::isAttackingEnemy(Unit* unit);
-	void ExampleAIModule::printAttackerInfo(map<Unit*, int>* attacking);
-	void ExampleAIModule::decideActions(map<Unit*, int>* attacking);
-	void ExampleAIModule::handleFlee(Unit* unit, map<Unit*, int>* attacking);
-	void ExampleAIModule::handleAttack(Unit* unit);
-	Unit* ExampleAIModule::getClosestEnemy(Unit* unit, set<Unit*> enemies);
-	Unit* ExampleAIModule::getClosestUnitFrom(Position &pos, set<Unit*> units);
-	bool ExampleAIModule::isInAttackRange(Unit* attacker, Unit* target);
+	bool isAttackingEnemy(Unit* unit);
+	void printAttackerInfo(map<Unit*, int>* attacking);
+	void decideActions(map<Unit*, int>* attacking);
+	void handleFlee(Unit* unit, map<Unit*, int>* attacking);
+	void handleAttack(Unit* unit);
+	bool isInAttackRange(Unit* attacker, Unit* target);
 };
