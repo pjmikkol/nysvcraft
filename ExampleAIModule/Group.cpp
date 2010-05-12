@@ -37,5 +37,5 @@ int Group::getSize()
 
 void Group::setFormation(Formations f)
 {
-	this->form = &Formation(f, &this->units);
+	this->form = Formation(f, &this->units);
 }

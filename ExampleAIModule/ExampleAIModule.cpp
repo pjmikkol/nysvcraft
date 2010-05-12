@@ -58,6 +58,7 @@ void ExampleAIModule::onStart()
 	Broodwar->printf("Size of the group 1: %d", unitsInGroup);
 	/* Testing that the functions work correctly: */
 	Group g = this->groupData.find(1)->second;
+	g.setFormation(parabola);
 	g.remove(boss);
 	Broodwar->printf("Size of the group 1: %d", g.getSize() );
 }

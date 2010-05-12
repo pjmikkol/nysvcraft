@@ -1,6 +1,20 @@
 #include "Formation.h"
 
+Formation::Formation()
+{
+	this->distances = this->p1 = this->angle = 0;
+	this->form = free_will;
+	this->units = 0;
+}
+
 Formation::Formation(Formations f, std::set<BWAPI::Unit*>* units)
 {
-
+	this->units = units;
+	this->form = f;
+	switch(f) {
+		case parabola:
+			this->p1 = 0.2;
+		default:
+			this->distances = this->p1 = this->angle;
+	}
 }
