@@ -11,11 +11,10 @@ using namespace BWAPI;
 
 /*States are:
 	flee			- for running away from enemy
-	default_state	- for ?
 	fight			- kicking ass
 	formation		- when moving in formation finding enemy or doing something
 */
-enum State { flee, default_state, fight, formation };
+enum State { flee, fight, formation };
 
 
 struct UnitData {

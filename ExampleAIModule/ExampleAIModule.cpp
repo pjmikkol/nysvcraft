@@ -10,8 +10,8 @@ string stateName(State state) {
 			return "flee";
 		case fight:
 			return "fight";
-		case default_state:
-			return "default_state";
+		case formation:
+			return "formation";
 		default:
 			return "penis";
 	}
@@ -39,7 +39,7 @@ void ExampleAIModule::onStart()
 		// Do something clever here, formation?
 		unit->attackMove(this->center);  
 		UnitData unitData;
-		unitData.state = default_state;
+		unitData.state = fight;
 		unitData.fleeCounter = 0;
 		unitData.group = 1;
 		unitData.attackCounter = 0;
@@ -106,7 +106,7 @@ void ExampleAIModule::handleFlee(Unit* unit, map<Unit*, int>* attacking) {
 			return;
 		}
 		else {
-			data->state = default_state;
+			data->state = fight;
 		}
 	}
 
@@ -129,7 +129,7 @@ void ExampleAIModule::handleAttack(Unit* unit) {
 	//TODO: units on low HP should assist some other unit,
 	//i.e. pick closest friendly unit and attack its target
 	//TODO: attack weakest enemy in range?
-	if (data->state == default_state) {
+	if (data->state == fight) {
 		set<Unit*> enemies = Broodwar->enemy()->getUnits();
 		if (!isAttackingEnemy(unit)) {
 			calculateTarget(unit, enemies);
@@ -223,7 +223,6 @@ map< Unit*, int > * ExampleAIModule::getAttackerCount() {
 bool ExampleAIModule::isInAttackRange(Unit* attacker, Unit* target) {
 	return attacker->getDistance(target) <= attacker->getType().groundWeapon()->maxRange();
 }	
-
 
 void ExampleAIModule::drawUnitInfo()
 {
