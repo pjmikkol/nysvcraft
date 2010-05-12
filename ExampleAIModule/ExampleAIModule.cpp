@@ -151,8 +151,15 @@ void ExampleAIModule::handleAttack(Unit* unit) {
 
 void ExampleAIModule::calculateTarget(Unit* unit, set<Unit*> enemies) {
 	UnitData* data = &unitData[unit];
-	
-	Unit* target = weakestEnemyInRange(unit, enemies);
+	Unit* target = NULL;
+
+	if (4 * unit->getHitPoints() < unit->getType().maxHitPoints()) {
+		set<Unit*> attackingAllies = getAttackingAllies();
+		target = getClosestUnitFrom(unit->getPosition(), attackingAllies)->getOrderTarget();
+	}
+	else {
+		target = weakestEnemyInRange(unit, enemies);
+	}
 
 	if (!target && !enemies.empty())
 		target = getClosestEnemy(unit, enemies);
@@ -179,12 +186,7 @@ Unit* ExampleAIModule::weakestEnemyInRange(Unit* unit, set<Unit*> enemies) {
 	return weakest;
 }
 
-bool ExampleAIModule::isAttackingEnemy(Unit* unit) {
-	Unit* other = unit->getOrderTarget();
-	return other && other->getPlayer() == Broodwar->enemy();
-}
-
-map< Unit*, set<Unit*> > * ExampleAIModule::getAttackers() {
+map< Unit*, set<Unit*> > * ExampleAIModule::getAttackerCount() {
 	map< Unit*, set<Unit*> > * attackedBy = new map< Unit*, set<Unit*> >();
 
 	set<Unit*> myUnits = Broodwar->self()->getUnits();

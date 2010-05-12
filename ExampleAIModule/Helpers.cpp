@@ -22,3 +22,19 @@ Unit* helpers::getClosestUnitFrom(Position &pos, set<Unit*> units) {
 	}
 	return closest;
 }
+
+set<Unit*> helpers::getAttackingAllies() {
+	set<Unit*> allies = Broodwar->self()->getUnits();
+	for (set<Unit*>::const_iterator iter = allies.begin(); iter != allies.end(); iter++) {
+		Unit* ally = *iter;
+		if (!isAttackingEnemy(ally)) {
+			allies.erase(iter);
+		}
+	}
+	return allies;
+}
+
+bool helpers::isAttackingEnemy(Unit* unit) {
+	Unit* other = unit->getOrderTarget();
+	return other && other->getPlayer() == Broodwar->enemy();
+}
