@@ -18,7 +18,6 @@ private:
 	// TODO: how the inverted y-axis will affect to the trig
 	double angle;
 	double distances; //Parameter which controls the distances between the units
-	double p1; //first parameter to control formation
-
+	double p1; //first parameter to control formation 
 	std::set<BWAPI::Unit*>* units;
 };

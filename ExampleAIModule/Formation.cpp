@@ -23,6 +23,6 @@ Formation::Formation(Formations f, std::set<BWAPI::Unit*>* units)
 
 void Formation::moveInFormation(BWAPI::Position to)
 {
-	
+	//double newangle = 
 
 }
