@@ -1,5 +1,7 @@
 #include "Formation.h"
 
+using namespace helpers;
+
 Formation::Formation()
 {
 	this->distances = this->p1 = this->angle = 0;
@@ -23,6 +25,12 @@ Formation::Formation(Formations f, std::set<BWAPI::Unit*>* units)
 
 void Formation::moveInFormation(BWAPI::Position to)
 {
-	//double newangle = 
-
+	double newangle = angleBetween(to, cos(this->angle), sin(this->angle));
+	if (fabs(angle - newangle) > 0.001) {
+		this->angle = newangle;
+		// rotate the formation
+	}
+	else {
+		// keep the course
+	}
 }

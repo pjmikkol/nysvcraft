@@ -1,5 +1,6 @@
 #pragma once
 #include <BWAPI.h>
+#include "Helpers.h"
 
 enum Formations { free_will, parabola };
 
