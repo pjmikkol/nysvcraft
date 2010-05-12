@@ -19,6 +19,7 @@ string stateName(State state) {
 
 void ExampleAIModule::onStart()
 {
+	Broodwar->setLocalSpeed(20);
 	Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
 	// Enable some cheat flags
 	Broodwar->enableFlag(Flag::UserInput);
@@ -73,7 +74,7 @@ void ExampleAIModule::onFrame()
 {
 	drawUnitInfo();
 
-	map< Unit*, set<Unit*> > * attackedBy = this->getAttackerCount();
+	map< Unit*, set<Unit*> > * attackedBy = this->getAttackers();
 	
 	this->printAttackerInfo(attackedBy);
 	this->decideActions(attackedBy);
@@ -199,7 +200,7 @@ bool ExampleAIModule::isAttackingEnemy(Unit* unit) {
 	return other && other->getPlayer() == Broodwar->enemy();
 }
 
-map< Unit*, set<Unit*> > * ExampleAIModule::getAttackerCount() {
+map< Unit*, set<Unit*> > * ExampleAIModule::getAttackers() {
 	map< Unit*, set<Unit*> > * attackedBy = new map< Unit*, set<Unit*> >();
 
 	set<Unit*> myUnits = Broodwar->self()->getUnits();

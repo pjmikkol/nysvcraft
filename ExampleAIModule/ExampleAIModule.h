@@ -45,7 +45,7 @@ private:
 	map< int, Group> groupData;
 	map< Unit*, UnitData > unitData;
 
-	map< Unit*, set<Unit*> > * getAttackerCount();
+	map< Unit*, set<Unit*> > * getAttackers();
 	void drawUnitInfo();
 	UnitData getUnitData(Unit* unit);
 	bool isAttackingEnemy(Unit* unit);
