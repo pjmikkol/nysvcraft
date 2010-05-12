@@ -3,6 +3,7 @@
 #include <BWTA.h>
 #include <windows.h>
 #include <limits>
+#include <cmath>
 
 /*States are:
 	flee			- for running away from enemy
@@ -23,4 +24,8 @@ namespace helpers {
 	BWAPI::Unit* getClosestEnemy(BWAPI::Unit* unit, std::set<BWAPI::Unit*> enemies);
 	std::set<BWAPI::Unit*> getAttackingAllies();
 	bool isAttackingEnemy(BWAPI::Unit* unit);
+
+	// Returns the angle between two vectors
+	// Interprets given positions as origo-centered vectors
+	double angleBetween(BWAPI::Position, BWAPI::Position);
 }

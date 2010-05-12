@@ -38,3 +38,11 @@ bool helpers::isAttackingEnemy(Unit* unit) {
 	Unit* other = unit->getOrderTarget();
 	return other && other->getPlayer() == Broodwar->enemy();
 }
+
+double helpers::angleBetween(Position p1, Position p2)
+{
+	double len1 = p1.getLength();
+	double len2 = p2.getLength();
+	double p = (p1.x()*p2.x() + p1.y()+p2.y())/(len1*len2);
+	return acos(p);
+}
