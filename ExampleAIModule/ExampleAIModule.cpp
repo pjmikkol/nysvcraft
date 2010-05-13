@@ -133,8 +133,10 @@ void ExampleAIModule::handleFlee(Unit* unit, map<Unit*, set<Unit*> >* attackedBy
 
 	// TODO add smarter flee
 	// Parameterize on unit type
-	if ((*attackedBy)[unit].size() >= fleeThreshold[unit->getType()]) {
-		TilePosition runTo = fleeTo(unit, &(*attackedBy)[unit]);
+	set<Unit*> attackers = (*attackedBy)[unit];
+
+	if (shouldFlee(unit, attackers)) {	
+		TilePosition runTo = fleeTo(unit, &attackers);
 		
 		data->state = flee;
 		data->fleeCounter = 25;

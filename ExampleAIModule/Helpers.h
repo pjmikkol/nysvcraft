@@ -39,4 +39,6 @@ namespace helpers {
 	int deadUnitCount();
 	int killedUnitCount();
 	void initializeFleeThresholds();
+
+	bool shouldFlee(BWAPI::Unit* unit, std::set<BWAPI::Unit*> attackers);
 }

@@ -90,4 +90,21 @@ namespace helpers {
 		fleeThreshold.insert(make_pair(UnitTypes::Protoss_Dragoon, 3));
 		fleeThreshold.insert(make_pair(UnitTypes::Protoss_Zealot, 2));
 	}
+		
+	bool shouldFlee(Unit* unit, set<Unit*> attackers) {
+		if (unit->getType() == UnitTypes::Protoss_Zealot) {
+			foreach (Unit* attacker, attackers)
+				if (attacker->getType() == UnitTypes::Protoss_Dragoon)
+					return false;								
+		}
+
+		if (unit->getType() == UnitTypes::Protoss_Dragoon) {
+			foreach (Unit* attacker, attackers)
+				if (attacker->getType() == UnitTypes::Protoss_Zealot)
+					return true;
+		}
+
+		return attackers.size() >= fleeThreshold[unit->getType()];				
+	}
+
 }
