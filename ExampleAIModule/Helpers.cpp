@@ -10,7 +10,7 @@ namespace helpers {
 	map<UnitType, int> fleeThreshold;
 
 	Unit* getLolEnemy(Unit* unit, set<Unit*> enemies) {
-		// LOL LOL LOL
+		//LOL
 		return NULL;
 	}
 
@@ -32,6 +32,13 @@ namespace helpers {
 		}
 
 		return closest;
+	}
+
+	bool contains(UnitType type, set<Unit*> units) {
+		foreach (Unit* unit, units)
+			if (unit->getType() == type)
+				return true;
+		return false;
 	}
 
 	bool isAttackingEnemy(Unit* unit) {

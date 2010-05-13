@@ -197,7 +197,7 @@ void ExampleAIModule::handleAttack(Unit* unit) {
 		} else {
 			if (data->attackCounter > 0) {
 				data->attackCounter--;
-			} else {
+			} else if (!isInAttackRange(unit, unit->getOrderTarget())) {
 				calculateTarget(unit, enemies);
 			}
 		}
@@ -224,12 +224,10 @@ void ExampleAIModule::calculateTarget(Unit* unit, set<Unit*> enemies) {
 				if (!target) target = ally->getTarget();
 			}
 		}
-	} else {
-		target = weakestEnemyInRange(unit, enemies);
 	}
 
 	if (!target && !enemies.empty())
-		target = getLolEnemy(unit, enemies);
+		target = weakestEnemyInRange(unit, enemies);
 
 	if (!target && !enemies.empty())
 		target = getClosestEnemy(unit, enemies);

@@ -27,6 +27,7 @@ namespace helpers {
 	BWAPI::Unit* getClosestEnemy(BWAPI::Unit* unit, std::set<BWAPI::Unit*> enemies);
 	std::set<BWAPI::Unit*> getAttackingAllies();
 	bool isAttackingEnemy(BWAPI::Unit* unit);
+	bool contains(BWAPI::UnitType type, std::set<BWAPI::Unit*> units);
 
 	// Returns the angle between two vectors
 	// Interprets given positions as origo-centered vectors
