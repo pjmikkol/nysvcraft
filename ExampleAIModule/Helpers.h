@@ -30,4 +30,6 @@ namespace helpers {
 	double angleBetween(BWAPI::Position, BWAPI::Position);
 
 	double angleBetween(BWAPI::Position, double x, double y);
+
+	BWAPI::Position vecFromAngle(double angle, int tiles = 1);
 }
