@@ -12,6 +12,7 @@ class Group
 {
 public:
 	Group(int id, map< BWAPI::Unit*, UnitData >* unitData); // takes group id as a parameter
+	//void setLeader()
 	void add(BWAPI::Unit*); // adds the unit to the group (if not already present)
 	void remove(BWAPI::Unit*);
 	const set<BWAPI::Unit*>* getUnits();

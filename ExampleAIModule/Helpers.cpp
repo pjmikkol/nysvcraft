@@ -43,6 +43,19 @@ double helpers::angleBetween(Position p1, Position p2)
 {
 	double len1 = p1.getLength();
 	double len2 = p2.getLength();
-	double p = (p1.x()*p2.x() + p1.y()+p2.y())/(len1*len2);
+	double p = (p1.x()*p2.x() + p1.y()*p2.y())/(len1*len2);
 	return acos(p);
+}
+
+double helpers::angleBetween(Position p, double x, double y)
+{
+	double len = sqrt(x*x + y*y);
+	double v = (p.x()*x + p.y()*y)/(len*p.getLength());
+	return acos(v);
+}
+
+Position helpers::vecFromAngle(double angle, int tiles)
+{
+	int coef = TILE_SIZE*tiles;
+	return Position(static_cast<int>(cos(angle)*coef), static_cast<int>(sin(angle)*coef));
 }

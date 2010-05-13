@@ -28,4 +28,8 @@ namespace helpers {
 	// Returns the angle between two vectors
 	// Interprets given positions as origo-centered vectors
 	double angleBetween(BWAPI::Position, BWAPI::Position);
+
+	double angleBetween(BWAPI::Position, double x, double y);
+
+	BWAPI::Position vecFromAngle(double angle, int tiles = 1);
 }
