@@ -261,7 +261,12 @@ map< Unit*, set<Unit*> > * ExampleAIModule::getAttackers() {
 }
 
 bool ExampleAIModule::isInAttackRange(Unit* attacker, Unit* target) {
-	return attacker->getDistance(target) <= attacker->getType().groundWeapon()->maxRange();
+	int attackerRange = attacker->getType().groundWeapon()->maxRange();
+	if (attacker->getType() == UnitTypes::getUnitType(string("Protoss Dragoon"))
+		&& attacker->getUpgradeLevel(UpgradeTypes::Singularity_Charge)) {
+			attackerRange = attackerRange * 6 / 4;
+	}
+	return attacker->getDistance(target) <= attackerRange;
 }	
 
 void ExampleAIModule::drawUnitInfo()
