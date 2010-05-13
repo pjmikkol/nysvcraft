@@ -7,6 +7,8 @@ using namespace BWAPI;
 using namespace std;
 
 namespace helpers {
+	map<UnitType, int> fleeThreshold;
+
 	Unit* getClosestEnemy(Unit* unit, set<Unit*> enemies) {		
 		return getClosestUnitFrom(unit->getPosition(), enemies);
 	}
@@ -82,5 +84,10 @@ namespace helpers {
 		}
 
 		return count;
+	}
+
+	void initializeFleeThresholds() {
+		fleeThreshold.insert(make_pair(UnitTypes::Protoss_Dragoon, 3));
+		fleeThreshold.insert(make_pair(UnitTypes::Protoss_Zealot, 2));
 	}
 }

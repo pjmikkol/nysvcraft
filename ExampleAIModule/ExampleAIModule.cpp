@@ -28,6 +28,8 @@ string stateName(State state) {
 
 void ExampleAIModule::onStart()
 {
+	initializeFleeThresholds();
+
 	Broodwar->setLocalSpeed(50);
 	Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
 	// Enable some cheat flags
@@ -87,10 +89,10 @@ void ExampleAIModule::onFrame()
 {
 	drawUnitInfo();
 
-	map< Unit*, set<Unit*> > * attackedBy = this->getAttackers();
+	map< Unit*, set<Unit*> > * attackedBy = getAttackers();
 	
-	this->printAttackerInfo(attackedBy);
-	this->decideActions(attackedBy);
+	printAttackerInfo(attackedBy);
+	decideActions(attackedBy);
 
 	delete attackedBy;
 }
@@ -110,8 +112,8 @@ void ExampleAIModule::decideActions(map<Unit*, set<Unit*> >* attackedBy) {
 	foreach (p, *attackedBy) {			
 		Unit* unit = p.first;
 
-		this->handleFlee(unit, attackedBy);
-		this->handleAttack(unit);
+		handleFlee(unit, attackedBy);
+		handleAttack(unit);
 	}
 }
 
@@ -131,7 +133,7 @@ void ExampleAIModule::handleFlee(Unit* unit, map<Unit*, set<Unit*> >* attackedBy
 
 	// TODO add smarter flee
 	// Parameterize on unit type
-	if ((*attackedBy)[unit].size() > 1) {
+	if ((*attackedBy)[unit].size() >= fleeThreshold[unit->getType()]) {
 		TilePosition runTo = fleeTo(unit, &(*attackedBy)[unit]);
 		
 		data->state = flee;
@@ -257,8 +259,10 @@ map< Unit*, set<Unit*> > * ExampleAIModule::getAttackers() {
 
 	foreach (Unit* enemy, enemyUnits) {
 		Unit* target = enemy->getOrderTarget();
+		if (!target)
+			target = enemy->getTarget();
 
-		if (target && target->getPlayer() == Broodwar->self() && this->isInAttackRange(enemy, target))
+		if (target && target->getPlayer() == Broodwar->self() && isInAttackRange(enemy, target))
 			(*attackedBy)[target].insert(enemy);					
 	}
 
@@ -267,10 +271,13 @@ map< Unit*, set<Unit*> > * ExampleAIModule::getAttackers() {
 
 bool ExampleAIModule::isInAttackRange(Unit* attacker, Unit* target) {
 	int attackerRange = attacker->getType().groundWeapon()->maxRange();
-	if (attacker->getType() == UnitTypes::getUnitType(string("Protoss Dragoon"))
-		&& attacker->getUpgradeLevel(UpgradeTypes::Singularity_Charge)) {
+
+	if (attacker->getType() == UnitTypes::getUnitType(string("Protoss Dragoon")))
+		// We assume enemy Dragoons have the Singularity Charge upgrade because API doesn't let us check enemy units' upgrade status.
+		// We only do the upgrade check for allies.
+		if (attacker->getPlayer() == Broodwar->enemy() || attacker->getUpgradeLevel(UpgradeTypes::Singularity_Charge))
 			attackerRange = attackerRange * 6 / 4;
-	}
+
 	return attacker->getDistance(target) <= attackerRange;
 }	
 
@@ -288,8 +295,8 @@ void ExampleAIModule::drawUnitInfo()
 
 		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 16, "\x05(%d, %d)", pos.x(), pos.y());
 
-		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 26, "%s", stateName(this->getUnitData(unit).state).c_str());
-  }
+		//Broodwar->drawTextMap(pos.x() - 16, pos.y() - 26, "%s", stateName(getUnitData(*i).state).c_str());
+	}
 }
 
 UnitData ExampleAIModule::getUnitData(Unit* unit) {
