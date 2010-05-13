@@ -22,6 +22,7 @@ struct UnitData {
 };
 
 namespace helpers {
+	extern std::map<BWAPI::UnitType, int> fleeThreshold;
 	static char* unitTypes[5] = { "Protoss Zealot", "Protoss Dragoon", "Protoss Probe", "Zerg Mutalisk", "Zerg Scourge" };
 	static int typeCount = 5;
 	BWAPI::Unit* getClosestUnitFrom(BWAPI::Position &pos, std::set<BWAPI::Unit*> units);
@@ -44,5 +45,10 @@ namespace helpers {
 
 	BWAPI::Position rotClockwise(BWAPI::Position p, double angle);
 	BWAPI::Position rotCClockwise(BWAPI::Position p, double angle);
+	void initializeFleeThresholds();
+
+	bool shouldFlee(BWAPI::Unit* unit, std::set<BWAPI::Unit*> attackers);
+	int getFleeDuration(BWAPI::Unit* unit, std::set<BWAPI::Unit*>* attackers);
+	BWAPI::Unit* getLolEnemy(BWAPI::Unit* unit, std::set<BWAPI::Unit*> enemies);
 	void rotCClockwise(double &x, double &y, double angle);
 }

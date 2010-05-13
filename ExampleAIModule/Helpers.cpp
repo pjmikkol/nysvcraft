@@ -7,6 +7,13 @@ using namespace BWAPI;
 using namespace std;
 
 namespace helpers {
+	map<UnitType, int> fleeThreshold;
+
+	Unit* getLolEnemy(Unit* unit, set<Unit*> enemies) {
+		// LOL LOL LOL
+		return NULL;
+	}
+
 	Unit* getClosestEnemy(Unit* unit, set<Unit*> enemies) {		
 		return getClosestUnitFrom(unit->getPosition(), enemies);
 	}
@@ -16,7 +23,7 @@ namespace helpers {
 		double minDistance = numeric_limits<double>::infinity();
 
 		foreach (Unit* unit, units) {
-			double distance = unit->getPosition().getDistance(pos);
+			double distance = unit->getDistance(pos);
 
 			if (distance < minDistance) {
 				minDistance = distance;
@@ -111,6 +118,36 @@ namespace helpers {
 		double c = cos(angle), s = sin(angle);
 		x = x*c - s*y;
 		y = s*x + c*y;
+	}
+
+	void initializeFleeThresholds() {
+		fleeThreshold.insert(make_pair(UnitTypes::Protoss_Dragoon, 3));
+		fleeThreshold.insert(make_pair(UnitTypes::Protoss_Zealot, 2));
+	}
+		
+	bool shouldFlee(Unit* unit, set<Unit*> attackers) {
+		if (unit->getType() == UnitTypes::Protoss_Zealot) {
+			foreach (Unit* attacker, attackers)
+				if (attacker->getType() == UnitTypes::Protoss_Dragoon)
+					return false;								
+		}
+
+		if (unit->getType() == UnitTypes::Protoss_Dragoon) {
+			foreach (Unit* attacker, attackers)
+				if (attacker->getType() == UnitTypes::Protoss_Zealot)
+					return true;
+		}
+
+		return attackers.size() >= fleeThreshold[unit->getType()];				
+	}
+		
+	int getFleeDuration(Unit* unit, set<Unit*>* attackers) {
+		if (unit->getType() == UnitTypes::Protoss_Dragoon)
+			foreach (Unit* attacker, *attackers)
+				if (attacker->getType() == UnitTypes::Protoss_Zealot)
+					return 30;
+
+		return 25;
 	}
 
 }
