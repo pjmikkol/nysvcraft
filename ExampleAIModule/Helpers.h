@@ -20,6 +20,8 @@ struct UnitData {
 };
 
 namespace helpers {
+	static char* unitTypes[5] = { "Protoss Zealot", "Protoss Dragoon", "Protoss Probe", "Zerg Mutalisk", "Zerg Scourge" };
+	static int typeCount = 5;
 	BWAPI::Unit* getClosestUnitFrom(BWAPI::Position &pos, std::set<BWAPI::Unit*> units);
 	BWAPI::Unit* getClosestEnemy(BWAPI::Unit* unit, std::set<BWAPI::Unit*> enemies);
 	std::set<BWAPI::Unit*> getAttackingAllies();
@@ -32,4 +34,7 @@ namespace helpers {
 	double angleBetween(BWAPI::Position, double x, double y);
 
 	BWAPI::Position vecFromAngle(double angle, int tiles = 1);
+
+	int deadUnitCount();
+	int killedUnitCount();
 }

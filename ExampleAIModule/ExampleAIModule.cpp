@@ -1,6 +1,8 @@
 #include <assert.h>
 #include <cmath>
 #include "ExampleAIModule.h"
+#include <fstream>
+#include <cstdlib>
 
 using namespace BWAPI;
 using namespace std;
@@ -69,10 +71,15 @@ void ExampleAIModule::onStart()
 
 void ExampleAIModule::onEnd(bool isWinner)
 {
-  if (isWinner)
-  {
-    //log win to file
-  }
+	string home = getenv("USERPROFILE");
+	string target = home + "\\Documents\\statistics.txt";
+
+	string status = isWinner ? "Won" : "Lost";
+
+	ofstream stats(target.c_str(), ios_base::app | ios_base::out);
+	stats << status << "\t" << deadUnitCount() << "\t" << killedUnitCount() << endl;
+
+	stats.close();
 }
 
 void ExampleAIModule::onFrame()
@@ -102,6 +109,7 @@ void ExampleAIModule::decideActions(map<Unit*, set<Unit*> >* attackedBy) {
 		this->handleAttack(unit);
 	}
 }
+
 
 void ExampleAIModule::handleFlee(Unit* unit, map<Unit*, set<Unit*> >* attackedBy) {
 	UnitData* data = &unitData[unit];
