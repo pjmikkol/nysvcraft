@@ -4,6 +4,9 @@
 #include <fstream>
 #include <cstdlib>
 
+#include <boost/foreach.hpp>
+#define foreach BOOST_FOREACH
+
 using namespace BWAPI;
 using namespace std;
 using namespace helpers;
@@ -38,11 +41,8 @@ void ExampleAIModule::onStart()
 	// In this version always start with single group.
 	Position groupCenter = Position(0, 0);
 	Group startGroup = Group(1, &this->unitData);
-	for(set<Unit*>::const_iterator i = Broodwar->self()->getUnits().begin();
-	    i != Broodwar->self()->getUnits().end();
-	    i++) {
-		
-		Unit* unit = *i;
+
+	foreach (Unit* unit, Broodwar->self()->getUnits()) {
 		// Do something clever here, formation?
 		unit->attackMove(this->center);  
 		UnitData unitData;
@@ -56,6 +56,7 @@ void ExampleAIModule::onStart()
 		groupCenter += unit->getPosition();
 		Broodwar->printf("Initial hit points: %d", unit->getType().maxHitPoints());
 	}
+
 	int unitsInGroup = startGroup.getSize();
 	this->groupData.insert(make_pair(startGroup.getId(), startGroup));
 	/* TODO: Group AI initialization */
@@ -95,15 +96,19 @@ void ExampleAIModule::onFrame()
 }
 
 void ExampleAIModule::printAttackerInfo(map<Unit*, set<Unit*> >* attackedBy) {
-	for (map<Unit*, set<Unit*> >::const_iterator iter = attackedBy->begin(); iter != attackedBy->end(); iter++) {
-		Position pos = iter->first->getPosition();
-		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 26, "%d", iter->second.size());
+	pair< Unit*, set<Unit*> > p;
+	
+	foreach (p, *attackedBy) {	
+		Position pos = p.first->getPosition();
+		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 26, "%d", p.second.size());
 	}
 }
 
 void ExampleAIModule::decideActions(map<Unit*, set<Unit*> >* attackedBy) {
-	for(set<Unit*>::const_iterator u = Broodwar->getAllUnits().begin(); u != Broodwar->getAllUnits().end(); u++) {
-		Unit* unit = *u;
+	pair< Unit*, set<Unit*> > p;
+	
+	foreach (p, *attackedBy) {			
+		Unit* unit = p.first;
 
 		this->handleFlee(unit, attackedBy);
 		this->handleAttack(unit);
@@ -182,10 +187,10 @@ void ExampleAIModule::handleAttack(Unit* unit) {
 
 	if (data->state == fight) {
 		set<Unit*> enemies = Broodwar->enemy()->getUnits();
+
 		if (!isAttackingEnemy(unit)) {
 			calculateTarget(unit, enemies);
-		}
-		else {
+		} else {
 			if (data->attackCounter > 0) {
 				data->attackCounter--;
 			} else {
@@ -223,18 +228,19 @@ void ExampleAIModule::calculateTarget(Unit* unit, set<Unit*> enemies) {
 
 Unit* ExampleAIModule::weakestEnemyInRange(Unit* unit, set<Unit*> enemies) {
 	Unit* weakest = NULL;
-	for (set<Unit*>::const_iterator iter = enemies.begin(); iter != enemies.end(); iter++) {
-		Unit* current = *iter;
-		if (!isInAttackRange(current, unit))
+
+	foreach (Unit* enemy, enemies) {
+		if (!isInAttackRange(enemy, unit))
 			continue;
 		
 		if (!weakest)
-			weakest = current;
+			weakest = enemy;
 		else {
-			if (weakest->getHitPoints() > current->getHitPoints())
-				weakest = current;
+			if (weakest->getHitPoints() > enemy->getHitPoints())
+				weakest = enemy;
 		}
 	}
+
 	return weakest;
 }
 
@@ -243,20 +249,19 @@ map< Unit*, set<Unit*> > * ExampleAIModule::getAttackers() {
 
 	set<Unit*> myUnits = Broodwar->self()->getUnits();
 
-	for (set<Unit*>::const_iterator iter = myUnits.begin(); iter != myUnits.end(); iter++) {
-		Unit* u = *iter;
-		(*attackedBy)[u] = set<Unit*>();
+	foreach (Unit* unit, myUnits) {
+		(*attackedBy)[unit] = set<Unit*>();
 	}
 
 	set<Unit*> enemyUnits = Broodwar->enemy()->getUnits();
 
-	for(set<Unit*>::const_iterator iter = enemyUnits.begin(); iter != enemyUnits.end(); iter++) {
-		Unit* enemy = *iter;							
+	foreach (Unit* enemy, enemyUnits) {
 		Unit* target = enemy->getOrderTarget();
 
 		if (target && target->getPlayer() == Broodwar->self() && this->isInAttackRange(enemy, target))
 			(*attackedBy)[target].insert(enemy);					
 	}
+
 	return attackedBy;
 }
 
@@ -271,23 +276,19 @@ bool ExampleAIModule::isInAttackRange(Unit* attacker, Unit* target) {
 
 void ExampleAIModule::drawUnitInfo()
 {
-	for(set<Unit*>::const_iterator i=Broodwar->self()->getUnits().begin();i!=Broodwar->self()->getUnits().end();i++)
-	{
-		Position pos = (*i)->getPosition();
-		Unit* targetUnit = (*i)->getOrderTarget();
-		Position target = (*i)->getTargetPosition();
+	foreach (Unit* unit, Broodwar->self()->getUnits()) {
+		Position pos = unit->getPosition();
+		Unit* targetUnit = unit->getOrderTarget();
+		Position target = unit->getTargetPosition();
 		Color color;
 
-		if (targetUnit)
-			color = Color(Colors::Red);
-		else
-			color = Color(Colors::Green);
+		color = Color(targetUnit ? Colors::Red : Colors::Green);
 			
 		Broodwar->drawLineMap(pos.x(), pos.y(), target.x(), target.y(), color);
 
 		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 16, "\x05(%d, %d)", pos.x(), pos.y());
 
-		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 26, "%s", stateName(this->getUnitData(*i).state).c_str());
+		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 26, "%s", stateName(this->getUnitData(unit).state).c_str());
   }
 }
 

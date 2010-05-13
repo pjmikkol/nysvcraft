@@ -1,5 +1,8 @@
 #include "Helpers.h"
 
+#include <boost/foreach.hpp>
+#define foreach BOOST_FOREACH
+
 using namespace BWAPI;
 using namespace std;
 
@@ -11,33 +14,33 @@ namespace helpers {
 	Unit* getClosestUnitFrom(Position &pos, set<Unit*> units) {
 		Unit* closest = 0;
 		double minDistance = numeric_limits<double>::infinity();
-		
-		for (set<BWAPI::Unit*>::const_iterator iter = units.begin(); iter != units.end(); iter++) {
-			Unit* unit = *iter;
+
+		foreach (Unit* unit, units) {
 			double distance = unit->getPosition().getDistance(pos);
-					
+
 			if (distance < minDistance) {
 				minDistance = distance;
 				closest = unit;
 			}
 		}
-		return closest;
-	}
 
-	set<Unit*> getAttackingAllies() {
-		set<Unit*> allies = Broodwar->self()->getUnits();
-		for (set<Unit*>::const_iterator iter = allies.begin(); iter != allies.end(); iter++) {
-			Unit* ally = *iter;
-			if (!isAttackingEnemy(ally)) {
-				allies.erase(iter);
-			}
-		}
-		return allies;
+		return closest;
 	}
 
 	bool isAttackingEnemy(Unit* unit) {
 		Unit* other = unit->getOrderTarget();
 		return other && other->getPlayer() == Broodwar->enemy();
+	}
+
+	set<Unit*> getAttackingAllies() {
+		set<Unit*> allies = Broodwar->self()->getUnits();
+		
+		foreach (Unit* ally, allies) {
+			if (!isAttackingEnemy(ally))
+				allies.erase(ally);	
+		}
+
+		return allies;
 	}
 
 	double angleBetween(Position p1, Position p2)

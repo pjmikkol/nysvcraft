@@ -111,7 +111,7 @@
 				Name="VCCLCompilerTool"
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
-				AdditionalIncludeDirectories="&quot;C:\Program Files\Starcraft\BWAPI_Beta_2.6.1\include&quot;"
+				AdditionalIncludeDirectories="&quot;C:\Program Files\Starcraft\BWAPI_Beta_2.6.1\include&quot;;&quot;$(BoostHome)&quot;"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"
