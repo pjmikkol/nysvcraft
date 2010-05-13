@@ -219,10 +219,8 @@ void ExampleAIModule::calculateTarget(Unit* unit, set<Unit*> enemies) {
 			UnitType unitType = unit->getType();
 			UnitType allyType = ally->getType();
 
-			if (!(unitType == UnitTypes::Protoss_Zealot && allyType == UnitTypes::Protoss_Dragoon)) {
-				target = ally->getOrderTarget();
-				if (!target) target = ally->getTarget();
-			}
+			target = ally->getOrderTarget();
+			if (!target) target = ally->getTarget();
 		}
 	}
 
