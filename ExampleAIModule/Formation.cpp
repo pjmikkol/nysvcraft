@@ -12,7 +12,7 @@ Formation::Formation(void)
 {
 	this->units = 0;
 	this->form = free_will;
-	this->labels = map<Unit*, int>();
+	this->labels = new map<Unit*, int>();
 	this->isForming = false;
 	this->leader = 0;
 }
@@ -26,11 +26,13 @@ Formation::Formation(Formations f, std::set<BWAPI::Unit*>* units)
 			this->p1 = 0.2;
 			this->distances = BWAPI::TILE_SIZE*30;
 			this->angle = pi*3/2;
+			break;
 		default:
 			this->distances = 0;
 			this->p1 = this->angle = 0;
+			break;
 	}
-	this->labels = map<Unit*, int>();
+	this->labels = new map<Unit*, int>();
 	this->isForming = false;
 	decideLeader();
 }
@@ -49,6 +51,7 @@ void Formation::moveInFormation(Position to)
 }
 
 void Formation::makeFormation() {
+	printf("makeFormation()");
 	if (!this->leader) decideLeader();
 	bool inForm = this->inFormation();
 	if (!isForming && !inForm) {
@@ -56,6 +59,7 @@ void Formation::makeFormation() {
 		foreach (Unit* unit, *this->units) {
 			Position target = this->posInFormation(unit, center);
 			unit->rightClick(target);
+			Broodwar->printf("%d", (*this->labels)[unit]);
 		}
 		this->isForming = true;
 	} else if (inForm) {
@@ -65,27 +69,35 @@ void Formation::makeFormation() {
 
 void Formation::labelUnits()
 {
-	if (!this->leader) return;
+	Broodwar->printf("labelUnits()");
+	if (!this->leader) {
+		Broodwar->printf("no leader in labelUnits()");	
+		return;
+	}
 	double m = sin(this->angle)/cos(this->angle);
 	Position p = this->leader->getPosition();
 	double b = p.y() - m*p.x();
 	int below = 0, above = 0;
-	this->labels.insert(make_pair(this->leader, 0));
+	(*this->labels)[this->leader] = 0;
 	foreach (Unit* unit, *this->units) {
 		if (unit == this->leader) continue;
 		Position pos = unit->getPosition();
 		if (pos.y() < m*pos.x() + b) {
 			below++; 
-			this->labels[unit] = below;
+			(*this->labels)[unit] = below;
 		} else {
 			above++;
-			this->labels[unit] = -above;
+			(*this->labels)[unit] = -above;
 		}
 	}
 }
 
 void Formation::decideLeader()
 {
+	assert(this->units);
+	assert(this->units->size() > 0);
+
+	Broodwar->printf("decideLeader()");
 
 	this->leader = 0;
 	// TODO: ensure that there aren't dead units in units-set
@@ -104,15 +116,20 @@ void Formation::decideLeader()
 		}
 		if (abs(above - below) <= 1) {
 			this->leader = i;
+			labelUnits();
 			return;
 		}
 	}
 	this->leader = *(this->units->begin());
+	labelUnits();
+
+	assert(this->leader);
 }
 
 Position Formation::posInFormation(Unit* unit, Position center)
 {
-	int label = this->labels[unit];
+	assert(unit);
+	int label = (*this->labels)[unit];
 	int x = this->distances*label;
 	//double xp = x;
 	//double yp = this->p1*xp*xp;
@@ -127,7 +144,7 @@ bool Formation::inFormation()
 	if (this->form == free_will) return true;
 	if (!this->leader) return false;
 	Position center = this->leader->getPosition();
-	foreach (Unit* i, *units) {
+	foreach (Unit* i, *this->units) {
 		Position target = posInFormation(i, center);
 		if (target.getDistance( i->getPosition() ) > TILE_SIZE/2 ){
 			return false;
