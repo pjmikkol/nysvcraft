@@ -5,6 +5,8 @@
 #include <limits>
 #include <cmath>
 
+const double pi = 3.1415926535897932384626433;
+
 /*States are:
 	flee			- for running away from enemy
 	fight			- kicking ass
@@ -42,4 +44,5 @@ namespace helpers {
 
 	BWAPI::Position rotClockwise(BWAPI::Position p, double angle);
 	BWAPI::Position rotCClockwise(BWAPI::Position p, double angle);
+	void rotCClockwise(double &x, double &y, double angle);
 }

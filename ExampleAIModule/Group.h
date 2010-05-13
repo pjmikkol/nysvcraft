@@ -11,6 +11,8 @@ using namespace std;
 class Group
 {
 public:
+	Group();
+	~Group();
 	Group(int id, map< BWAPI::Unit*, UnitData >* unitData); // takes group id as a parameter
 	void add(BWAPI::Unit*); // adds the unit to the group (if not already present)
 	void remove(BWAPI::Unit*);
@@ -18,11 +20,13 @@ public:
 	int getSize();
 	int getId();
 	void setFormation(Formations f);
+	Formation form; // The formation of group
+	set<BWAPI::Unit*>* units; // Pointers to units belonging to group
 
 private:
 	map< BWAPI::Unit*, UnitData >* unitData;
 	int groupId; // Id of the group
-	set<BWAPI::Unit*> units; // Pointers to units belonging to group
-	Formation form; // The formation of group
+	
+	
 	BWAPI::Position target; // Target of the group
 };

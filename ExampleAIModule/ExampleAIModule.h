@@ -46,4 +46,7 @@ private:
 	double calculateAngle(Unit* unit, Unit* enemy);
 	double midAngle(set<double>* angles);
 	double reverseAngle(double angle);
+
+	//Ugly test
+	Group* g;
 };

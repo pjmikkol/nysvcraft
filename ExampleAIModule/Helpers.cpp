@@ -83,24 +83,34 @@ namespace helpers {
 
 		return count;
 	}
-}
 
-BWAPI::Position helpers::avgPos(std::set<BWAPI::Unit*>* units) 
-{
-	BWAPI::Position p(0,0);
-	for(std::set<Unit*>::const_iterator i = units->begin(); i != units->end(); i++)
-		p += (*i)->getPosition();
-	return BWAPI::Position(p.x()/units->size(), p.y()/units->size());
-}
 
-Position helpers::rotClockwise(Position p, double angle)
-{
-	double c = cos(angle), s = sin(angle);
-	return Position((int) (p.x()*c + s*p.y()), (int) (c*p.y() - s*p.x()));
-}
+	Position avgPos(set<Unit*>* units) 
+	{
+		Position p(0,0);
+		foreach (Unit* unit, *units) {
+			p += unit->getPosition();
+		}
+		return Position(p.x()/units->size(), p.y()/units->size());
+	}
 
-Position helpers::rotCClockwise(Position p, double angle)
-{
-	double c = cos(angle), s = sin(angle);
-	return Position((int) (p.x()*c - s*p.y()), (int) (s*p.x() + c*p.y()));
+	Position rotClockwise(Position p, double angle)
+	{
+		double c = cos(angle), s = sin(angle);
+		return Position((int) (p.x()*c + s*p.y()), (int) (c*p.y() - s*p.x()));
+	}
+
+	Position rotCClockwise(Position p, double angle)
+	{
+		double c = cos(angle), s = sin(angle);
+		return Position((int) (p.x()*c - s*p.y()), (int) (s*p.x() + c*p.y()));
+	}
+
+	void rotCClockwise(double &x, double &y, double angle)
+	{
+		double c = cos(angle), s = sin(angle);
+		x = x*c - s*y;
+		y = s*x + c*y;
+	}
+
 }

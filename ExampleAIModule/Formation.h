@@ -11,10 +11,11 @@ public:
 	Formation(void);
 	Formation(Formations f, std::set<BWAPI::Unit*>* units);
 	void moveInFormation(BWAPI::Position to);
-	BWAPI::Unit* decideLeader(std::set<BWAPI::Unit*>* units, BWAPI::Position to); //this one could belong to helpers
+	void decideLeader();
 	bool inFormation();
 	void labelUnits();
 	BWAPI::Position posInFormation(BWAPI::Unit* unit, BWAPI::Position center);
+	void makeFormation();
 private:
 	Formations form;
 	std::map<BWAPI::Unit*, int> labels;
@@ -24,6 +25,7 @@ private:
 	double angle;
 	int distances; //Parameter which controls the distances between the units
 	double p1; //first parameter to control formation 
+	bool isForming;
 	std::set<BWAPI::Unit*>* units;
 	BWAPI::Unit* leader; // "Center" of the group. Other units move relatively to this
 };
