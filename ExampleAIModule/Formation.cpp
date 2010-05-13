@@ -1,5 +1,7 @@
 #include "Formation.h"
 #include <cassert>
+#include <algorithm>
+#include <boost/bind.hpp>
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
 
@@ -23,8 +25,8 @@ Formation::Formation(Formations f, std::set<BWAPI::Unit*>* units)
 	this->form = f;
 	switch(f) {
 		case parabola:
-			this->p1 = 0.0;
-			this->distances = 24;
+			this->p1 = 0.005;
+			this->distances = TILE_SIZE*2;
 			this->angle = pi*3/2;
 			break;
 		default:
@@ -74,22 +76,51 @@ void Formation::labelUnits()
 		Broodwar->printf("no leader in labelUnits()");	
 		return;
 	}
+	// Again we use form y = mx + b for line 
 	double m = sin(this->angle)/cos(this->angle);
 	Position p = this->leader->getPosition();
 	double b = p.y() - m*p.x();
+
+	vector<Unit*> bel = vector<Unit*>();
+	vector<Unit*> ab = vector<Unit*>();
 	int below = 0, above = 0;
 	(*this->labels)[this->leader] = 0;
 	foreach (Unit* unit, *this->units) {
 		if (unit == this->leader) continue;
 		Position pos = unit->getPosition();
-		if (pos.y() < m*pos.x() + b) {
-			below++; 
-			(*this->labels)[unit] = below;
+		if (pos.y() <= m*pos.x() + b) {
+			bel.push_back(unit);
+			//below++; 
+			//(*this->labels)[unit] = below;
 		} else {
-			above++;
-			(*this->labels)[unit] = -above;
+			ab.push_back(unit);
+			//above++;
+			//(*this->labels)[unit] = -above;
 		}
 	}
+	while (bel.size() >= ab.size() + 1 && ab.size() > 0) {
+		ab.push_back(bel[bel.size() - 1]);
+		bel.pop_back();
+	}
+	while (ab.size() >= bel.size() + 1 && bel.size() > 0) {
+		bel.push_back(ab[ab.size() - 1]);
+		ab.pop_back();
+	}
+
+	sort(ab.begin(), ab.end(), bind(cmpUnit,this->leader,_1,_2));
+	sort(bel.begin(), bel.end(), bind(cmpUnit,this->leader,_1,_2));
+	for(int i = 0; i < ab.size(); i++)
+		(*this->labels)[ab[i]] = -(i+1);
+	for(int i = 0; i < bel.size(); i++)
+		(*this->labels)[bel[i]] = i+1;
+}
+
+bool cmpUnit(Unit *c, Unit* u, Unit* v)
+{
+	Position cen = c->getPosition();
+	if ( u->getPosition().getDistance(cen) < v->getPosition().getDistance(cen) )
+		return true;
+	else return false;
 }
 
 void Formation::decideLeader()
@@ -104,6 +135,7 @@ void Formation::decideLeader()
 	Position center = avgPos(units);
 	// Using the form y = mx + b for line
 	double m = static_cast<double>(sin(this->angle) - center.y())/(cos(this->angle) - center.x());
+	Unit* maybeLeader = 0;
 	foreach(Unit* i, *this->units) {
 		Position iPos = i->getPosition();
 		double b = iPos.y() - m*iPos.x();
@@ -114,13 +146,17 @@ void Formation::decideLeader()
 			if (jPos.y() < m*jPos.x() + b) below++;
 			else above++;
 		}
-		if (abs(above - below) <= 1) {
+		int diff = abs(above - below);
+		if (diff == 0) {
 			this->leader = i;
 			labelUnits();
 			return;
 		}
+		else if (diff <= 1) {
+			maybeLeader = i;
+		}
 	}
-	this->leader = *(this->units->begin());
+	this->leader = maybeLeader;
 	labelUnits();
 
 	assert(this->leader);
@@ -146,7 +182,7 @@ bool Formation::inFormation()
 	Position center = this->leader->getPosition();
 	foreach (Unit* i, *this->units) {
 		Position target = posInFormation(i, center);
-		if (target.getDistance( i->getPosition() ) > TILE_SIZE/2 ){
+		if (target.getDistance( i->getPosition() ) > TILE_SIZE/4 ){
 			return false;
 		}
 	}

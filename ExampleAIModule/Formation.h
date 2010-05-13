@@ -4,6 +4,8 @@
 
 enum Formations { free_will, parabola };
 
+bool cmpUnit(BWAPI::Unit* c,BWAPI::Unit* u, BWAPI::Unit* v);
+
 /* Base-class for representing the different formations */
 class Formation
 {

@@ -27,13 +27,6 @@ string stateName(State state) {
 
 void ExampleAIModule::onStart()
 {
-	string home = getenv("USERPROFILE");
-	string target = home + "\\Documents\\err.txt";
-
-	ofstream errlog(target.c_str(), ios_base::app | ios_base::out);
-
-
-
 	Broodwar->setLocalSpeed(100);
 	initializeFleeThresholds();
 
@@ -45,12 +38,10 @@ void ExampleAIModule::onStart()
 	this->unitData = map< Unit*, UnitData >();
 	this->groupData = map<int, Group>();
 
-	errlog << "eka" << endl;
 	// Calculate the center of group nro 1 in this loop,
 	// In this version always start with single group.
 	Group* startGroup = new Group(1, &this->unitData);
 
-	errlog << "toka" << endl;
 	foreach (Unit* unit, Broodwar->self()->getUnits()) {
 		// Do something clever here, formation?
 		//unit->attackMove(this->center);  
@@ -64,14 +55,11 @@ void ExampleAIModule::onStart()
 		startGroup->add(unit);
 		//Broodwar->printf("Initial hit points: %d", unit->getType().maxHitPoints());
 	}
-	errlog << "kolmas" << endl;
 	//this->groupData.insert(make_pair(startGroup.getId(), startGroup));
 	this->g = startGroup;
 	//g->setFormation(parabola);
-	errlog << "nel" << endl;
 	startGroup->setFormation(parabola);
 	/* TODO: Group AI initialization */
-	errlog <<"nel" << endl;
 }
 
 void ExampleAIModule::onEnd(bool isWinner)
