@@ -23,8 +23,8 @@ Formation::Formation(Formations f, std::set<BWAPI::Unit*>* units)
 	this->form = f;
 	switch(f) {
 		case parabola:
-			this->p1 = 0.2;
-			this->distances = BWAPI::TILE_SIZE*30;
+			this->p1 = 0.0;
+			this->distances = 24;
 			this->angle = pi*3/2;
 			break;
 		default:
@@ -59,7 +59,7 @@ void Formation::makeFormation() {
 		foreach (Unit* unit, *this->units) {
 			Position target = this->posInFormation(unit, center);
 			unit->rightClick(target);
-			Broodwar->printf("%d", (*this->labels)[unit]);
+			Broodwar->printf("%d, %d", target.x(), target.y());
 		}
 		this->isForming = true;
 	} else if (inForm) {
