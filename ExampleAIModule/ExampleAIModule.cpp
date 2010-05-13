@@ -136,10 +136,10 @@ void ExampleAIModule::handleFlee(Unit* unit, map<Unit*, set<Unit*> >* attackedBy
 	set<Unit*> attackers = (*attackedBy)[unit];
 
 	if (shouldFlee(unit, attackers)) {	
-		TilePosition runTo = fleeTo(unit, &attackers);
+		Position runTo = fleeTo(unit, &attackers);
 		
 		data->state = flee;
-		data->fleeCounter = 25;
+		data->fleeCounter = getFleeDuration(unit, &attackers);
 
 		unit->rightClick(runTo);
 	}
@@ -214,19 +214,29 @@ void ExampleAIModule::calculateTarget(Unit* unit, set<Unit*> enemies) {
 	if (4 * unit->getHitPoints() < unit->getType().maxHitPoints()) {
 		set<Unit*> attackingAllies = getAttackingAllies();
 		Unit* ally = getClosestUnitFrom(unit->getPosition(), attackingAllies);
+		
 		if (ally) {
-			target = ally->getOrderTarget();
+			UnitType unitType = unit->getType();
+			UnitType allyType = ally->getType();
+
+			if (!(unitType == UnitTypes::Protoss_Zealot && allyType == UnitTypes::Protoss_Dragoon)) {
+				target = ally->getOrderTarget();
+				if (!target) target = ally->getTarget();
+			}
 		}
-	}
-	else {
+	} else {
 		target = weakestEnemyInRange(unit, enemies);
 	}
 
 	if (!target && !enemies.empty())
+		target = getLolEnemy(unit, enemies);
+
+	if (!target && !enemies.empty())
 		target = getClosestEnemy(unit, enemies);
+
 	if (target) {
 		unit->attackUnit(target);
-		data->attackCounter = 50;
+		data->attackCounter = 10;
 	}
 }
 
@@ -234,7 +244,7 @@ Unit* ExampleAIModule::weakestEnemyInRange(Unit* unit, set<Unit*> enemies) {
 	Unit* weakest = NULL;
 
 	foreach (Unit* enemy, enemies) {
-		if (!isInAttackRange(enemy, unit))
+		if (!isInAttackRange(unit, enemy))
 			continue;
 		
 		if (!weakest)

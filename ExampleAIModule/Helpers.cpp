@@ -9,6 +9,10 @@ using namespace std;
 namespace helpers {
 	map<UnitType, int> fleeThreshold;
 
+	Unit* getLolEnemy(Unit* unit, set<Unit*> enemies) {
+		// LOL LOL LOL
+	}
+
 	Unit* getClosestEnemy(Unit* unit, set<Unit*> enemies) {		
 		return getClosestUnitFrom(unit->getPosition(), enemies);
 	}
@@ -18,7 +22,7 @@ namespace helpers {
 		double minDistance = numeric_limits<double>::infinity();
 
 		foreach (Unit* unit, units) {
-			double distance = unit->getPosition().getDistance(pos);
+			double distance = unit->getDistance(pos);
 
 			if (distance < minDistance) {
 				minDistance = distance;
@@ -105,6 +109,15 @@ namespace helpers {
 		}
 
 		return attackers.size() >= fleeThreshold[unit->getType()];				
+	}
+		
+	int getFleeDuration(Unit* unit, set<Unit*>* attackers) {
+		if (unit->getType() == UnitTypes::Protoss_Dragoon)
+			foreach (Unit* attacker, *attackers)
+				if (attacker->getType() == UnitTypes::Protoss_Zealot)
+					return 30;
+
+		return 25;
 	}
 
 }

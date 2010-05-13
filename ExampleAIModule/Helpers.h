@@ -41,4 +41,5 @@ namespace helpers {
 	void initializeFleeThresholds();
 
 	bool shouldFlee(BWAPI::Unit* unit, std::set<BWAPI::Unit*> attackers);
+	int getFleeDuration(BWAPI::Unit* unit, std::set<BWAPI::Unit*>* attackers);
 }
