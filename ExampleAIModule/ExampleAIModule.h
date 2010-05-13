@@ -30,6 +30,8 @@ private:
 	map< int, Group> groupData;
 	map< Unit*, UnitData > unitData;
 
+	bool formed = false;
+
 	map< Unit*, set<Unit*> > * getAttackers();
 	void drawUnitInfo();
 	UnitData getUnitData(Unit* unit);

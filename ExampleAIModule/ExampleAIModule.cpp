@@ -4,8 +4,14 @@
 #include <fstream>
 #include <cstdlib>
 
+#include <boost/bind.hpp>
+
+#include <algorithm>
+
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
+
+#define NYSVCRAFT_START_FORMATION_X 400
 
 using namespace BWAPI;
 using namespace std;
@@ -26,11 +32,19 @@ string stateName(State state) {
 	}
 }
 
+bool unitIsLower(Unit* a, Unit* b) {
+	return a->getPosition().y() > b->getPosition().y();
+}
+
 void ExampleAIModule::onStart()
 {
+	formed = false;
+	dragoonDelay = 15;
+	formationDelay = 100;
+
 	initializeFleeThresholds();
 
-	Broodwar->setLocalSpeed(20);
+	Broodwar->setLocalSpeed(50);
 	Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
 	// Enable some cheat flags
 	Broodwar->enableFlag(Flag::UserInput);
@@ -44,13 +58,14 @@ void ExampleAIModule::onStart()
 	Position groupCenter = Position(0, 0);
 	Group startGroup = Group(1, &this->unitData);
 
-	int placeInLine = -4;
+	set<Unit*> units = Broodwar->self()->getUnits();
 
-	foreach (Unit* unit, Broodwar->self()->getUnits()) {		
-		if (unit->getType() == UnitTypes::Protoss_Dragoon)
-			unit->rightClick(this->center - Position(0.10 * (Broodwar->mapWidth() * TILE_SIZE), -100 + placeInLine++ * 30));
-		else
-			unit->rightClick(this->center);
+	foreach (Unit* unit, units) {				
+		if (unit->getType() != UnitTypes::Protoss_Dragoon)			
+			if (pastEnemy(unit))
+				unit->rightClick(unit->getPosition() - Position(NYSVCRAFT_START_FORMATION_X + 200, 0));
+			else
+				unit->rightClick(unit->getPosition() + Position(NYSVCRAFT_START_FORMATION_X + 200, 0));
 
 		UnitData unitData;
 		unitData.state = fight;
@@ -77,6 +92,10 @@ void ExampleAIModule::onStart()
 	Broodwar->printf("Size of the group 1: %d", g.getSize() );
 }
 
+bool ExampleAIModule::pastEnemy(Unit* unit) {
+	return unit->getPosition().x() >= Broodwar->mapWidth() * TILE_SIZE - Broodwar->self()->getStartLocation().x();
+}
+
 void ExampleAIModule::onEnd(bool isWinner)
 {
 	string home = getenv("USERPROFILE");
@@ -92,6 +111,12 @@ void ExampleAIModule::onEnd(bool isWinner)
 
 void ExampleAIModule::onFrame()
 {
+	if (dragoonDelay > 0)
+		dragoonDelay--;
+
+	if (formationDelay > 0)
+		formationDelay--;
+
 	drawUnitInfo();
 
 	map< Unit*, set<Unit*> > * attackedBy = getAttackers();
@@ -113,7 +138,41 @@ void ExampleAIModule::printAttackerInfo(map<Unit*, set<Unit*> >* attackedBy) {
 
 void ExampleAIModule::decideActions(map<Unit*, set<Unit*> >* attackedBy) {
 	pair< Unit*, set<Unit*> > p;
-	
+
+	if (!formed && dragoonDelay == 0) {
+		dragoonDelay = -1;
+
+		int placeInLine = -4;
+
+		set<Unit*> units = Broodwar->self()->getUnits();
+		vector<Unit*> unitsV(units.begin(), units.end());
+		sort(unitsV.begin(), unitsV.end(), unitIsLower);
+
+		foreach (Unit* unit, unitsV)
+			if (unit->getType() == UnitTypes::Protoss_Dragoon)
+				if (unit->getPosition().x() >= Broodwar->mapWidth() * TILE_SIZE - Broodwar->self()->getStartLocation().x())
+					unit->rightClick(Broodwar->self()->getStartLocation() - Position(NYSVCRAFT_START_FORMATION_X, 100 - placeInLine++ * 50));
+				else
+					unit->rightClick(Broodwar->self()->getStartLocation() + Position(NYSVCRAFT_START_FORMATION_X, 100 - placeInLine++ * 50));
+	}
+
+	if (!formed && formationDelay == 0) {
+		formed = true;		
+		Broodwar->printf("Formed");
+	}
+
+	if (formed && dragoonDelay <= 0 && Broodwar->enemy()->getUnits().empty()) {
+		Broodwar->printf("Proceeding");
+
+		dragoonDelay = 15;
+
+		foreach (Unit* unit, Broodwar->self()->getUnits())
+			if (unit->getPosition().x() >= Broodwar->mapWidth() * TILE_SIZE - Broodwar->self()->getStartLocation().x())
+				unit->rightClick(unit->getPosition() - Position(100, 0));
+			else
+				unit->rightClick(unit->getPosition() + Position(100, 0));
+	}
+
 	foreach (p, *attackedBy) {			
 		Unit* unit = p.first;
 
@@ -304,7 +363,8 @@ void ExampleAIModule::drawUnitInfo()
 
 		color = Color(targetUnit ? Colors::Red : Colors::Green);
 			
-		Broodwar->drawLineMap(pos.x(), pos.y(), target.x(), target.y(), color);
+		if (unit->getType() == UnitTypes::Protoss_Dragoon)
+			Broodwar->drawLineMap(pos.x(), pos.y(), target.x(), target.y(), color);
 
 		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 16, "\x05(%d, %d)", pos.x(), pos.y());
 
