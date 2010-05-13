@@ -30,7 +30,7 @@ void ExampleAIModule::onStart()
 {
 	initializeFleeThresholds();
 
-	Broodwar->setLocalSpeed(50);
+	Broodwar->setLocalSpeed(20);
 	Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
 	// Enable some cheat flags
 	Broodwar->enableFlag(Flag::UserInput);
@@ -44,9 +44,14 @@ void ExampleAIModule::onStart()
 	Position groupCenter = Position(0, 0);
 	Group startGroup = Group(1, &this->unitData);
 
-	foreach (Unit* unit, Broodwar->self()->getUnits()) {
-		// Do something clever here, formation?
-		unit->attackMove(this->center);  
+	int placeInLine = -4;
+
+	foreach (Unit* unit, Broodwar->self()->getUnits()) {		
+		if (unit->getType() == UnitTypes::Protoss_Dragoon)
+			unit->rightClick(this->center - Position(0.10 * (Broodwar->mapWidth() * TILE_SIZE), -100 + placeInLine++ * 30));
+		else
+			unit->rightClick(this->center);
+
 		UnitData unitData;
 		unitData.state = fight;
 		unitData.fleeCounter = 0;
