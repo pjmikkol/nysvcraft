@@ -11,6 +11,7 @@ namespace helpers {
 
 	Unit* getLolEnemy(Unit* unit, set<Unit*> enemies) {
 		// LOL LOL LOL
+		return NULL;
 	}
 
 	Unit* getClosestEnemy(Unit* unit, set<Unit*> enemies) {		

@@ -42,4 +42,5 @@ namespace helpers {
 
 	bool shouldFlee(BWAPI::Unit* unit, std::set<BWAPI::Unit*> attackers);
 	int getFleeDuration(BWAPI::Unit* unit, std::set<BWAPI::Unit*>* attackers);
+	BWAPI::Unit* getLolEnemy(BWAPI::Unit* unit, std::set<BWAPI::Unit*> enemies);
 }
