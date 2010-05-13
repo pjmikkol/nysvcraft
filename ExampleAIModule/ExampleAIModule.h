@@ -40,4 +40,10 @@ private:
 	bool isInAttackRange(Unit* attacker, Unit* target);
 	Unit* weakestEnemyInRange(Unit* unit, set<Unit*> enemies);
 	void calculateTarget(Unit* unit, set<Unit*> enemies);
+
+	Position fleeTo(Unit* unit, const set<Unit*>* attackers);
+	set<double>* calculateAngles(Unit* unit, const set<Unit*>* attackers);
+	double calculateAngle(Unit* unit, Unit* enemy);
+	double midAngle(set<double>* angles);
+	double reverseAngle(double angle);
 };

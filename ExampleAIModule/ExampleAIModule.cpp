@@ -1,9 +1,12 @@
 #include <assert.h>
+#include <cmath>
 #include "ExampleAIModule.h"
 
 using namespace BWAPI;
 using namespace std;
 using namespace helpers;
+
+const double pi = 3.14159;
 
 string stateName(State state) {
 	switch (state) {
@@ -116,9 +119,7 @@ void ExampleAIModule::handleFlee(Unit* unit, map<Unit*, set<Unit*> >* attackedBy
 	// TODO add smarter flee
 	// Parameterize on unit type
 	if ((*attackedBy)[unit].size() > 1) {
-		TilePosition current = unit->getTilePosition();
-		//TODO: calculate better flee direction
-		TilePosition runTo = current - TilePosition(5, 5);
+		TilePosition runTo = fleeTo(unit, &(*attackedBy)[unit]);
 		
 		data->state = flee;
 		data->fleeCounter = 25;
@@ -132,10 +133,12 @@ Position ExampleAIModule::fleeTo(Unit* unit, const set<Unit*>* attackers) {
 
 	set<double>* angles = calculateAngles(unit, attackers);
 	double mid = midAngle(angles);
-	double direction = reverseAngle(mid);
+	Position direction = vecFromAngle(reverseAngle(mid), 2);
+
+	return unit->getPosition() + direction;
 }
 
-set<double> calculateAngles(Unit* unit, const set<Unit*>* attackers) {
+set<double>* ExampleAIModule::calculateAngles(Unit* unit, const set<Unit*>* attackers) {
 	set<double>* angles = new set<double>();
 	for (set<Unit*>::const_iterator iter = attackers->begin(); iter != attackers->end(); iter++) {
 		Unit* enemy = *iter;
@@ -144,32 +147,26 @@ set<double> calculateAngles(Unit* unit, const set<Unit*>* attackers) {
 	return angles;
 }
 
-double calculateAngle(Unit* unit, Unit* enemy) {
+double ExampleAIModule::calculateAngle(Unit* unit, Unit* enemy) {
 	Position enemyVec = enemy->getPosition() - unit->getPosition();
 	Position neutralVec = Position(1, 0);
 	return angleBetween(enemyVec, neutralVec);
 }
 	
 
-double midAngle(set<double>* angles) {
-	double sum = sum(angles);
-	if (sum != 0)
-		return sum / angles->size();
-	else
-		return -1;
-}
-
-double sum(set<double>* nums) {
-	double sum = 0.0;
-	for (set<double>::const_iterator iter = nums->begin(); iter != nums->end(); iter++) {
+double ExampleAIModule::midAngle(set<double>* angles) {
+	double sum = 0;
+	for (set<double>::const_iterator iter = angles->begin(); iter != angles->end(); iter++) {
 		sum += *iter;
 	}
-	return sum;
+	return sum / angles->size();
 }
 
-double reverseAngle(double angle) {
-	//TODO: FIX
-	return angle;
+double ExampleAIModule::reverseAngle(double angle) {
+	double reverse = angle - pi;
+	if (reverse < 0) 
+		reverse += 2*pi;
+	return reverse;
 }
 
 void ExampleAIModule::handleAttack(Unit* unit) {
