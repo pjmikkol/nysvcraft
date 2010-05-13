@@ -14,6 +14,7 @@ public:
 	BWAPI::Unit* decideLeader(std::set<BWAPI::Unit*>* units, BWAPI::Position to); //this one could belong to helpers
 	bool inFormation();
 	void labelUnits();
+	BWAPI::Position posInFormation(BWAPI::Unit* unit, BWAPI::Position center);
 private:
 	Formations form;
 	std::map<BWAPI::Unit*, int> labels;
