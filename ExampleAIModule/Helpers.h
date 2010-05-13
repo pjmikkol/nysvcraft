@@ -37,4 +37,9 @@ namespace helpers {
 
 	int deadUnitCount();
 	int killedUnitCount();
+
+	BWAPI::Position avgPos(std::set<BWAPI::Unit*>* units);
+
+	BWAPI::Position rotClockwise(BWAPI::Position p, double angle);
+	BWAPI::Position rotCClockwise(BWAPI::Position p, double angle);
 }

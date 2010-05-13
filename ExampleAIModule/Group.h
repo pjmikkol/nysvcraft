@@ -12,7 +12,6 @@ class Group
 {
 public:
 	Group(int id, map< BWAPI::Unit*, UnitData >* unitData); // takes group id as a parameter
-	//void setLeader()
 	void add(BWAPI::Unit*); // adds the unit to the group (if not already present)
 	void remove(BWAPI::Unit*);
 	const set<BWAPI::Unit*>* getUnits();
@@ -25,6 +24,5 @@ private:
 	int groupId; // Id of the group
 	set<BWAPI::Unit*> units; // Pointers to units belonging to group
 	Formation form; // The formation of group
-	BWAPI::Unit* leader; // "Center" of the group. Other units move relatively to this
 	BWAPI::Position target; // Target of the group
 };
