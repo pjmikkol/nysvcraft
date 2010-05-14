@@ -30,8 +30,11 @@ private:
 	map< int, Group> groupData;
 	map< Unit*, UnitData > unitData;
 
-	bool formed = false;
+	bool formed;
+	int dragoonDelay;
+	int formationDelay;
 
+	bool ExampleAIModule::pastEnemy(Unit* unit);
 	map< Unit*, set<Unit*> > * getAttackers();
 	void drawUnitInfo();
 	UnitData getUnitData(Unit* unit);
