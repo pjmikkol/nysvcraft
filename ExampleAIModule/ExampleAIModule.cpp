@@ -98,7 +98,11 @@ bool ExampleAIModule::pastEnemy(Unit* unit) {
 
 void ExampleAIModule::onEnd(bool isWinner)
 {
-	string home = getenv("USERPROFILE");
+	char* homep; 
+	size_t len;
+	_dupenv_s(&homep, &len, "USERPROFILE");
+	string home(homep);
+
 	string target = home + "\\Documents\\statistics.txt";
 
 	string status = isWinner ? "Won" : "Lost";

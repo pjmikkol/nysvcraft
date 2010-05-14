@@ -20,7 +20,7 @@ struct UnitData {
 };
 
 namespace helpers {
-	extern std::map<BWAPI::UnitType, int> fleeThreshold;
+	extern std::map<BWAPI::UnitType, unsigned int> fleeThreshold;
 	static char* unitTypes[5] = { "Protoss Zealot", "Protoss Dragoon", "Protoss Probe", "Zerg Mutalisk", "Zerg Scourge" };
 	static int typeCount = 5;
 	BWAPI::Unit* getClosestUnitFrom(BWAPI::Position &pos, std::set<BWAPI::Unit*> units);

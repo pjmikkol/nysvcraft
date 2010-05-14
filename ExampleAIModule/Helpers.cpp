@@ -7,7 +7,7 @@ using namespace BWAPI;
 using namespace std;
 
 namespace helpers {
-	map<UnitType, int> fleeThreshold;
+	map<UnitType, unsigned int> fleeThreshold;
 
 	Unit* getLolEnemy(Unit* unit, set<Unit*> enemies) {
 		//LOL
