@@ -17,6 +17,7 @@ Formation::Formation(void)
 	this->labels = new map<Unit*, int>();
 	this->isForming = false;
 	this->leader = 0;
+	this->delay = 0;
 }
 
 Formation::Formation(Formations f, std::set<BWAPI::Unit*>* units)
@@ -25,8 +26,8 @@ Formation::Formation(Formations f, std::set<BWAPI::Unit*>* units)
 	this->form = f;
 	switch(f) {
 		case parabola:
-			this->p1 = 0.005;
-			this->distances = TILE_SIZE*2;
+			this->p1 = 0.00;
+			this->distances = 24;
 			this->angle = pi*3/2;
 			break;
 		default:
@@ -36,19 +37,36 @@ Formation::Formation(Formations f, std::set<BWAPI::Unit*>* units)
 	}
 	this->labels = new map<Unit*, int>();
 	this->isForming = false;
+	this->delay = 0;
 	decideLeader();
 }
 
 void Formation::moveInFormation(Position to)
 {
+	if (this->delay-- > 0) return;
+	this->delay = 15;
 	double newangle = angleBetween(to, cos(this->angle), sin(this->angle));
-	if (this->leader && this->leader->getHitPoints() > 0 && fabs(angle - newangle) > 0.01) {
-		this->angle = newangle;
+	if (!this->leader || this->leader->getHitPoints() <= 0)
 		decideLeader();
-		// rotate the formation
+	if (fabs(this->angle - newangle) > 0.1) {
+		Broodwar->printf("newangle %f %f", this->angle, newangle);
+		this->angle = newangle;
+		//decideLeader();
+		this->isForming = true;
+		Position dir = vecFromAngle(this->angle, 1);
+		this->leader->rightClick(this->leader->getPosition() + Position(dir.x()/2, dir.y()/2));
+		makeFormation();
+	}
+	else if (!inFormation()) {
+		Broodwar->printf("not in Formation");
+		this->isForming = true;
+		//this->leader->rightClick(this->leader->getPosition() + vecFromAngle(this->angle, 1));
+		makeFormation();
 	}
 	else {
-		
+		Broodwar->printf("move to pos");
+		foreach(Unit* unit, *this->units)
+			unit->rightClick(unit->getPosition() + vecFromAngle(this->angle, 3));
 	}
 }
 
@@ -90,12 +108,8 @@ void Formation::labelUnits()
 		Position pos = unit->getPosition();
 		if (pos.y() <= m*pos.x() + b) {
 			bel.push_back(unit);
-			//below++; 
-			//(*this->labels)[unit] = below;
 		} else {
 			ab.push_back(unit);
-			//above++;
-			//(*this->labels)[unit] = -above;
 		}
 	}
 	while (bel.size() >= ab.size() + 1 && ab.size() > 0) {
@@ -141,7 +155,10 @@ void Formation::decideLeader()
 		double b = iPos.y() - m*iPos.x();
 		int below = 0, above = 0;
 		foreach (Unit* j, *units) {
-			if (i == j) continue;
+			if (i == j) {
+				maybeLeader = i;
+				continue;
+			}
 			Position jPos = j->getPosition();
 			if (jPos.y() < m*jPos.x() + b) below++;
 			else above++;
@@ -182,7 +199,7 @@ bool Formation::inFormation()
 	Position center = this->leader->getPosition();
 	foreach (Unit* i, *this->units) {
 		Position target = posInFormation(i, center);
-		if (target.getDistance( i->getPosition() ) > TILE_SIZE/4 ){
+		if (target.getDistance( i->getPosition() ) > TILE_SIZE/2 ){
 			return false;
 		}
 	}

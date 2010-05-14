@@ -83,7 +83,7 @@ void ExampleAIModule::onFrame()
 	
 	printAttackerInfo(attackedBy);
 	decideActions(attackedBy);
-	this->g->form.makeFormation();
+	this->g->form.moveInFormation(this->center);
 	delete attackedBy;
 }
 

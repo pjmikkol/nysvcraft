@@ -30,4 +30,5 @@ private:
 	bool isForming;
 	std::set<BWAPI::Unit*>* units;
 	BWAPI::Unit* leader; // "Center" of the group. Other units move relatively to this
+	int delay;
 };
