@@ -34,7 +34,6 @@ private:
 	int dragoonDelay;
 	int formationDelay;
 
-	bool ExampleAIModule::pastEnemy(Unit* unit);
 	map< Unit*, set<Unit*> > * getAttackers();
 	void drawUnitInfo();
 	UnitData getUnitData(Unit* unit);

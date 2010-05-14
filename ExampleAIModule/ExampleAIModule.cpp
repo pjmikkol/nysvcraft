@@ -45,9 +45,8 @@ void ExampleAIModule::onStart()
 	initializeFleeThresholds();
 
 	Broodwar->setLocalSpeed(50);
-	Broodwar->printf("The map is %s, a %d player map",Broodwar->mapName().c_str(),Broodwar->getStartLocations().size());
 	// Enable some cheat flags
-	Broodwar->enableFlag(Flag::UserInput);
+	//Broodwar->enableFlag(Flag::UserInput);
 
 	this->center = Position((Broodwar->mapWidth() * TILE_SIZE)/2 , (Broodwar->mapHeight() * TILE_SIZE)/2 );
 	this->unitData = map< Unit*, UnitData >();
@@ -62,7 +61,7 @@ void ExampleAIModule::onStart()
 
 	foreach (Unit* unit, units) {				
 		if (unit->getType() != UnitTypes::Protoss_Dragoon)			
-			if (pastEnemy(unit))
+			if (this->center.x() < Broodwar->self()->getStartLocation().x()*TILE_SIZE)
 				unit->rightClick(unit->getPosition() - Position(NYSVCRAFT_START_FORMATION_X + 200, 0));
 			else
 				unit->rightClick(unit->getPosition() + Position(NYSVCRAFT_START_FORMATION_X + 200, 0));
@@ -76,7 +75,6 @@ void ExampleAIModule::onStart()
 
 		startGroup.add(unit);
 		groupCenter += unit->getPosition();
-		Broodwar->printf("Initial hit points: %d", unit->getType().maxHitPoints());
 	}
 
 	int unitsInGroup = startGroup.getSize();
@@ -84,16 +82,12 @@ void ExampleAIModule::onStart()
 	/* TODO: Group AI initialization */
 	groupCenter = Position(groupCenter.x()/unitsInGroup, groupCenter.y()/unitsInGroup);
 	Unit* boss = getClosestUnitFrom(groupCenter, Broodwar->self()->getUnits());
-	Broodwar->printf("Size of the group 1: %d", unitsInGroup);
+	//Broodwar->printf("Size of the group 1: %d", unitsInGroup);
 	/* Testing that the functions work correctly: */
 	Group g = this->groupData.find(1)->second;
 	g.setFormation(parabola);
 	g.remove(boss);
-	Broodwar->printf("Size of the group 1: %d", g.getSize() );
-}
-
-bool ExampleAIModule::pastEnemy(Unit* unit) {
-	return unit->getPosition().x() >= Broodwar->mapWidth() * TILE_SIZE - Broodwar->self()->getStartLocation().x();
+	//Broodwar->printf("Size of the group 1: %d", g.getSize() );
 }
 
 void ExampleAIModule::onEnd(bool isWinner)
@@ -121,11 +115,11 @@ void ExampleAIModule::onFrame()
 	if (formationDelay > 0)
 		formationDelay--;
 
-	drawUnitInfo();
+	//drawUnitInfo();
 
 	map< Unit*, set<Unit*> > * attackedBy = getAttackers();
 	
-	printAttackerInfo(attackedBy);
+	//printAttackerInfo(attackedBy);
 	decideActions(attackedBy);
 
 	delete attackedBy;
@@ -154,7 +148,7 @@ void ExampleAIModule::decideActions(map<Unit*, set<Unit*> >* attackedBy) {
 
 		foreach (Unit* unit, unitsV)
 			if (unit->getType() == UnitTypes::Protoss_Dragoon)
-				if (unit->getPosition().x() >= Broodwar->mapWidth() * TILE_SIZE - Broodwar->self()->getStartLocation().x())
+				if (this->center.x() < Broodwar->self()->getStartLocation().x()*TILE_SIZE)
 					unit->rightClick(Broodwar->self()->getStartLocation() - Position(NYSVCRAFT_START_FORMATION_X, 100 - placeInLine++ * 50));
 				else
 					unit->rightClick(Broodwar->self()->getStartLocation() + Position(NYSVCRAFT_START_FORMATION_X, 100 - placeInLine++ * 50));
@@ -162,16 +156,13 @@ void ExampleAIModule::decideActions(map<Unit*, set<Unit*> >* attackedBy) {
 
 	if (!formed && formationDelay == 0) {
 		formed = true;		
-		Broodwar->printf("Formed");
 	}
 
 	if (formed && dragoonDelay <= 0 && Broodwar->enemy()->getUnits().empty()) {
-		Broodwar->printf("Proceeding");
-
 		dragoonDelay = 15;
 
 		foreach (Unit* unit, Broodwar->self()->getUnits())
-			if (unit->getPosition().x() >= Broodwar->mapWidth() * TILE_SIZE - Broodwar->self()->getStartLocation().x())
+			if (this->center.x() < Broodwar->self()->getStartLocation().x()*TILE_SIZE)
 				unit->rightClick(unit->getPosition() - Position(100, 0));
 			else
 				unit->rightClick(unit->getPosition() + Position(100, 0));
