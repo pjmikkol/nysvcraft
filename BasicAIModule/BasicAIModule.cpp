@@ -22,7 +22,6 @@ void BasicAIModule::onStart()
 
 	CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) AnalyzeThread, NULL, 0, NULL);
 
-	this->analyzed=true;
 	this->buildManager       = new BuildManager(&this->arbitrator);
 	this->techManager        = new TechManager(&this->arbitrator);
 	this->upgradeManager     = new UpgradeManager(&this->arbitrator);
@@ -52,7 +51,7 @@ void BasicAIModule::onStart()
 void BasicAIModule::onFrame()
 {
 	if (Broodwar->isReplay()) return;
-	if (!this->analyzed) return;
+	if (!analyzed) return;
 	this->buildManager->update();
 	this->buildOrderManager->update();
 	this->baseManager->update();
