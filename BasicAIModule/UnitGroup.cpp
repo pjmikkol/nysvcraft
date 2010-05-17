@@ -592,7 +592,7 @@ bool passesFlag(Unit* u, int f)
     case None:
       if(u->getType()==UnitTypes::None) return true;
     break;
-    case Unknown:
+    case UnknownType:
       if(u->getType()==UnitTypes::Unknown) return true;
     break;
   }

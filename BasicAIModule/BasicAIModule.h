@@ -14,6 +14,10 @@
 #include <InformationManager.h>
 #include <UnitGroupManager.h>
 #include <EnhancedUI.h>
+#include <windows.h>
+
+static bool analyzed;
+
 class BasicAIModule : public BWAPI::AIModule
 {
 public:
