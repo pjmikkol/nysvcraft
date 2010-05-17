@@ -112,7 +112,7 @@
 				Optimization="2"
 				EnableIntrinsicFunctions="true"
 				FavorSizeOrSpeed="0"
-				AdditionalIncludeDirectories="$(BWSALHome)/include"
+				AdditionalIncludeDirectories="include;&quot;$(BoostHome)&quot;"
 				RuntimeLibrary="2"
 				EnableFunctionLevelLinking="true"
 				WarningLevel="3"

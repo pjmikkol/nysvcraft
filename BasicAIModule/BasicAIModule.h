@@ -15,6 +15,7 @@
 #include <UnitGroupManager.h>
 #include <EnhancedUI.h>
 #include <windows.h>
+#include <boost/foreach.hpp>
 
 static bool analyzed;
 
