@@ -198,11 +198,11 @@
 				>
 			</File>
 			<File
-				RelativePath=".\EnhancedUI.h"
+				RelativePath="include\EnhancedUI.h"
 				>
 			</File>
 			<File
-				RelativePath="..\..\include\RectangleArray.h"
+				RelativePath="include\RectangleArray.h"
 				>
 			</File>
 			<File
