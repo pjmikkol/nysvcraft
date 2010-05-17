@@ -1,11 +1,38 @@
 #include "BasicAIModule.h"
 using namespace BWAPI;
 
-DWORD WINAPI AnalyzeThread() {
+DWORD WINAPI AnalyzeThread(void* obj) {
 	BWTA::readMap();
 	BWTA::analyze();
 
 	analyzed = true;
+
+	BasicAIModule* ai = (BasicAIModule*) obj;
+
+	ai->buildManager       = new BuildManager(&ai->arbitrator);
+	ai->techManager        = new TechManager(&ai->arbitrator);
+	ai->upgradeManager     = new UpgradeManager(&ai->arbitrator);
+	ai->scoutManager       = new ScoutManager(&ai->arbitrator);
+	ai->workerManager      = new WorkerManager(&ai->arbitrator);
+	ai->buildOrderManager  = new BuildOrderManager(ai->buildManager,ai->techManager,ai->upgradeManager,ai->workerManager);
+	ai->baseManager        = new BaseManager();
+	ai->supplyManager      = new SupplyManager();
+	ai->defenseManager     = new DefenseManager(&ai->arbitrator);
+	ai->informationManager = new InformationManager();
+	ai->unitGroupManager   = new UnitGroupManager();
+	ai->enhancedUI         = new EnhancedUI();
+
+	ai->supplyManager->setBuildManager(ai->buildManager);
+	ai->supplyManager->setBuildOrderManager(ai->buildOrderManager);
+	ai->techManager->setBuildingPlacer(ai->buildManager->getBuildingPlacer());
+	ai->upgradeManager->setBuildingPlacer(ai->buildManager->getBuildingPlacer());
+	ai->workerManager->setBaseManager(ai->baseManager);
+	ai->workerManager->setBuildOrderManager(ai->buildOrderManager);
+	ai->baseManager->setBuildOrderManager(ai->buildOrderManager);
+
+	ai->buildOrderManager->enableDependencyResolver();
+	ai->workerManager->enableAutoBuild();
+	ai->workerManager->setAutoBuildPriority(40); 
 
 	return 0;
 }
@@ -20,32 +47,7 @@ void BasicAIModule::onStart()
 
 	Broodwar->enableFlag(Flag::UserInput);
 
-	CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) AnalyzeThread, NULL, 0, NULL);
-
-	this->buildManager       = new BuildManager(&this->arbitrator);
-	this->techManager        = new TechManager(&this->arbitrator);
-	this->upgradeManager     = new UpgradeManager(&this->arbitrator);
-	this->scoutManager       = new ScoutManager(&this->arbitrator);
-	this->workerManager      = new WorkerManager(&this->arbitrator);
-	this->buildOrderManager  = new BuildOrderManager(this->buildManager,this->techManager,this->upgradeManager,this->workerManager);
-	this->baseManager        = new BaseManager();
-	this->supplyManager      = new SupplyManager();
-	this->defenseManager     = new DefenseManager(&this->arbitrator);
-	this->informationManager = new InformationManager();
-	this->unitGroupManager   = new UnitGroupManager();
-	this->enhancedUI         = new EnhancedUI();
-
-	this->supplyManager->setBuildManager(this->buildManager);
-	this->supplyManager->setBuildOrderManager(this->buildOrderManager);
-	this->techManager->setBuildingPlacer(this->buildManager->getBuildingPlacer());
-	this->upgradeManager->setBuildingPlacer(this->buildManager->getBuildingPlacer());
-	this->workerManager->setBaseManager(this->baseManager);
-	this->workerManager->setBuildOrderManager(this->buildOrderManager);
-	this->baseManager->setBuildOrderManager(this->buildOrderManager);
-
-	this->buildOrderManager->enableDependencyResolver();
-	this->workerManager->enableAutoBuild();
-	this->workerManager->setAutoBuildPriority(40); 
+	CreateThread(NULL, 0, (LPTHREAD_START_ROUTINE) AnalyzeThread, (void*) this, 0, NULL);
 }
 
 void BasicAIModule::onFrame()
