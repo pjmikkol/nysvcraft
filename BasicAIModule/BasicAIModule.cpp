@@ -5,8 +5,6 @@ DWORD WINAPI AnalyzeThread(void* obj) {
 	BWTA::readMap();
 	BWTA::analyze();
 
-	analyzed = true;
-
 	BasicAIModule* ai = (BasicAIModule*) obj;
 
 	ai->buildManager       = new BuildManager(&ai->arbitrator);
@@ -33,6 +31,8 @@ DWORD WINAPI AnalyzeThread(void* obj) {
 	ai->buildOrderManager->enableDependencyResolver();
 	ai->workerManager->enableAutoBuild();
 	ai->workerManager->setAutoBuildPriority(40); 
+	
+	analyzed = true;
 
 	return 0;
 }
