@@ -31,7 +31,7 @@ DWORD WINAPI AnalyzeThread(void* obj) {
 
 	ai->buildOrderManager->enableDependencyResolver();
 	ai->workerManager->enableAutoBuild();
-	ai->workerManager->setAutoBuildPriority(40); 
+	ai->workerManager->setAutoBuildPriority(80); 
 	
 	analyzed = true;
 
@@ -40,6 +40,8 @@ DWORD WINAPI AnalyzeThread(void* obj) {
 
 void BasicAIModule::onStart()
 {
+	Broodwar->setLocalSpeed(50);
+
 	analyzed = false;
 
 	this->showManagerAssignments = false;

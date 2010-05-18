@@ -17,7 +17,7 @@ WorkerManager::WorkerManager(Arbitrator::Arbitrator<Unit*,double>* arbitrator)
   this->mineralRate       = 0;
   this->gasRate           = 0;
   this->autoBuild         = false;
-  this->autoBuildPriority = 80;
+  this->autoBuildPriority = 40;
 }
 void WorkerManager::setBaseManager(BaseManager* baseManager)
 {

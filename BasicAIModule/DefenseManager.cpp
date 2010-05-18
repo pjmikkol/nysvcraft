@@ -41,6 +41,7 @@ void DefenseManager::onRemoveUnit(BWAPI::Unit* unit)
 
 void DefenseManager::update()
 {
+	return;
   // Bid on all completed military units
   std::set<BWAPI::Unit*> myPlayerUnits=BWAPI::Broodwar->self()->getUnits();
   for (std::set<BWAPI::Unit*>::iterator u = myPlayerUnits.begin(); u != myPlayerUnits.end(); u++)

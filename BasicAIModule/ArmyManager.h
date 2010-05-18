@@ -15,6 +15,8 @@ public:
 	ArmyManager(Arbitrator::Arbitrator<BWAPI::Unit*, double>* arbitrator, BuildOrderManager* buildOrderManager);
 	~ArmyManager();
 
+	enum TroopState { IdleTroop, AttackingTroop };
+
 	void onOffer(set<Unit*> units);
 	void onRevoke(Unit* unit, double bid);
 
@@ -29,4 +31,5 @@ public:
 private:
 	Arbitrator::Arbitrator<BWAPI::Unit*, double>* arbitrator;
 	BuildOrderManager* buildOrderManager;
+	map<Unit*, TroopState> attackers;
 };
