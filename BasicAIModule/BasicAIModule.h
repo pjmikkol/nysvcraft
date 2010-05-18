@@ -14,6 +14,7 @@
 #include <InformationManager.h>
 #include <UnitGroupManager.h>
 #include <EnhancedUI.h>
+#include "ArmyManager.h"
 #include <windows.h>
 #include <boost/foreach.hpp>
 
@@ -47,5 +48,6 @@ public:
 	InformationManager* informationManager;
 	UnitGroupManager* unitGroupManager;
 	EnhancedUI* enhancedUI;
+	ArmyManager* armyManager;
 	bool showManagerAssignments;
 };
