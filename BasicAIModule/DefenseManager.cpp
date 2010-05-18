@@ -2,6 +2,8 @@
 #include <DefenseManager.h>
 
 using namespace BWAPI;
+using namespace std;
+using namespace BWTA;
 
 DefenseManager::DefenseManager(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator, BuildOrderManager* buildOrderManager)
 {
@@ -56,6 +58,39 @@ void DefenseManager::update()
       arbitrator->setBid(this, *u, 20);
     }
   }
+
+  std::set<Region*> regions;  
+	
+  std::set<Unit*> bases = BWAPI::Broodwar->self()->getUnits(BWAPI::UnitTypes::Protoss_Nexus);
+
+  foreach (Unit* base, bases)
+	  regions.insert(base->getTilePosition());
+
+  set<Chokepoint*> chokepoints;
+
+  foreach (Region* region, regions) {
+	  foreach (Chokepoint* chokepoint, region->getChokepoints()) {
+		  Region* first = chokepoint->getRegions().first();
+		  Region* second = chokepoint->getRegions().second();
+
+		  if (!regions.count(first) || !regions.count(second))
+			  chokepoints.insert(chokepoint);
+	}
+  }
+
+  int defendersPerChokepoint = defenders.size() / chokepoints.size();
+  int i = 0;
+  set<Chokepoint*>::const_iterator chokepointIter = chokepoints.begin();
+
+  foreach (Unit* defender, defenders) {
+	Chokepoint* point = *chokepointIter;
+
+	defender->attackMove(point->getCenter());
+
+	if (++i % defendersPerChokepoint == 0)
+		chokepointIter++;
+  }
+
   //Order all units to choke
   for (std::map<BWAPI::Unit*,DefenseData>::iterator u = defenders.begin(); u != defenders.end(); u++)
   {

@@ -3,6 +3,8 @@
 #include <BWAPI.h>
 #include <BWTA.h>
 #include "BuildOrderManager.h"
+#include <boost/foreach.hpp>
+#define foreach BOOST_FOREACH
 
 class DefenseManager : Arbitrator::Controller<BWAPI::Unit*,double>
 {
