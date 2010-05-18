@@ -188,6 +188,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\ExpansionManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Util.cpp"
 				>
 			</File>
@@ -207,6 +211,10 @@
 			</File>
 			<File
 				RelativePath="include\EnhancedUI.h"
+				>
+			</File>
+			<File
+				RelativePath=".\ExpansionManager.h"
 				>
 			</File>
 			<File

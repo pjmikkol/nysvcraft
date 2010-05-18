@@ -3,17 +3,20 @@
 using namespace BWAPI;
 using namespace std;
 
-ArmyManager::ArmyManager(Arbitrator::Arbitrator<BWAPI::Unit*, double>* arbitrator, BuildOrderManager* buildOrderManager) {
+ArmyManager::ArmyManager(Arbitrator::Arbitrator<BWAPI::Unit*, double>* arbitrator, BuildOrderManager* buildOrderManager, BuildManager* buildManager) {
 	this->arbitrator = arbitrator;
 	this->buildOrderManager = buildOrderManager;
+	this->buildManager = buildManager;
 
 	buildOrderManager->build(20, UnitTypes::Protoss_Zealot, 70);
+	buildOrderManager->build(2, UnitTypes::Protoss_Gateway, 70);
 }
 
 ArmyManager::~ArmyManager()
 {
 	delete this->buildOrderManager;
 	delete this->arbitrator;
+	delete this->buildManager;
 }
 
 void ArmyManager::onOffer(set<Unit*> units) {
@@ -31,8 +34,13 @@ void ArmyManager::onRevoke(Unit* unit, double bid) {
 void ArmyManager::update() {
 	set<Unit*> units = BWAPI::Broodwar->self()->getUnits();
 	
+	int completedZealots = buildManager->getCompletedCount(UnitTypes::Protoss_Zealot);
+
+	if (completedZealots == 6)
+		buildOrderManager->build(999999, UnitTypes::Protoss_Dragoon, 70);
+
 	foreach (Unit* unit, units) 
-		if (unit->getType() == UnitTypes::Protoss_Zealot)
+		if (unit->isCompleted() && unit->getType() == UnitTypes::Protoss_Zealot)
 			arbitrator->setBid(this, unit, 20);    
 
 	pair<Unit*, TroopState> pair;

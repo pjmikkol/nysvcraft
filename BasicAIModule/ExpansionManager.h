@@ -9,14 +9,12 @@
 using namespace BWAPI;
 using namespace std;
 
-class ArmyManager :
+class ExpansionManager :
 	public Arbitrator::Controller<BWAPI::Unit*, double>
 {
 public:
-	ArmyManager(Arbitrator::Arbitrator<BWAPI::Unit*, double>* arbitrator, BuildOrderManager* buildOrderManager, BuildManager* buildManager);
-	~ArmyManager();
-
-	enum TroopState { IdleTroop, AttackingTroop };
+	ExpansionManager(Arbitrator::Arbitrator<Unit*, double>* arbitrator, BuildOrderManager* buildOrderManager, BuildManager* buildManager);
+	~ExpansionManager();
 
 	void onOffer(set<Unit*> units);
 	void onRevoke(Unit* unit, double bid);
@@ -30,8 +28,7 @@ public:
 	string getName() const;
 	string getShortName() const;
 private:
-	Arbitrator::Arbitrator<BWAPI::Unit*, double>* arbitrator;
+	Arbitrator::Arbitrator<Unit*, double>* arbitrator;
 	BuildOrderManager* buildOrderManager;
 	BuildManager* buildManager;
-	map<Unit*, TroopState> attackers;
 };

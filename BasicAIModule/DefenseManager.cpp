@@ -1,23 +1,25 @@
 #include <BWTA.h>
 #include <DefenseManager.h>
 
-DefenseManager::DefenseManager(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator)
+using namespace BWAPI;
+
+DefenseManager::DefenseManager(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator, BuildOrderManager* buildOrderManager)
 {
-  this->arbitrator = arbitrator;
-  std::set<BWTA::Chokepoint*> chokepoints = BWTA::getStartLocation(BWAPI::Broodwar->self())->getRegion()->getChokepoints();
-  if (chokepoints.size() == 1)
-  {
-    chokePosition = (*chokepoints.begin())->getCenter();
-  }
-  else
-  {
-    chokePosition = BWAPI::Positions::None;
-  }
+	this->arbitrator = arbitrator;
+	this->buildOrderManager = buildOrderManager;
+
+	std::set<BWTA::Chokepoint*> chokepoints = BWTA::getStartLocation(BWAPI::Broodwar->self())->getRegion()->getChokepoints();
+  
+	if (chokepoints.size() >= 1)
+	    chokePosition = (*chokepoints.begin())->getCenter();
+	else
+	    chokePosition = BWAPI::Positions::None;
+  
+	buildOrderManager->build(10, UnitTypes::Protoss_Photon_Cannon, 40);
 }
 
 void DefenseManager::onOffer(std::set<BWAPI::Unit*> units)
 {
-	return;
   for(std::set<BWAPI::Unit*>::iterator u = units.begin(); u != units.end(); u++)
   {
     if (defenders.find(*u) == defenders.end())
@@ -41,7 +43,6 @@ void DefenseManager::onRemoveUnit(BWAPI::Unit* unit)
 
 void DefenseManager::update()
 {
-	return;
   // Bid on all completed military units
   std::set<BWAPI::Unit*> myPlayerUnits=BWAPI::Broodwar->self()->getUnits();
   for (std::set<BWAPI::Unit*>::iterator u = myPlayerUnits.begin(); u != myPlayerUnits.end(); u++)
