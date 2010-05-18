@@ -102,7 +102,6 @@ void BasicAIModule::onFrame()
 	{
 		Broodwar->drawCircleMap(u->getPosition().x(),u->getPosition().y(),20,Colors::Red);
 	}
-
 }
 
 void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
