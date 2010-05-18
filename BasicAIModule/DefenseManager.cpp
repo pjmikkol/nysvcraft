@@ -17,6 +17,7 @@ DefenseManager::DefenseManager(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbi
 
 void DefenseManager::onOffer(std::set<BWAPI::Unit*> units)
 {
+	return;
   for(std::set<BWAPI::Unit*>::iterator u = units.begin(); u != units.end(); u++)
   {
     if (defenders.find(*u) == defenders.end())
