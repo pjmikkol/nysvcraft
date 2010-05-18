@@ -13,7 +13,7 @@ class ExpansionManager :
 	public Arbitrator::Controller<BWAPI::Unit*, double>
 {
 public:
-	ExpansionManager(Arbitrator::Arbitrator<Unit*, double>* arbitrator, BuildOrderManager* buildOrderManager, BuildManager* buildManager);
+	ExpansionManager(Arbitrator::Arbitrator<Unit*, double>* arbitrator, BuildManager* buildManager, BaseManager* baseManager);
 	~ExpansionManager();
 
 	void onOffer(set<Unit*> units);
@@ -29,6 +29,7 @@ public:
 	string getShortName() const;
 private:
 	Arbitrator::Arbitrator<Unit*, double>* arbitrator;
-	BuildOrderManager* buildOrderManager;
 	BuildManager* buildManager;
+	BaseManager* baseManager;
+	int expansionCount;
 };

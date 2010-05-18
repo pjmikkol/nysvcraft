@@ -8,15 +8,14 @@ ArmyManager::ArmyManager(Arbitrator::Arbitrator<BWAPI::Unit*, double>* arbitrato
 	this->buildOrderManager = buildOrderManager;
 	this->buildManager = buildManager;
 
+	builtDragoons = false;
+
 	buildOrderManager->build(20, UnitTypes::Protoss_Zealot, 70);
 	buildOrderManager->build(2, UnitTypes::Protoss_Gateway, 70);
 }
 
 ArmyManager::~ArmyManager()
 {
-	delete this->buildOrderManager;
-	delete this->arbitrator;
-	delete this->buildManager;
 }
 
 void ArmyManager::onOffer(set<Unit*> units) {
@@ -36,8 +35,10 @@ void ArmyManager::update() {
 	
 	int completedZealots = buildManager->getCompletedCount(UnitTypes::Protoss_Zealot);
 
-	if (completedZealots == 6)
+	if (!builtDragoons && completedZealots == 6) {
 		buildOrderManager->build(999999, UnitTypes::Protoss_Dragoon, 70);
+		builtDragoons = true;
+	}
 
 	foreach (Unit* unit, units) 
 		if (unit->isCompleted() && unit->getType() == UnitTypes::Protoss_Zealot)
