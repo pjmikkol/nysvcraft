@@ -42,6 +42,8 @@ void DefenseManager::update()
 {
 	bidOnMilitaryUnits();
 
+	updateExploredRegions();
+
 	checkInterestingChokepoints();
 	
 	giveDefenseOrders();
@@ -63,11 +65,29 @@ void DefenseManager::bidOnMilitaryUnits() {
 	}
 }
 
+void DefenseManager::updateExploredRegions() {
+	foreach (Unit* unit, Broodwar->self()->getUnits()) {
+		Region* region = BWTA::getRegion(unit->getTilePosition());
+		if (!isBaseRegion(region))
+			exploredRegions.insert(region);
+	}
+}
+
+bool DefenseManager::isBaseRegion(Region* region) {
+	foreach (Base* base, baseManager->getActiveBases())
+		if (BWTA::getRegion(base->getBaseLocation()->getTilePosition()) == region)
+			return true;
+
+	return false;
+}
+
 void DefenseManager::checkInterestingChokepoints() {
 	set<Base*> newBases = baseManager->getActiveBases();
 
 	if (newBases != bases) {
 		bases = newBases;
+
+
 
 		set<Chokepoint*> oldInterestingChokepoints = interestingChokepoints;
 		interestingChokepoints = findInterestingChokepoints();

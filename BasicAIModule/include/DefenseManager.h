@@ -39,6 +39,8 @@ private:
 	void giveDefenseOrders();
 	std::set<BWAPI::Unit*> getIdleDefenders();
 	void releaseDefenseGroupAt(BWTA::Chokepoint* chokepoint);
+	void updateExploredRegions();
+	bool isBaseRegion(BWTA::Region* region);
 
 	BuildOrderManager* buildOrderManager;
 	BaseManager* baseManager;
@@ -47,4 +49,5 @@ private:
 	std::set<BWTA::Chokepoint*> interestingChokepoints;
 	std::set<Base*> bases;
 	std::map<BWTA::Chokepoint*, UnitGroup*> defenseGroups;
+	std::set<BWTA::Region*> exploredRegions;
 };
