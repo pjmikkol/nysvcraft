@@ -31,7 +31,6 @@ public:
 	virtual void update();
 	virtual std::string getName() const;
 	virtual std::string getShortName() const;
-	std::set<BWTA::Chokepoint*> findInterestingChokepoints();
 
 private:
 	void bidOnMilitaryUnits();
@@ -40,7 +39,12 @@ private:
 	std::set<BWAPI::Unit*> getIdleDefenders();
 	void releaseDefenseGroupAt(BWTA::Chokepoint* chokepoint);
 	void updateExploredRegions();
+	void addInterestingChokepoint(BWTA::Chokepoint* chokepoint);
+	void removeInterestingChokepoint(BWTA::Chokepoint* chokepoint);
+
 	bool isBaseRegion(BWTA::Region* region);
+	bool isUnexplored(BWTA::Region* region);
+	bool isExplored(BWTA::Region* region);
 
 	BuildOrderManager* buildOrderManager;
 	BaseManager* baseManager;

@@ -85,22 +85,64 @@ void DefenseManager::checkInterestingChokepoints() {
 	set<Base*> newBases = baseManager->getActiveBases();
 
 	if (newBases != bases) {
-		bases = newBases;
+		Base* newBase;
 
+		foreach (Base* base, newBases)
+			if (!bases.count(base)) {
+				newBase = base;
+				break;
+			}
 
+		assert(newBase != NULL);
 
-		set<Chokepoint*> oldInterestingChokepoints = interestingChokepoints;
-		interestingChokepoints = findInterestingChokepoints();
-		
-		foreach (Chokepoint* chokepoint, interestingChokepoints)
-			defenseGroups.insert(make_pair(chokepoint, new UnitGroup()));
+		Region* region = getRegion(newBase->getBaseLocation()->getTilePosition());
 
-		foreach (Chokepoint* chokepoint, oldInterestingChokepoints)
-			if (!interestingChokepoints.count(chokepoint))
-				releaseDefenseGroupAt(chokepoint);
+		foreach (Chokepoint* chokepoint, region->getChokepoints()) {
+			Region* other;
 
+			if (chokepoint->getRegions().first == region)
+				other = chokepoint->getRegions().second;
+			else
+				other = chokepoint->getRegions().first;
+
+			if (isUnexplored(other))
+				addInterestingChokepoint(chokepoint);
+			else if (isBaseRegion(other))
+				removeInterestingChokepoint(chokepoint);
+			else if (isExplored(other)) {
+				foreach (Chokepoint* otherChokepoint, other->getChokepoints()) {
+					removeInterestingChokepoint(otherChokepoint);			
+					
+					Region* neighbour = otherChokepoint->getRegions().first == other ? otherChokepoint->getRegions().second : otherChokepoint->getRegions().first;
+
+					if (isUnexplored(neighbour))
+						addInterestingChokepoint(otherChokepoint);
+				}
+			}
+		}
+				
+		bases = newBases;		
+	
 		Broodwar->printf("Found %d interesting chokepoints", interestingChokepoints.size());	
 	}
+}
+
+bool DefenseManager::isUnexplored(Region* region) {
+	return !isExplored(region);
+}
+
+bool DefenseManager::isExplored(Region* region) {
+	return exploredRegions.count(region) == 1;
+}
+
+void DefenseManager::addInterestingChokepoint(Chokepoint* chokepoint) {
+	interestingChokepoints.insert(chokepoint);
+	defenseGroups.insert(make_pair(chokepoint, new UnitGroup()));
+}
+
+void DefenseManager::removeInterestingChokepoint(Chokepoint* chokepoint) {
+	interestingChokepoints.erase(chokepoint);
+	releaseDefenseGroupAt(chokepoint);
 }
 
 void DefenseManager::releaseDefenseGroupAt(Chokepoint* chokepoint) {
@@ -146,33 +188,6 @@ set<Unit*> DefenseManager::getIdleDefenders() {
 			idleDefenders.insert(pair.first);
 
 	return idleDefenders;
-}
-
-set<Chokepoint*> DefenseManager::findInterestingChokepoints() {
-	std::set<Region*> myRegions;  
-
-	std::set<Base*> bases = baseManager->getActiveBases();
-
-	Broodwar->printf("Found %d bases", bases.size());
-
-	foreach (Base* base, bases)
-		myRegions.insert(BWTA::getRegion(base->getBaseLocation()->getTilePosition()));
-
-	Broodwar->printf("Found %d owned regions", myRegions.size());
-
-	set<Chokepoint*> chokepoints;
-
-	foreach (Region* region, myRegions) {
-		foreach (Chokepoint* chokepoint, region->getChokepoints()) {
-			Region* first = chokepoint->getRegions().first;
-			Region* second = chokepoint->getRegions().second;
-
-			if (!myRegions.count(first) || !myRegions.count(second))
-				chokepoints.insert(chokepoint);
-		}
-	}
-
-	return chokepoints;
 }
 
 std::string DefenseManager::getName() const
