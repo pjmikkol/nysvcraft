@@ -117,6 +117,7 @@ void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
 	this->defenseManager->onRemoveUnit(unit);
 	this->informationManager->onUnitDestroy(unit);
 	this->armyManager->onUnitDestroy(unit);
+	this->defenseManager->onUnitDestroy(unit);
 }
 
 void BasicAIModule::onUnitShow(BWAPI::Unit* unit)

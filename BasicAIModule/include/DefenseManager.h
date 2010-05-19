@@ -5,6 +5,7 @@
 #include <algorithm>
 #include "BuildOrderManager.h"
 #include "BaseManager.h"
+#include "BaseManager/Base.h"
 #include "UnitGroupManager.h"
 #include "UnitGroup.h"
 #include <boost/foreach.hpp>
@@ -27,10 +28,12 @@ public:
 	DefenseManager(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator, BuildOrderManager* buildOrderManager, BaseManager* baseManager);
 	virtual void onOffer(std::set<BWAPI::Unit*> units);
 	virtual void onRevoke(BWAPI::Unit* unit, double bid);
+	void onUnitDestroy(BWAPI::Unit* unit);
 	void onRemoveUnit(BWAPI::Unit* unit);
+	void onExpand(Base* newBase);
 	virtual void update();
 	virtual std::string getName() const;
-	virtual std::string getShortName() const;
+	virtual std::string getShortName() const;	
 
 private:
 	void bidOnMilitaryUnits();
@@ -51,7 +54,6 @@ private:
 	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
 	std::map<BWAPI::Unit*,DefenseData> defenders;
 	std::set<BWTA::Chokepoint*> interestingChokepoints;
-	std::set<Base*> bases;
 	std::map<BWTA::Chokepoint*, UnitGroup*> defenseGroups;
 	std::set<BWTA::Region*> exploredRegions;
 };

@@ -2,6 +2,8 @@
 #include <DefenseManager.h>
 #include <cassert>
 
+#include <fstream>
+
 using namespace BWAPI;
 using namespace std;
 using namespace BWTA;
@@ -11,7 +13,7 @@ DefenseManager::DefenseManager(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbi
 	this->arbitrator = arbitrator;
 	this->buildOrderManager = buildOrderManager;
 	this->baseManager = baseManager;
-	
+
 	buildOrderManager->build(10, UnitTypes::Protoss_Photon_Cannon, 40);
 }
 
@@ -26,6 +28,38 @@ void DefenseManager::onOffer(std::set<BWAPI::Unit*> units)
 			defenders.insert(std::make_pair(*u, temp));
 		}
 	}
+}
+
+void DefenseManager::onUnitDestroy(Unit* unit) {
+	if (unit->getPlayer() == Broodwar->self() && unit->getType() == UnitTypes::Protoss_Nexus) {
+		Broodwar->printf("Base destroyed at %d, %d", unit->getTilePosition().x(), unit->getTilePosition().y());
+
+		Region* region = getRegion(unit->getTilePosition());
+
+		foreach (Chokepoint* chokepoint, region->getChokepoints()) {
+			Region* other;
+
+			if (chokepoint->getRegions().first == region)
+				other = chokepoint->getRegions().second;
+			else
+				other = chokepoint->getRegions().first;
+
+			if (isBaseRegion(other))
+				addInterestingChokepoint(chokepoint);
+			else if (isUnexplored(other))
+				removeInterestingChokepoint(chokepoint);
+			else if (isExplored(other)) {
+				foreach (Chokepoint* otherChokepoint, other->getChokepoints()) {
+					removeInterestingChokepoint(otherChokepoint);			
+
+					Region* neighbour = otherChokepoint->getRegions().first == other ? otherChokepoint->getRegions().second : otherChokepoint->getRegions().first;
+
+					if (isBaseRegion(neighbour))
+						addInterestingChokepoint(chokepoint);
+				}
+			}
+		}
+	}	
 }
 
 void DefenseManager::onRevoke(BWAPI::Unit* unit, double bid)
@@ -44,8 +78,6 @@ void DefenseManager::update()
 
 	updateExploredRegions();
 
-	checkInterestingChokepoints();
-	
 	giveDefenseOrders();
 }
 
@@ -74,57 +106,49 @@ void DefenseManager::updateExploredRegions() {
 }
 
 bool DefenseManager::isBaseRegion(Region* region) {
-	foreach (Base* base, baseManager->getActiveBases())
-		if (BWTA::getRegion(base->getBaseLocation()->getTilePosition()) == region)
+	foreach (Base* base, baseManager->getAllBases())
+		if ((base->isActive() || base->isBeingConstructed()) && BWTA::getRegion(base->getBaseLocation()->getTilePosition()) == region)
 			return true;
 
 	return false;
 }
 
-void DefenseManager::checkInterestingChokepoints() {
-	set<Base*> newBases = baseManager->getActiveBases();
+void DefenseManager::onExpand(Base* newBase) {
+	TilePosition pos = newBase->getBaseLocation()->getTilePosition();
 
-	if (newBases != bases) {
-		Base* newBase;
+	Broodwar->printf("New base at %d, %d", pos.x(), pos.y());
 
-		foreach (Base* base, newBases)
-			if (!bases.count(base)) {
-				newBase = base;
-				break;
-			}
+	Region* region = getRegion(newBase->getBaseLocation()->getTilePosition());
 
-		assert(newBase != NULL);
+	Broodwar->printf("New region at %d, %d", region->getCenter().x(), region->getCenter().y());
 
-		Region* region = getRegion(newBase->getBaseLocation()->getTilePosition());
+	Broodwar->printf("Update chokepoints");
 
-		foreach (Chokepoint* chokepoint, region->getChokepoints()) {
-			Region* other;
+	foreach (Chokepoint* chokepoint, region->getChokepoints()) {
+		Region* other;
 
-			if (chokepoint->getRegions().first == region)
-				other = chokepoint->getRegions().second;
-			else
-				other = chokepoint->getRegions().first;
+		if (chokepoint->getRegions().first == region)
+			other = chokepoint->getRegions().second;
+		else
+			other = chokepoint->getRegions().first;
 
-			if (isUnexplored(other))
-				addInterestingChokepoint(chokepoint);
-			else if (isBaseRegion(other))
-				removeInterestingChokepoint(chokepoint);
-			else if (isExplored(other)) {
-				foreach (Chokepoint* otherChokepoint, other->getChokepoints()) {
-					removeInterestingChokepoint(otherChokepoint);			
-					
-					Region* neighbour = otherChokepoint->getRegions().first == other ? otherChokepoint->getRegions().second : otherChokepoint->getRegions().first;
+		if (isUnexplored(other))
+			addInterestingChokepoint(chokepoint);
+		else if (isBaseRegion(other))
+			removeInterestingChokepoint(chokepoint);
+		else if (isExplored(other)) {
+			foreach (Chokepoint* otherChokepoint, other->getChokepoints()) {
+				removeInterestingChokepoint(otherChokepoint);			
 
-					if (isUnexplored(neighbour))
-						addInterestingChokepoint(otherChokepoint);
-				}
+				Region* neighbour = otherChokepoint->getRegions().first == other ? otherChokepoint->getRegions().second : otherChokepoint->getRegions().first;
+
+				if (isUnexplored(neighbour))
+					addInterestingChokepoint(otherChokepoint);
 			}
 		}
-				
-		bases = newBases;		
-	
-		Broodwar->printf("Found %d interesting chokepoints", interestingChokepoints.size());	
 	}
+
+	Broodwar->printf("Found %d interesting chokepoints", interestingChokepoints.size());	
 }
 
 bool DefenseManager::isUnexplored(Region* region) {
@@ -150,7 +174,8 @@ void DefenseManager::releaseDefenseGroupAt(Chokepoint* chokepoint) {
 
 	UnitGroup* group = defenseGroups[chokepoint];
 
-	foreach (Unit* unit, *group)
+	if (group)
+		foreach (Unit* unit, *group)
 		defenders[unit].mode = DefenseData::Idle;
 
 	defenseGroups.erase(chokepoint);
