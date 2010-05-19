@@ -2,8 +2,11 @@
 #include <Arbitrator.h>
 #include <BWAPI.h>
 #include <BWTA.h>
+#include <algorithm>
 #include "BuildOrderManager.h"
 #include "BaseManager.h"
+#include "UnitGroupManager.h"
+#include "UnitGroup.h"
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
 
@@ -32,6 +35,10 @@ public:
 
 private:
 	void bidOnMilitaryUnits();
+	void checkInterestingChokepoints();
+	void giveDefenseOrders();
+	std::set<BWAPI::Unit*> getIdleDefenders();
+	void releaseDefenseGroupAt(BWTA::Chokepoint* chokepoint);
 
 	BuildOrderManager* buildOrderManager;
 	BaseManager* baseManager;
@@ -39,4 +46,5 @@ private:
 	std::map<BWAPI::Unit*,DefenseData> defenders;
 	std::set<BWTA::Chokepoint*> interestingChokepoints;
 	std::set<Base*> bases;
+	std::map<BWTA::Chokepoint*, UnitGroup*> defenseGroups;
 };

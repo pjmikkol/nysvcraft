@@ -42,21 +42,9 @@ void DefenseManager::update()
 {
 	bidOnMilitaryUnits();
 
-	set<Base*> newBases = baseManager->getActiveBases();
-
-	if (newBases != bases) {
-		bases = newBases;
-		interestingChokepoints = findInterestingChokepoints();
-		Broodwar->printf("Found %d interesting chokepoints", interestingChokepoints.size());	
-	}
+	checkInterestingChokepoints();
 	
-	pair<Unit*, DefenseData> pair;
-
-	foreach (pair, defenders)
-		if (pair.second.mode == DefenseData::Idle && !interestingChokepoints.empty()) {
-			pair.first->attackMove((*interestingChokepoints.begin())->getCenter());
-			defenders[pair.first].mode = DefenseData::Moving;
-		}
+	giveDefenseOrders();
 }
 
 void DefenseManager::bidOnMilitaryUnits() {
@@ -73,6 +61,71 @@ void DefenseManager::bidOnMilitaryUnits() {
 			arbitrator->setBid(this, *u, 20);
 		}
 	}
+}
+
+void DefenseManager::checkInterestingChokepoints() {
+	set<Base*> newBases = baseManager->getActiveBases();
+
+	if (newBases != bases) {
+		bases = newBases;
+
+		set<Chokepoint*> oldInterestingChokepoints = interestingChokepoints;
+		interestingChokepoints = findInterestingChokepoints();
+		
+		foreach (Chokepoint* chokepoint, interestingChokepoints)
+			defenseGroups.insert(make_pair(chokepoint, new UnitGroup()));
+
+		foreach (Chokepoint* chokepoint, oldInterestingChokepoints)
+			if (!interestingChokepoints.count(chokepoint))
+				releaseDefenseGroupAt(chokepoint);
+
+		Broodwar->printf("Found %d interesting chokepoints", interestingChokepoints.size());	
+	}
+}
+
+void DefenseManager::releaseDefenseGroupAt(Chokepoint* chokepoint) {
+	Broodwar->printf("Release defenders at %d, %d", chokepoint->getCenter().x(), chokepoint->getCenter().y());
+
+	UnitGroup* group = defenseGroups[chokepoint];
+
+	foreach (Unit* unit, *group)
+		defenders[unit].mode = DefenseData::Idle;
+
+	defenseGroups.erase(chokepoint);
+}
+
+bool sortByUnitCount(pair<Chokepoint*, UnitGroup*> a, pair<Chokepoint*, UnitGroup*> b) {
+	return a.second->size() < b.second->size();
+}
+
+void DefenseManager::giveDefenseOrders() {
+	set<Unit*> idleUnits = getIdleDefenders();
+
+	foreach (Unit* defender, idleUnits) {
+		vector< pair<Chokepoint*, UnitGroup*> > defGroups = 
+			vector< pair<Chokepoint*, UnitGroup*> >(defenseGroups.begin(), defenseGroups.end());
+
+		sort(defGroups.begin(), defGroups.end(), sortByUnitCount);
+
+		Chokepoint* target = (*defGroups.begin()).first;
+		UnitGroup* group   = (*defGroups.begin()).second;
+
+		group->insert(defender);
+		defender->attackMove(target->getCenter());
+		defenders[defender].mode = DefenseData::Moving;
+	}
+}
+
+set<Unit*> DefenseManager::getIdleDefenders() {
+	set<Unit*> idleDefenders;
+
+	pair<Unit*, DefenseData> pair;
+
+	foreach (pair, defenders)
+		if (pair.second.mode == DefenseData::Idle)
+			idleDefenders.insert(pair.first);
+
+	return idleDefenders;
 }
 
 set<Chokepoint*> DefenseManager::findInterestingChokepoints() {
