@@ -131,7 +131,7 @@ set<Unit*> DefenseManager::getIdleDefenders() {
 set<Chokepoint*> DefenseManager::findInterestingChokepoints() {
 	std::set<Region*> myRegions;  
 
-	std::set<Base*> bases = baseManager->getAllBases();
+	std::set<Base*> bases = baseManager->getActiveBases();
 
 	Broodwar->printf("Found %d bases", bases.size());
 
