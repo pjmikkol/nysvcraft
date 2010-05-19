@@ -4,6 +4,7 @@
 #include <BaseManager.h>
 #include <BuildManager.h>
 #include "Helpers.h"
+#include <assert.h>
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
 
@@ -30,6 +31,21 @@ public:
 
 	string getName() const;
 	string getShortName() const;
+
+	void printAttackerInfo(map<Unit*, set<Unit*> >* attackedBy);
+	void decideActions(map<Unit*, set<Unit*> >* attackedBy);
+	void handleFlee(Unit* unit, map<Unit*, set<Unit*> >* attackedBy);
+	Position fleeTo(Unit* unit, const set<Unit*>* attackers);
+	set<double>* calculateAngles(Unit* unit, const set<Unit*>* attackers);
+	double calculateAngle(Unit* unit, Unit* enemy);
+	double midAngle(set<double>* angles);
+	double reverseAngle(double angle);
+	void handleAttack(Unit* unit);
+	void calculateTarget(Unit* unit, set<Unit*> enemies);
+	Unit* weakestEnemyInRange(Unit* unit, set<Unit*> enemies);
+	map< Unit*, set<Unit*> > * getAttackers();
+	bool isInAttackRange(Unit* attacker, Unit* target);
+	void drawUnitInfo();
 
 private:
 	Arbitrator::Arbitrator<BWAPI::Unit*, double>* arbitrator;

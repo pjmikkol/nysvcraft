@@ -19,6 +19,8 @@ struct UnitData {
 };
 
 namespace helpers {
+	const double pi = 3.14159;
+
 	extern std::map<BWAPI::UnitType, unsigned int> fleeThreshold;
 	static char* unitTypes[] = { "Protoss Zealot", "Protoss Dragoon", "Protoss Probe" };
 	static int typeCount = 3;
