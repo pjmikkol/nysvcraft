@@ -3,7 +3,6 @@
 #include <BWAPI.h>
 #include <BaseManager.h>
 #include <BuildManager.h>
-#include "DefenseManager.h"
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
 
@@ -14,7 +13,7 @@ class ExpansionManager :
 	public Arbitrator::Controller<BWAPI::Unit*, double>
 {
 public:
-	ExpansionManager(Arbitrator::Arbitrator<Unit*, double>* arbitrator, BuildManager* buildManager, BaseManager* baseManager, DefenseManager* defenseManager);
+	ExpansionManager(Arbitrator::Arbitrator<Unit*, double>* arbitrator, BuildManager* buildManager, BaseManager* baseManager);
 	~ExpansionManager();
 
 	void onOffer(set<Unit*> units);
@@ -32,6 +31,5 @@ private:
 	Arbitrator::Arbitrator<Unit*, double>* arbitrator;
 	BuildManager* buildManager;
 	BaseManager* baseManager;
-	DefenseManager* defenseManager;
 	int expansionCount;
 };
