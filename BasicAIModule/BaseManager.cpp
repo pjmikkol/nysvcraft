@@ -65,7 +65,7 @@ Base* BaseManager::getBase(BWTA::BaseLocation* location)
 }
 
 
-void BaseManager::expand(int priority)
+Base* BaseManager::expand(int priority)
 {
   BWTA::BaseLocation* location=NULL;
   double minDist=-1;
@@ -82,14 +82,15 @@ void BaseManager::expand(int priority)
       }
     }
   }
-  expand(location,priority);
+  return expand(location,priority);
 }
-void BaseManager::expand(BWTA::BaseLocation* location, int priority)
+Base* BaseManager::expand(BWTA::BaseLocation* location, int priority)
 {
   if (location==NULL)
-    return;
+    return NULL; //FIXME: keep this in mind
   addBase(location);
   this->builder->buildAdditional(1,*BWAPI::Broodwar->self()->getRace().getCenter(),priority,location->getTilePosition());
+  return getBase(location);
 }
 
 

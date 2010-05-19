@@ -20,7 +20,7 @@ DWORD WINAPI AnalyzeThread(void* obj) {
 	ai->unitGroupManager   = new UnitGroupManager();
 	ai->enhancedUI         = new EnhancedUI();
 	ai->armyManager		   = new ArmyManager(&ai->arbitrator, ai->buildOrderManager, ai->buildManager);
-	ai->expansionManager   = new ExpansionManager(&ai->arbitrator, ai->buildManager, ai->baseManager);
+	ai->expansionManager   = new ExpansionManager(&ai->arbitrator, ai->buildManager, ai->baseManager, ai->defenseManager);
 
 	ai->supplyManager->setBuildManager(ai->buildManager);
 	ai->supplyManager->setBuildOrderManager(ai->buildOrderManager);
@@ -161,7 +161,7 @@ bool BasicAIModule::onSendText(std::string text)
 	}
 	if (text=="expand")
 	{
-		this->baseManager->expand();
+		this->expansionManager->expand();
 	}
 	if (type!=UnitTypes::Unknown)
 	{

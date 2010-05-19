@@ -10,13 +10,15 @@ using namespace BWTA;
 //TODO: should build assimilator to new bases
 //TODO: should build defense cannons to new bases
 
-ExpansionManager::ExpansionManager(Arbitrator::Arbitrator<Unit*, double>* arbitrator, BuildManager* buildManager, BaseManager* baseManager) {
+ExpansionManager::ExpansionManager(Arbitrator::Arbitrator<Unit*, double>* arbitrator, BuildManager* buildManager,
+								   BaseManager* baseManager, DefenseManager* defenseManager) {
 	this->arbitrator = arbitrator;
 	this->buildManager = buildManager;
 	this->baseManager = baseManager;
 	this->expansionCount = 0;
 	this->lastExpanded = 0;
 	this->expansionInterval = 1000;
+	this->defenseManager = defenseManager;
 }
 
 ExpansionManager::~ExpansionManager(void) {
@@ -40,14 +42,15 @@ bool ExpansionManager::shouldExpand() {
 	       buildManager->getCompletedCount(UnitTypes::Protoss_Pylon) >= 2*(expansionCount + 1);
 }
 void ExpansionManager::expand() {
-	BaseLocation* expansion = expansionLocation();
-	if (!expansion)
+	BaseLocation* expansionLocationPenis = expansionLocation();
+	if (!expansionLocationPenis)
 		return; //no valid expansions left
 	Broodwar->printf("Expand #%d", expansionCount);
-	baseManager->expand();
+	Base* expansion = baseManager->expand();
 	expansionCount++;
 	lastExpanded = Broodwar->getFrameCount();
 	expansionInterval /= 2;
+	defenseManager->onExpand(expansion);
 }
 
 /*
