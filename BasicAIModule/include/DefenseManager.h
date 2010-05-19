@@ -35,4 +35,5 @@ private:
   BaseManager* baseManager;
   Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
   std::map<BWAPI::Unit*,DefenseData> defenders;
+  std::set<BWTA::Chokepoint*> interestingChokepoints;
 };

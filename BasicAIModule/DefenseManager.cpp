@@ -12,82 +12,96 @@ DefenseManager::DefenseManager(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbi
 	this->buildOrderManager = buildOrderManager;
 	this->baseManager = baseManager;
 
-	set<Chokepoint*> chokepoints = findInterestingChokepoints();
-
-	assert(chokepoints.size() == 1);
-
 	buildOrderManager->build(10, UnitTypes::Protoss_Photon_Cannon, 40);
 }
 
 void DefenseManager::onOffer(std::set<BWAPI::Unit*> units)
 {
-  for(std::set<BWAPI::Unit*>::iterator u = units.begin(); u != units.end(); u++)
-  {
-    if (defenders.find(*u) == defenders.end())
-    {
-      arbitrator->accept(this, *u);
-      DefenseData temp;
-      defenders.insert(std::make_pair(*u, temp));
-    }
-  }
+	for(std::set<BWAPI::Unit*>::iterator u = units.begin(); u != units.end(); u++)
+	{
+		if (defenders.find(*u) == defenders.end())
+		{
+			arbitrator->accept(this, *u);
+			DefenseData temp;
+			defenders.insert(std::make_pair(*u, temp));
+		}
+	}
 }
 
 void DefenseManager::onRevoke(BWAPI::Unit* unit, double bid)
 {
-  defenders.erase(unit);
+	defenders.erase(unit);
 }
 
 void DefenseManager::onRemoveUnit(BWAPI::Unit* unit)
 {
-  defenders.erase(unit);
+	defenders.erase(unit);
 }
 
 void DefenseManager::update()
 {
-  // Bid on all completed military units
-  std::set<BWAPI::Unit*> myPlayerUnits=BWAPI::Broodwar->self()->getUnits();
-  for (std::set<BWAPI::Unit*>::iterator u = myPlayerUnits.begin(); u != myPlayerUnits.end(); u++)
-  {
-    if ((*u)->isCompleted() && 
-        !(*u)->getType().isWorker() && 
-        !(*u)->getType().isBuilding() &&
-        (*u)->getType() != BWAPI::UnitTypes::Zerg_Egg &&
-        (*u)->getType() != BWAPI::UnitTypes::Zerg_Larva)
-    {
-      arbitrator->setBid(this, *u, 20);
-    }
-  }
+	// Bid on all completed military units
+	std::set<BWAPI::Unit*> myPlayerUnits=BWAPI::Broodwar->self()->getUnits();
+	for (std::set<BWAPI::Unit*>::iterator u = myPlayerUnits.begin(); u != myPlayerUnits.end(); u++)
+	{
+		if ((*u)->isCompleted() && 
+			!(*u)->getType().isWorker() && 
+			!(*u)->getType().isBuilding() &&
+			(*u)->getType() != BWAPI::UnitTypes::Zerg_Egg &&
+			(*u)->getType() != BWAPI::UnitTypes::Zerg_Larva)
+		{
+			arbitrator->setBid(this, *u, 20);
+		}
+	}
+
+	if (interestingChokepoints.empty()) {
+		interestingChokepoints = findInterestingChokepoints();
+
+		Broodwar->printf("Found %d interesting chokepoints", interestingChokepoints.size());
+	}
+
+	pair<Unit*, DefenseData> pair;
+
+	foreach (pair, defenders)
+		if (pair.second.mode == DefenseData::Idle && !interestingChokepoints.empty()) {
+			pair.first->attackMove((*interestingChokepoints.begin())->getCenter());
+			defenders[pair.first].mode = DefenseData::Moving;
+		}
 }
 
 set<Chokepoint*> DefenseManager::findInterestingChokepoints() {
-  std::set<Region*> regions;  
-	
-  std::set<Base*> bases = baseManager->getActiveBases();
+	std::set<Region*> myRegions;  
 
-  foreach (Base* base, bases)
-	  regions.insert(BWTA::getRegion(base->getBaseLocation()->getTilePosition()));
+	std::set<Base*> bases = baseManager->getAllBases();
 
-  set<Chokepoint*> chokepoints;
+	Broodwar->printf("Found %d bases", bases.size());
 
-  foreach (Region* region, regions) {
-	  foreach (Chokepoint* chokepoint, region->getChokepoints()) {
-		  Region* first = chokepoint->getRegions().first;
-		  Region* second = chokepoint->getRegions().second;
+	foreach (Base* base, bases)
+		myRegions.insert(BWTA::getRegion(base->getBaseLocation()->getTilePosition()));
 
-		  if (!regions.count(first) || !regions.count(second))
-			  chokepoints.insert(chokepoint);
+	Broodwar->printf("Found %d owned regions", myRegions.size());
+
+	set<Chokepoint*> chokepoints;
+
+	foreach (Region* region, myRegions) {
+		foreach (Chokepoint* chokepoint, region->getChokepoints()) {
+			Region* first = chokepoint->getRegions().first;
+			Region* second = chokepoint->getRegions().second;
+
+			if (!myRegions.count(first) || !myRegions.count(second))
+				chokepoints.insert(chokepoint);
+		}
 	}
-  }
 
-  return chokepoints;
+	return chokepoints;
 }
 
 std::string DefenseManager::getName() const
 {
-  return "Defense Manager";
+	return "Defense Manager";
 }
 
 std::string DefenseManager::getShortName() const
 {
-  return "Def";
+	return "Def";
 }
