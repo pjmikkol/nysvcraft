@@ -34,4 +34,5 @@ private:
 	BuildOrderManager* buildOrderManager;
 	BuildManager* buildManager;
 	map<Unit*, TroopState> attackers;
+	bool builtDragoons;
 };

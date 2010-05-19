@@ -15,12 +15,12 @@ DWORD WINAPI AnalyzeThread(void* obj) {
 	ai->buildOrderManager  = new BuildOrderManager(ai->buildManager,ai->techManager,ai->upgradeManager,ai->workerManager);
 	ai->baseManager        = new BaseManager();
 	ai->supplyManager      = new SupplyManager();
-	ai->defenseManager     = new DefenseManager(&ai->arbitrator, ai->buildOrderManager);
+	ai->defenseManager     = new DefenseManager(&ai->arbitrator, ai->buildOrderManager, ai->baseManager);
 	ai->informationManager = new InformationManager();
 	ai->unitGroupManager   = new UnitGroupManager();
 	ai->enhancedUI         = new EnhancedUI();
 	ai->armyManager		   = new ArmyManager(&ai->arbitrator, ai->buildOrderManager, ai->buildManager);
-	ai->expansionManager   = new ExpansionManager(&ai->arbitrator, ai->buildOrderManager, ai->buildManager);
+	ai->expansionManager   = new ExpansionManager(&ai->arbitrator, ai->buildManager, ai->baseManager);
 
 	ai->supplyManager->setBuildManager(ai->buildManager);
 	ai->supplyManager->setBuildOrderManager(ai->buildOrderManager);
@@ -69,6 +69,7 @@ void BasicAIModule::onFrame()
 	this->scoutManager->update();
 	this->defenseManager->update();
 	this->armyManager->update();
+	this->expansionManager->update();
 	this->arbitrator.update();
 
 	this->enhancedUI->update();

@@ -8,7 +8,7 @@
 #include "Base.h"
 class BaseManager
 {
-  public:
+public:
   BaseManager();
   void setBuildOrderManager(BuildOrderManager* builder);
   void update();
