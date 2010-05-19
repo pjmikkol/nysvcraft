@@ -1,5 +1,6 @@
 #include "BattleManager.h"
 
+const double releaseDist = 300;
 
 BattleManager::BattleManager(Arbitrator::Arbitrator<BWAPI::Unit*, double>* arbitrator)
 {
@@ -16,20 +17,50 @@ void BattleManager::onOffer(set<Unit*> units)
 {
 	foreach (Unit* unit, units) {
 		if (unit->getType() == UnitTypes::Protoss_Zealot || unit->getType() == UnitTypes::Protoss_Dragoon) {
-			this->arbitrator->accept(this, unit);
-			UnitData ud = { fight, 0, 0 };
-			this->fighters->insert(make_pair(unit, ud));
+			if (this->arbitrator->accept(this, unit)) {
+				UnitData ud = { fight, 0, 0 };
+				this->fighters->insert(make_pair(unit, ud));
+			} else this->fighters->erase(unit);
 		}
 	}
 }
 
 void BattleManager::onRevoke(Unit* unit, double bid)
 {
+	//this->arbitrator->setBid(this, unit, 99999);
+}
 
+void BattleManager::BidUnits()
+{
+	foreach (Unit* unit, Broodwar->self()->getUnits()) {
+		if ( doWeWantUnit(unit) ) {
+			this->arbitrator->setBid(this, unit, 30);
+		} else {
+			this->arbitrator->removeBid(this, unit);
+		}
+	}
+}
+
+bool BattleManager::doWeWantUnit(Unit* unit)
+{
+	if (!unit) return false;
+
+	//TODO: fix this hard-coded number
+	const double maxDist = 150;
+
+	UnitType t = unit->getType();
+	if ( t == UnitTypes::Protoss_Zealot || t == UnitTypes::Protoss_Dragoon) {
+		Unit* enemy = getClosestEnemy(unit, Broodwar->enemy()->getUnits());
+
+		if (enemy && enemy->getPosition().getDistance(unit->getPosition()) < maxDist)
+			return true;
+	}
+	return false;
 }
 
 void BattleManager::update()
 {
+	BidUnits();
 	/*Micro-level attack code goes here*/
 	//drawUnitInfo();
 	map< Unit*, set<Unit*> > * attackedBy = getAttackers();
@@ -47,13 +78,42 @@ void BattleManager::onUnitShow(Unit* unit)
 
 void BattleManager::onUnitHide(Unit* unit)
 {
+	//setUnitsFree();
+}
 
+void BattleManager::setUnitsFree()
+{
+	set<Unit*> toReleased;
+	pair<Unit*, UnitData> p;
+	foreach(p, *this->fighters) {
+		if (canWeReleaseUnit(p.first)) {
+			this->arbitrator->removeBid(this, p.first);
+			toReleased.insert(p.first);
+		}
+	}
+	foreach(Unit* u, toReleased) {
+		this->fighters->erase(u);
+	}
+}
+
+bool BattleManager::canWeReleaseUnit(Unit* u) {
+	Unit* enemy = getClosestEnemy(u, Broodwar->self()->getUnits());
+	if (enemy && enemy->getPosition().getDistance(u->getPosition()) < releaseDist)
+		return false;
+	return true;
 }
 
 void BattleManager::onUnitDestroy(Unit* unit)
 {
-
+	this->fighters->erase(unit);
+	//setUnitsFree();
 }
+
+void BattleManager::onRemoveUnit(Unit* unit)
+{
+	this->fighters->erase(unit);
+}
+
 
 string BattleManager::getName() const
 {
@@ -227,23 +287,24 @@ Unit* BattleManager::weakestEnemyInRange(Unit* unit, set<Unit*> enemies) {
 map< Unit*, set<Unit*> > * BattleManager::getAttackers() {
 	map< Unit*, set<Unit*> > * attackedBy = new map< Unit*, set<Unit*> >();
 
-	set<Unit*> myUnits = Broodwar->self()->getUnits();
-
-	foreach (Unit* unit, myUnits) {
-		(*attackedBy)[unit] = set<Unit*>();
-	}
-
-	set<Unit*> enemyUnits = Broodwar->enemy()->getUnits();
-
-	foreach (Unit* enemy, enemyUnits) {
+	foreach(Unit* enemy, Broodwar->enemy()->getUnits()) {
 		Unit* target = enemy->getOrderTarget();
 		if (!target)
 			target = enemy->getTarget();
 
-		if (target && target->getPlayer() == Broodwar->self() && isInAttackRange(enemy, target))
+		/* First if: Do we have to react to enemy and is the target of
+		 * enemy in our control.
+		 */
+		if (target && target->getPlayer() == Broodwar->self() && 			
+			isInAttackRange(enemy, target) && 
+			(this->fighters->find(target) != this->fighters->end()) ) {
+			
+			/* Have we already made the set of attackers for this unit */
+			if ( attackedBy->find(target) != attackedBy->end() )
+				(*attackedBy)[target] = set<Unit*>();
 			(*attackedBy)[target].insert(enemy);					
+		}
 	}
-
 	return attackedBy;
 }
 

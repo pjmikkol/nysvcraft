@@ -21,6 +21,7 @@ DWORD WINAPI AnalyzeThread(void* obj) {
 	ai->enhancedUI         = new EnhancedUI();
 	ai->armyManager		   = new ArmyManager(&ai->arbitrator, ai->buildOrderManager, ai->buildManager);
 	ai->expansionManager   = new ExpansionManager(&ai->arbitrator, ai->buildManager, ai->baseManager);
+	ai->battleManager      = new BattleManager(&ai->arbitrator);
 
 	ai->supplyManager->setBuildManager(ai->buildManager);
 	ai->supplyManager->setBuildOrderManager(ai->buildOrderManager);
@@ -70,6 +71,7 @@ void BasicAIModule::onFrame()
 	this->defenseManager->update();
 	this->armyManager->update();
 	this->expansionManager->update();
+	this->battleManager->update();
 	this->arbitrator.update();
 
 	this->enhancedUI->update();
@@ -116,6 +118,7 @@ void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
 	this->defenseManager->onRemoveUnit(unit);
 	this->informationManager->onUnitDestroy(unit);
 	this->armyManager->onUnitDestroy(unit);
+	this->battleManager->onUnitDestroy(unit);
 }
 
 void BasicAIModule::onUnitShow(BWAPI::Unit* unit)
@@ -149,6 +152,9 @@ bool BasicAIModule::onSendText(std::string text)
 	
 	if (text == "very fast")
 		Broodwar->setLocalSpeed(20);
+
+	if (text == "slow")
+		Broodwar->setLocalSpeed(70);
 
 	if (text=="debug")
 	{

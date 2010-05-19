@@ -4,7 +4,8 @@
 #include <BaseManager.h>
 #include <BuildManager.h>
 #include "Helpers.h"
-#include <assert.h>
+#include <cassert>
+#include <algorithm>
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
 
@@ -28,6 +29,7 @@ public:
 	void onUnitShow(Unit* unit);
 	void onUnitHide(Unit* unit);
 	void onUnitDestroy(Unit* unit);
+	void onRemoveUnit(Unit* unit);
 
 	string getName() const;
 	string getShortName() const;
@@ -46,6 +48,10 @@ public:
 	map< Unit*, set<Unit*> > * getAttackers();
 	bool isInAttackRange(Unit* attacker, Unit* target);
 	void drawUnitInfo();
+	void BidUnits();
+	bool doWeWantUnit(Unit* unit);
+	void setUnitsFree();
+	bool canWeReleaseUnit(Unit* u);
 
 private:
 	Arbitrator::Arbitrator<BWAPI::Unit*, double>* arbitrator;
