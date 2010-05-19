@@ -7,6 +7,7 @@
 #define foreach BOOST_FOREACH
 
 using namespace BWAPI;
+using namespace BWTA;
 using namespace std;
 
 class ExpansionManager :
@@ -30,6 +31,8 @@ public:
 private:
 	bool shouldExpand();
 	void expand();
+	BaseLocation* expansionLocation();
+	bool occupied(BaseLocation*);
 
 	Arbitrator::Arbitrator<Unit*, double>* arbitrator;
 	BuildManager* buildManager;
