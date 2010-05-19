@@ -1,5 +1,10 @@
 #include "ExpansionManager.h"
 
+//TODO: baseManager should not try to expand to enemy bases
+//TODO: baseManager should rebuild destroyed bases
+//TODO: should build assimilator to new bases
+//TODO: should build defense cannons to new bases
+
 ExpansionManager::ExpansionManager(Arbitrator::Arbitrator<Unit*, double>* arbitrator, BuildManager* buildManager, BaseManager* baseManager) {
 	this->arbitrator = arbitrator;
 	this->buildManager = buildManager;
@@ -19,15 +24,22 @@ void ExpansionManager::onRevoke(Unit* unit, double bid) {
 }
 
 void ExpansionManager::update() {
-	int timeFromLastExpansion = Broodwar->getFrameCount() - lastExpanded;
-	if (timeFromLastExpansion > expansionInterval &&
-		buildManager->getCompletedCount(UnitTypes::Protoss_Pylon) >= 2*(expansionCount + 1)) {
-		Broodwar->printf("Expand #%d", expansionCount);
-		baseManager->expand();
-		expansionCount++;
-		lastExpanded = Broodwar->getFrameCount();
-		expansionInterval /= 2;
+	if (shouldExpand()) {
+		expand();
 	}
+}
+
+bool ExpansionManager::shouldExpand() {
+	int timeFromLastExpansion = Broodwar->getFrameCount() - lastExpanded;
+	return timeFromLastExpansion > expansionInterval &&
+	       buildManager->getCompletedCount(UnitTypes::Protoss_Pylon) >= 2*(expansionCount + 1);
+}
+void ExpansionManager::expand() {
+	Broodwar->printf("Expand #%d", expansionCount);
+	baseManager->expand();
+	expansionCount++;
+	lastExpanded = Broodwar->getFrameCount();
+	expansionInterval /= 2;
 }
 
 string ExpansionManager::getName() const {

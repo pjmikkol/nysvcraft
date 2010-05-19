@@ -28,6 +28,9 @@ public:
 	string getName() const;
 	string getShortName() const;
 private:
+	bool shouldExpand();
+	void expand();
+
 	Arbitrator::Arbitrator<Unit*, double>* arbitrator;
 	BuildManager* buildManager;
 	BaseManager* baseManager;
