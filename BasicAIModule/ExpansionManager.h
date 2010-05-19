@@ -32,4 +32,6 @@ private:
 	BuildManager* buildManager;
 	BaseManager* baseManager;
 	int expansionCount;
+	int lastExpanded;
+	int expansionInterval;
 };
