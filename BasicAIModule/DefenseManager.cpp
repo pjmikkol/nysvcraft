@@ -11,7 +11,7 @@ DefenseManager::DefenseManager(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbi
 	this->arbitrator = arbitrator;
 	this->buildOrderManager = buildOrderManager;
 	this->baseManager = baseManager;
-
+	
 	buildOrderManager->build(10, UnitTypes::Protoss_Photon_Cannon, 40);
 }
 
@@ -40,6 +40,26 @@ void DefenseManager::onRemoveUnit(BWAPI::Unit* unit)
 
 void DefenseManager::update()
 {
+	bidOnMilitaryUnits();
+
+	set<Base*> newBases = baseManager->getActiveBases();
+
+	if (newBases != bases) {
+		bases = newBases;
+		interestingChokepoints = findInterestingChokepoints();
+		Broodwar->printf("Found %d interesting chokepoints", interestingChokepoints.size());	
+	}
+	
+	pair<Unit*, DefenseData> pair;
+
+	foreach (pair, defenders)
+		if (pair.second.mode == DefenseData::Idle && !interestingChokepoints.empty()) {
+			pair.first->attackMove((*interestingChokepoints.begin())->getCenter());
+			defenders[pair.first].mode = DefenseData::Moving;
+		}
+}
+
+void DefenseManager::bidOnMilitaryUnits() {
 	// Bid on all completed military units
 	std::set<BWAPI::Unit*> myPlayerUnits=BWAPI::Broodwar->self()->getUnits();
 	for (std::set<BWAPI::Unit*>::iterator u = myPlayerUnits.begin(); u != myPlayerUnits.end(); u++)
@@ -53,20 +73,6 @@ void DefenseManager::update()
 			arbitrator->setBid(this, *u, 20);
 		}
 	}
-
-	if (interestingChokepoints.empty()) {
-		interestingChokepoints = findInterestingChokepoints();
-
-		Broodwar->printf("Found %d interesting chokepoints", interestingChokepoints.size());
-	}
-
-	pair<Unit*, DefenseData> pair;
-
-	foreach (pair, defenders)
-		if (pair.second.mode == DefenseData::Idle && !interestingChokepoints.empty()) {
-			pair.first->attackMove((*interestingChokepoints.begin())->getCenter());
-			defenders[pair.first].mode = DefenseData::Moving;
-		}
 }
 
 set<Chokepoint*> DefenseManager::findInterestingChokepoints() {
