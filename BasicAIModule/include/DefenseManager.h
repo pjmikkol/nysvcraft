@@ -51,6 +51,7 @@ private:
 	bool isUnexplored(BWTA::Region* region);
 	bool isExplored(BWTA::Region* region);
 	bool isEnemyRegion(BWTA::Region* region);
+	void onFailedExpansion(BWAPI::Unit* unit);
 
 	bool calledInitialOnExpand;
 

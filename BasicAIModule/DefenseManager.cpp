@@ -30,6 +30,11 @@ void DefenseManager::onOffer(std::set<BWAPI::Unit*> units)
 	}
 }
 
+void DefenseManager::onFailedExpansion(Unit* unit) {
+	assert(unit);
+	// TODO
+}
+
 void DefenseManager::onUnitDestroy(Unit* unit) {
 	if (unit->getPlayer() == Broodwar->self() && unit->getType() == UnitTypes::Protoss_Nexus) {
 		Broodwar->printf("Base destroyed at %d, %d", unit->getTilePosition().x(), unit->getTilePosition().y());
