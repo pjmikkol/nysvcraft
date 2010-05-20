@@ -12,6 +12,7 @@ class Base
   std::set<BWAPI::Unit*> getGeysers() const;
   bool isActive() const;
   bool isBeingConstructed() const;
+  void setBeingConstructed(bool beingConstructed);
 
   void setResourceDepot(BWAPI::Unit* unit);
   void setActive(bool active);

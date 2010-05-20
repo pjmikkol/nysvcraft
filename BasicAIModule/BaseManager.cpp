@@ -53,6 +53,7 @@ void BaseManager::update()
 void BaseManager::addBase(BWTA::BaseLocation* location)
 {
   Base* newBase = new Base(location);
+  newBase->setBeingConstructed(true);
   allBases.insert(newBase);
   this->location2base[location] = newBase;
 }

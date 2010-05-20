@@ -26,10 +26,16 @@ std::set<BWAPI::Unit*> Base::getGeysers() const
 {
   return this->baseLocation->getGeysers();
 }
+
 bool Base::isActive() const
 {
   return this->active;
 }
+
+void Base::setBeingConstructed(bool beingConstructed) {
+	this->beingConstructed = true;
+}
+
 bool Base::isBeingConstructed() const
 {
   return this->beingConstructed;
