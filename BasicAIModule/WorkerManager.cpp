@@ -282,7 +282,7 @@ string WorkerManager::getShortName() const
 
 void WorkerManager::onRemoveUnit(Unit* unit)
 {
-  if (unit->getType().isWorker())
+  if (unit->getType().isWorker() )
     workers.erase(unit);
   if (unit->getType().isResourceContainer())
   {
