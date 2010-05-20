@@ -113,6 +113,8 @@ void ArmyManager::defendBase(Unit* base) {
 
 	foreach (UnitGroup* group, defGroups)
 		foreach (Unit* unit, *group) {
+			if (attackers.count(unit) || recalledAttackers.count(unit))
+				continue;
 			arbitrator->setBid(this, unit, 100);	
 			recalled.insert(unit);
 		}
