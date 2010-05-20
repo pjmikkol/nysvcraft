@@ -10,7 +10,7 @@ ArmyManager::ArmyManager(Arbitrator::Arbitrator<BWAPI::Unit*, double>* arbitrato
 
 	builtDragoons = false;
 
-	buildOrderManager->build(20, UnitTypes::Protoss_Zealot, 70);
+	buildOrderManager->build(999999, UnitTypes::Protoss_Zealot, 70);
 	buildOrderManager->build(2, UnitTypes::Protoss_Gateway, 70);
 }
 

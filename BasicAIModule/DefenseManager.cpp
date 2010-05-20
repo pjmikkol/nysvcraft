@@ -43,7 +43,7 @@ void DefenseManager::onUnitDestroy(Unit* unit) {
 				other = chokepoint->getRegions().second;
 			else
 				other = chokepoint->getRegions().first;
-
+ 
 			if (isBaseRegion(other))
 				addInterestingChokepoint(chokepoint);
 			else if (isUnexplored(other))
@@ -116,6 +116,15 @@ bool DefenseManager::isBaseRegion(Region* region) {
 			return true;
 
 	return false;
+}
+
+void DefenseManager::onUnitShow(Unit* unit) {
+	if (unit->getType() == UnitTypes::Protoss_Nexus) {
+		TilePosition pos = unit->getTilePosition();
+		buildOrderManager->buildAdditional(2, UnitTypes::Protoss_Pylon, 1000, pos);
+		buildOrderManager->build(5, UnitTypes::Protoss_Photon_Cannon, 70, pos);
+		buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Gateway, 70, pos);		
+	}
 }
 
 void DefenseManager::onExpand(Base* newBase) {

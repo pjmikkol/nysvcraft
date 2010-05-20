@@ -125,6 +125,7 @@ void BasicAIModule::onUnitShow(BWAPI::Unit* unit)
 	this->informationManager->onUnitShow(unit);
 	this->unitGroupManager->onUnitShow(unit);
 	this->armyManager->onUnitShow(unit);
+	this->defenseManager->onUnitShow(unit);
 }
 void BasicAIModule::onUnitHide(BWAPI::Unit* unit)
 {
