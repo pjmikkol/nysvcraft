@@ -110,17 +110,39 @@ namespace helpers {
 				if (attacker->getType() == UnitTypes::Protoss_Zealot)
 					return true;
 		}
-
 		return attackers.size() >= fleeThreshold[unit->getType()];				
 	}
 		
 	int getFleeDuration(Unit* unit, set<Unit*>* attackers) {
-		if (unit->getType() == UnitTypes::Protoss_Dragoon)
-			foreach (Unit* attacker, *attackers)
-				if (attacker->getType() == UnitTypes::Protoss_Zealot)
-					return 30;
+		Unit* nearest = getClosestEnemy(unit, *attackers);
+	
+		UnitType t = unit->getType();
 
-		return 25;
+		if ( t == UnitTypes::Protoss_Dragoon ) {
+			if (nearest && nearest->getType() == UnitTypes::Protoss_Zealot
+				&& nearest->getPosition().getDistance(unit->getPosition()) < 2*TILE_SIZE) {
+				return 5;
+			}
+			else return 0;
+		} 
+		else if (t == UnitTypes::Protoss_Probe) {
+			set<Unit*> enemies = Broodwar->enemy()->getUnits();
+			Unit* closest = getClosestEnemy(unit, enemies);
+			UnitType t = closest->getType();
+			if (t == UnitTypes::Protoss_Dragoon || t == UnitTypes::Protoss_Zealot)
+					return 20;
+			return 0; 
+		}
+		else if (t == UnitTypes::Protoss_Zealot) {
+			foreach(Unit* enema, *attackers) {
+				UnitType t = enema->getType();
+				if (t == UnitTypes::Protoss_Dragoon)
+					return 10;
+			}
+		}
+		return 0;
+
 	}
+
 
 }

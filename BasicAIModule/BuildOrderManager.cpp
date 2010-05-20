@@ -45,9 +45,9 @@ int BuildOrderManager::nextFreeTime(const Unit* unit)
 {
   int ctime=Broodwar->getFrameCount();
   if (!unit->isCompleted())
-  {
+  { 
     if (unit->getType().getRace()==Races::Protoss && unit->getType().isBuilding() && unit->getRemainingBuildTime()>0 && nextFreeTimeData[unit]<ctime+24*3)
-      nextFreeTimeData[unit]=ctime+24*3;
+      nextFreeTimeData[unit]=ctime+24*3; 
     if (!unit->isBeingConstructed() && !unit->getType().isAddon())
       return -1;
   }
