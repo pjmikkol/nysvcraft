@@ -2,6 +2,7 @@
 #include <Arbitrator.h>
 #include <BWAPI.h>
 #include <BaseManager.h>
+#include <fstream>
 class BuildOrderManager;
 class WorkerManager : public Arbitrator::Controller<BWAPI::Unit*,double>
 {
@@ -30,6 +31,7 @@ class WorkerManager : public Arbitrator::Controller<BWAPI::Unit*,double>
     void enableAutoBuild();
     void disableAutoBuild();
     void setAutoBuildPriority(int priority);
+	int getWorkerCount();
   private:
 
     Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;

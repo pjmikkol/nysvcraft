@@ -4,7 +4,10 @@
 #include <BaseManager.h>
 #include <BuildManager.h>
 #include <DefenseManager.h>
+#include <WorkerManager.h>
 #include <boost/foreach.hpp>
+#include <cassert>
+#include <fstream>
 #define foreach BOOST_FOREACH
 
 using namespace BWAPI;
@@ -16,7 +19,7 @@ class ExpansionManager :
 {
 public:
 	ExpansionManager(Arbitrator::Arbitrator<Unit*, double>* arbitrator, BuildManager* buildManager,
-		BaseManager* baseManager, DefenseManager* defenseManager);
+		BaseManager* baseManager, DefenseManager* defenseManager, WorkerManager* workerManager);
 	~ExpansionManager();
 
 	void onOffer(set<Unit*> units);
@@ -36,12 +39,18 @@ private:
 	bool shouldExpand();
 	BaseLocation* expansionLocation();
 	bool occupied(BaseLocation*);
+	int mineralCount();
+
+	BaseLocation* baseLocation(Unit* unit);
 
 	Arbitrator::Arbitrator<Unit*, double>* arbitrator;
 	BuildManager* buildManager;
 	BaseManager* baseManager;
 	DefenseManager* defenseManager;
+	WorkerManager* workerManager;
 	int expansionCount;
 	int lastExpanded;
 	int expansionInterval;
+
+	set<BaseLocation*> occupiedBases;
 };

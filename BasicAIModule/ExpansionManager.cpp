@@ -1,7 +1,4 @@
 #include "ExpansionManager.h"
-#include <boost/foreach.hpp>
-
-#define foreach BOOST_FOREACH
 
 using namespace BWTA;
 
@@ -11,14 +8,16 @@ using namespace BWTA;
 //TODO: should build defense cannons to new bases
 
 ExpansionManager::ExpansionManager(Arbitrator::Arbitrator<Unit*, double>* arbitrator, BuildManager* buildManager,
-								   BaseManager* baseManager, DefenseManager* defenseManager) {
+								   BaseManager* baseManager, DefenseManager* defenseManager, WorkerManager* workerManager) {
 	this->arbitrator = arbitrator;
 	this->buildManager = buildManager;
 	this->baseManager = baseManager;
+	this->defenseManager = defenseManager;
+	this->workerManager = workerManager;
 	this->expansionCount = 0;
 	this->lastExpanded = 0;
 	this->expansionInterval = 1000;
-	this->defenseManager = defenseManager;
+	this->occupiedBases = set<BaseLocation*>();
 }
 
 ExpansionManager::~ExpansionManager(void) {
@@ -31,22 +30,45 @@ void ExpansionManager::onRevoke(Unit* unit, double bid) {
 }
 
 void ExpansionManager::update() {
+	ofstream out("nysvcraft.log", fstream::out | fstream::app);
+	out << "update" << endl;
 	if (shouldExpand()) {
+		out << "should expand" << endl;
 		expand();
+	} else {
+		out << "shouldn't expand" << endl;
 	}
 }
 
 bool ExpansionManager::shouldExpand() {
-	int timeFromLastExpansion = Broodwar->getFrameCount() - lastExpanded;
-	return timeFromLastExpansion > expansionInterval &&
-	       buildManager->getCompletedCount(UnitTypes::Protoss_Pylon) >= 2*(expansionCount + 1);
+	ofstream out("nysvcraft.log", fstream::out | fstream::app);
+	out << "shouldExpand1" << endl;
+	double workersPerMineral = ((double)workerManager->getWorkerCount())/mineralCount();
+	out << "shouldExpand2" << endl;
+	Broodwar->drawTextScreen(400, 100, "workersPerMinerals: %f", workersPerMineral);
+	out << "shouldExpand3" << endl;
+	return workersPerMineral > 1.5;
 }
+
+int ExpansionManager::mineralCount() {
+	int sum = 0;
+	foreach (Base* base, this->baseManager->getActiveBases()) {
+		assert(base);
+		sum += base->getMinerals().size();
+	}
+	return sum;
+}
+
 void ExpansionManager::expand() {
-	BaseLocation* expansionLocationPenis = expansionLocation();
-	if (!expansionLocationPenis)
+	ofstream out("nysvcraft.log", fstream::out | fstream::app);
+	out << "expand" << endl;
+	BaseLocation* buildLocation = expansionLocation();
+	if (!buildLocation)
 		return; //no valid expansions left
 	Broodwar->printf("Expand #%d", expansionCount);
-	Base* expansion = baseManager->expand();
+	out << "baseManager->expand()" << endl;
+	Base* expansion = baseManager->expand(buildLocation, 100);
+	out << "expansion done" << endl;
 	expansionCount++;
 	lastExpanded = Broodwar->getFrameCount();
 	expansionInterval /= 2;
@@ -57,6 +79,8 @@ void ExpansionManager::expand() {
  * finds nearest free BaseLocation, return NULL if none available
  */
 BaseLocation* ExpansionManager::expansionLocation() {
+	ofstream out("nysvcraft.log", fstream::out | fstream::app);
+	out << "expansionLocation" << endl;
 	BWTA::BaseLocation* location = NULL;
 	double minDist = -1;
 	BWTA::BaseLocation* home = BWTA::getStartLocation(BWAPI::Broodwar->self());
@@ -65,38 +89,17 @@ BaseLocation* ExpansionManager::expansionLocation() {
 			continue;
 		double distance = home->getGroundDistance(base);
 		if (minDist == -1 || distance < minDist) {
+			out << "closer base found" << endl;
 			minDist = distance;
 			location = base;
 		}
 	}
+	out << "expansionLocation end" << endl;
 	return location;
 }
 
 bool ExpansionManager::occupied(BaseLocation* base) {
-	return false; /*
-	set<BaseLocation*> enemyBases = getEnemyBases();
-	set<BaseLocation*> myBases    = getMyBases();
-	set<BaseLocation*> occupiedBases = getOccupiedBases();
-	return !enemyBases->find(base) && !myBases->find(base); */
-}
-
-set<BaseLocation*>* getEnemyBases() {
-	return NULL; //FIXME
-
-	/*
-	set<BaseLocation*> freeBases = BWTA::getBaseLocations();
-	set<Unit*> enemyUnits = Broodwar->enemy()->getUnits();
-	set<Unit*> allUnits;
-	foreach	(Unit* unit, enemyUnits) {
-		if (unit->getType() == UnitTypes::Protoss_Nexus) {
-			BWTA::BaseLocation* base = getNearestBaseLocation(unit->getTilePosition());
-			if (freeBases.find(base)) {
-				freeBases.erase(base);
-			}
-		}
-	}
-
-	*/
+	return occupiedBases.find(base) != occupiedBases.end();
 }
 
 string ExpansionManager::getName() const {
@@ -105,4 +108,30 @@ string ExpansionManager::getName() const {
 
 string ExpansionManager::getShortName() const {
 	return "Expansion";
+}
+
+//TODO: should maybe keep track of nexuses instead of BaseLocations,
+// since there could possibly be multiple bases close to a single BaseLocations
+void ExpansionManager::onUnitShow(Unit* unit) {
+	ofstream out("nysvcraft.log", fstream::out | fstream::app);
+	out << "onUnitShow" << endl;
+	assert(unit);
+	if (unit->getType() == UnitTypes::Protoss_Nexus) {
+		occupiedBases.insert(baseLocation(unit));
+	}
+}
+
+void ExpansionManager::onUnitDestroy(Unit* unit) {
+	assert(unit);
+	if (unit->getType() == UnitTypes::Protoss_Nexus) {
+		occupiedBases.erase(baseLocation(unit));
+	}
+}
+
+BaseLocation* ExpansionManager::baseLocation(Unit* unit) {
+	ofstream out("nysvcraft.log", fstream::out | fstream::app);
+	out << "baseLocation" << endl;
+	Region* reg = BWTA::getRegion(unit->getTilePosition());
+	set<BaseLocation*> baseLocations = reg->getBaseLocations();
+	return *(baseLocations.begin());
 }

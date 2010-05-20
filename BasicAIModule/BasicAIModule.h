@@ -18,6 +18,7 @@
 #include "ExpansionManager.h"
 #include "BattleManager.h"
 #include <windows.h>
+#include <fstream>
 #include <boost/foreach.hpp>
 
 static bool analyzed;
