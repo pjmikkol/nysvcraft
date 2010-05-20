@@ -16,6 +16,7 @@
 #include <EnhancedUI.h>
 #include "ArmyManager.h"
 #include "ExpansionManager.h"
+#include "BattleManager.h"
 #include <windows.h>
 #include <boost/foreach.hpp>
 
@@ -51,5 +52,6 @@ public:
 	EnhancedUI* enhancedUI;
 	ArmyManager* armyManager;
 	ExpansionManager* expansionManager;
+	BattleManager* battleManager;
 	bool showManagerAssignments;
 };

@@ -42,7 +42,7 @@ void ArmyManager::update() {
 
 	foreach (Unit* unit, units) 
 		if (unit->isCompleted() && unit->getType() == UnitTypes::Protoss_Zealot)
-			arbitrator->setBid(this, unit, 20);    
+			arbitrator->setBid(this, unit, 20);
 
 	pair<Unit*, TroopState> pair;
 

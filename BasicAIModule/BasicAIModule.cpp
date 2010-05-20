@@ -20,6 +20,7 @@ DWORD WINAPI AnalyzeThread(void* obj) {
 	ai->unitGroupManager   = new UnitGroupManager();
 	ai->enhancedUI         = new EnhancedUI();
 	ai->armyManager		   = new ArmyManager(&ai->arbitrator, ai->buildOrderManager, ai->buildManager);
+	ai->battleManager      = new BattleManager(&ai->arbitrator);
 	ai->expansionManager   = new ExpansionManager(&ai->arbitrator, ai->buildManager, ai->baseManager, ai->defenseManager);
 
 	ai->supplyManager->setBuildManager(ai->buildManager);
@@ -70,6 +71,7 @@ void BasicAIModule::onFrame()
 	this->defenseManager->update();
 	this->armyManager->update();
 	this->expansionManager->update();
+	this->battleManager->update();
 	this->arbitrator.update();
 
 	this->enhancedUI->update();
@@ -103,7 +105,6 @@ void BasicAIModule::onFrame()
 	{
 		Broodwar->drawCircleMap(u->getPosition().x(),u->getPosition().y(),20,Colors::Red);
 	}
-
 }
 
 void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
@@ -117,6 +118,7 @@ void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
 	this->defenseManager->onRemoveUnit(unit);
 	this->informationManager->onUnitDestroy(unit);
 	this->armyManager->onUnitDestroy(unit);
+	this->battleManager->onUnitDestroy(unit);
 	this->defenseManager->onUnitDestroy(unit);
 }
 
@@ -153,6 +155,9 @@ bool BasicAIModule::onSendText(std::string text)
 	if (text == "very fast")
 		Broodwar->setLocalSpeed(20);
 
+	if (text == "slow")
+		Broodwar->setLocalSpeed(70);
+
 	if (text=="debug")
 	{
 		this->showManagerAssignments=true;
@@ -169,7 +174,7 @@ bool BasicAIModule::onSendText(std::string text)
 		this->buildOrderManager->buildAdditional(1,type,300);
 	}
 	else
-	{
+	
 		TechType type=TechTypes::getTechType(text);
 		if (type!=TechTypes::Unknown)
 		{

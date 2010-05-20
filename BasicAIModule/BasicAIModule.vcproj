@@ -180,6 +180,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\BattleManager.cpp"
+				>
+			</File>
+			<File
 				RelativePath=".\Dll.cpp"
 				>
 			</File>
@@ -189,6 +193,10 @@
 			</File>
 			<File
 				RelativePath=".\ExpansionManager.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\Helpers.cpp"
 				>
 			</File>
 			<File
@@ -210,11 +218,19 @@
 				>
 			</File>
 			<File
+				RelativePath=".\BattleManager.h"
+				>
+			</File>
+			<File
 				RelativePath="include\EnhancedUI.h"
 				>
 			</File>
 			<File
 				RelativePath=".\ExpansionManager.h"
+				>
+			</File>
+			<File
+				RelativePath=".\Helpers.h"
 				>
 			</File>
 			<File
