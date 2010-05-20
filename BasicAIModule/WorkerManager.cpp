@@ -303,6 +303,11 @@ void WorkerManager::onRemoveUnit(Unit* unit)
   }
 }
 
+int WorkerManager::getWorkerCount() {
+	ofstream out("nysvcraft.log", fstream::out | fstream::app);
+	out << "getWorkerCount" << endl;
+	return this->workers.size();
+}
 void WorkerManager::setWorkersPerGas(int count)
 {
   this->WorkersPerGas=count;
