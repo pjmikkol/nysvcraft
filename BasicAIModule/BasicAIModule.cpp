@@ -34,6 +34,8 @@ DWORD WINAPI AnalyzeThread(void* obj) {
 	ai->buildOrderManager->enableDependencyResolver();
 	ai->workerManager->enableAutoBuild();
 	ai->workerManager->setAutoBuildPriority(80); 
+
+	ai->scoutManager->setScoutCount(1);
 	
 	analyzed = true;
 
@@ -152,7 +154,7 @@ bool BasicAIModule::onSendText(std::string text)
 		Broodwar->setLocalSpeed(35);
 	
 	if (text == "very fast")
-		Broodwar->setLocalSpeed(20);
+		Broodwar->setLocalSpeed(0);
 
 	if (text == "slow")
 		Broodwar->setLocalSpeed(70);
