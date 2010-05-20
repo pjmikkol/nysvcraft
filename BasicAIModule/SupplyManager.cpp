@@ -40,7 +40,8 @@ void SupplyManager::update()
       productionCapacity += max;
     }
 
-    if (getPlannedSupply() <= BWAPI::Broodwar->self()->supplyUsed() + productionCapacity)
+	if (getPlannedSupply() <= BWAPI::Broodwar->self()->supplyUsed() + productionCapacity 
+		&& this->buildManager->getCompletedCount(*BWAPI::Broodwar->self()->getRace().getSupplyProvider()) < 100)
     {
       this->buildOrderManager->buildAdditional(1,*BWAPI::Broodwar->self()->getRace().getSupplyProvider(),1000);
     }
