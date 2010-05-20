@@ -73,7 +73,7 @@ BaseLocation* ExpansionManager::expansionLocation() {
 	double minDist = -1;
 	BWTA::BaseLocation* home = BWTA::getStartLocation(BWAPI::Broodwar->self());
 	foreach (BWTA::BaseLocation* base, BWTA::getBaseLocations()) {
-		if (occupied(base) || !hasResources(base))
+		if (occupied(base))
 			continue;
 		double distance = home->getGroundDistance(base);
 		if (minDist == -1 || distance < minDist) {
