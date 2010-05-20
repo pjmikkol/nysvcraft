@@ -27,7 +27,7 @@ void BuildManager::update()
   this->morphManager->update();
 }
 
-ConstructionManager* getConstructionManager() {
+ConstructionManager* BuildManager::getConstructionManager() {
 	return this->constructionManager;
 }
 

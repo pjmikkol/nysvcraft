@@ -14,7 +14,7 @@ ConstructionManager::ConstructionManager(Arbitrator::Arbitrator<BWAPI::Unit*,dou
   }
 }
 
-void setExpansionManager(ExpansionManager* expansionManager) {
+void ConstructionManager::setExpansionManager(ExpansionManager* expansionManager) {
 	this->expansionManager = expansionManager;
 }
 
@@ -271,7 +271,7 @@ void ConstructionManager::update()
 	  if (b->builderUnit!=NULL && !b->builderUnit->exists()) {
         b->builderUnit=NULL;
 		if (b->buildingUnit->getType() == UnitTypes::Protoss_Nexus) {
-			incompleteBuildings.erase(b);
+			incompleteBuildings.erase(i);
 			expansionManager->expansionFailed(b->buildingUnit);
 		}
 	  }

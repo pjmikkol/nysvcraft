@@ -1,7 +1,9 @@
 #pragma once
 #include <Arbitrator.h>
+#include "../ExpansionManager.h"
 #include <BWAPI.h>
 #include <BuildingPlacer.h>
+class ExpansionManager;
 class ConstructionManager : public Arbitrator::Controller<BWAPI::Unit*,double>
 {
   public:

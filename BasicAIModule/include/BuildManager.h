@@ -1,5 +1,6 @@
 #pragma once
 #include <Arbitrator.h>
+#include <ConstructionManager.h>
 #include <BWAPI.h>
 class BuildingPlacer;
 class ConstructionManager;
@@ -23,7 +24,7 @@ class BuildManager
     int getCompletedCount(BWAPI::UnitType type) const;
     void setBuildDistance(int distance);
     BWAPI::UnitType getBuildType(BWAPI::Unit* unit) const;
-	ContructionManager* getConstructionManager();
+	ConstructionManager* getConstructionManager();
 
   private:
     Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
