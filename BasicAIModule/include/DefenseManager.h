@@ -36,6 +36,7 @@ public:
 	virtual std::string getShortName() const;	
 
 private:
+	void drawNeighbourData();
 	void bidOnMilitaryUnits();
 	void checkInterestingChokepoints();
 	void giveDefenseOrders();

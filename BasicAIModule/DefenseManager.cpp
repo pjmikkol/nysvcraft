@@ -84,6 +84,23 @@ void DefenseManager::update()
 	updateExploredRegions();
 
 	giveDefenseOrders();
+
+	drawNeighbourData();
+}
+
+void DefenseManager::drawNeighbourData() {
+	foreach (Region* region, getRegions()) {
+		int baseNeighbours = 0;
+
+		foreach (Chokepoint* chokepoint, region->getChokepoints()) {
+			Region* neighbour = chokepoint->getRegions().first == region ? chokepoint->getRegions().second : chokepoint->getRegions().first;
+			
+			if (isBaseRegion(neighbour))
+				baseNeighbours++;
+		}
+
+		Broodwar->drawTextMap(region->getCenter().x(), region->getCenter().y(), "Base neighbours: %d", baseNeighbours);
+	}
 }
 
 void DefenseManager::bidOnMilitaryUnits() {
@@ -112,8 +129,13 @@ void DefenseManager::updateExploredRegions() {
 
 bool DefenseManager::isBaseRegion(Region* region) {
 	foreach (Base* base, baseManager->getAllBases())
-		if ((base->isActive() || base->isBeingConstructed()) && BWTA::getRegion(base->getBaseLocation()->getTilePosition()) == region)
-			return true;
+		if ((base->isActive() /*|| base->isBeingConstructed()*/) && BWTA::getRegion(base->getBaseLocation()->getTilePosition()) == region) {
+			TilePosition pos = base->getBaseLocation()->getTilePosition();
+			set<Unit*> units = Broodwar->unitsOnTile(pos.x(), pos.y());
+			foreach (Unit* unit, units)
+				if (unit->getType() == UnitTypes::Protoss_Nexus && unit->getPlayer() == Broodwar->self())
+					return true;
+		}
 
 	return false;
 }
@@ -151,13 +173,33 @@ void DefenseManager::onExpand(Base* newBase) {
 		else if (isBaseRegion(other))
 			removeInterestingChokepoint(chokepoint);
 		else if (isExplored(other)) {
+			bool hasManyBaseNeighbours = false;
+
 			foreach (Chokepoint* otherChokepoint, other->getChokepoints()) {
+				Region* neighbour = otherChokepoint->getRegions().first == other ? otherChokepoint->getRegions().second : otherChokepoint->getRegions().first;
+				
+				if (neighbour != region && isBaseRegion(neighbour)) {
+					hasManyBaseNeighbours = true;
+					break;
+				}
+			}
+
+			Broodwar->printf("Neighbour region at %d, %d %s.", other->getCenter().x(), other->getCenter().y(),
+				hasManyBaseNeighbours ? "has many base neighbours" : "has one base neighbour");
+
+			foreach (Chokepoint* otherChokepoint, other->getChokepoints()) {
+				/*if (otherChokepoint == chokepoint)
+					continue;*/
+
 				removeInterestingChokepoint(otherChokepoint);			
 
 				Region* neighbour = otherChokepoint->getRegions().first == other ? otherChokepoint->getRegions().second : otherChokepoint->getRegions().first;
 
-				if (isUnexplored(neighbour))
-					addInterestingChokepoint(otherChokepoint);
+				if (!isBaseRegion(neighbour))
+					if (hasManyBaseNeighbours && neighbour != region)
+						addInterestingChokepoint(otherChokepoint);
+					else if (!hasManyBaseNeighbours)
+						addInterestingChokepoint(chokepoint);
 			}
 		}
 	}
