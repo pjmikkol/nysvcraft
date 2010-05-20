@@ -42,6 +42,7 @@ private:
 	BaseLocation* expansionLocation();
 	bool occupied(BaseLocation*);
 	int mineralCount();
+	bool hasResources(BaseLocation* base);
 
 	BaseLocation* baseLocation(Unit* unit);
 	set<Base*> interestingBases();
@@ -54,6 +55,7 @@ private:
 	int expansionCount;
 	int lastExpanded;
 	int expansionInterval;
+	double expansionStep;
 
 	set<BaseLocation*> occupiedBases;
 };

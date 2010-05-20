@@ -17,6 +17,7 @@ ExpansionManager::ExpansionManager(Arbitrator::Arbitrator<Unit*, double>* arbitr
 	this->expansionCount = 0;
 	this->lastExpanded = 0;
 	this->expansionInterval = 1000;
+	this->expansionStep = 1.9;
 	this->occupiedBases = set<BaseLocation*>();
 	this->occupiedBases.insert(getStartLocation(Broodwar->self()));
 }
@@ -40,7 +41,7 @@ bool ExpansionManager::shouldExpand() {
 	double workersPerMineral = ((double)workerManager->getWorkerCount())/mineralCount();
 	Broodwar->drawTextScreen(450, 25, "workersPerMinerals: %.2f", workersPerMineral);
 	int framesFromLastExpand = Broodwar->getFrameCount() - lastExpanded;
-	return workersPerMineral > 1.9 && framesFromLastExpand > 2500;
+	return workersPerMineral >= expansionStep && framesFromLastExpand > 2500;
 }
 
 int ExpansionManager::mineralCount() {
@@ -58,6 +59,7 @@ void ExpansionManager::expand() {
 	Broodwar->printf("Expand #%d", expansionCount);
 	Base* expansion = baseManager->expand(buildLocation, 100);
 	expansionCount++;
+	expansionStep -= 0.05;
 	lastExpanded = Broodwar->getFrameCount();
 	expansionInterval /= 2;
 	defenseManager->onExpand(expansion);
@@ -71,7 +73,7 @@ BaseLocation* ExpansionManager::expansionLocation() {
 	double minDist = -1;
 	BWTA::BaseLocation* home = BWTA::getStartLocation(BWAPI::Broodwar->self());
 	foreach (BWTA::BaseLocation* base, BWTA::getBaseLocations()) {
-		if (occupied(base))
+		if (occupied(base) || !hasResources(base))
 			continue;
 		double distance = home->getGroundDistance(base);
 		if (minDist == -1 || distance < minDist) {
@@ -80,6 +82,10 @@ BaseLocation* ExpansionManager::expansionLocation() {
 		}
 	}
 	return location;
+}
+
+bool ExpansionManager::hasResources(BaseLocation* base) {
+	return base->getMinerals().size() > 0;
 }
 
 void ExpansionManager::expansionFailed(Unit* base) {
