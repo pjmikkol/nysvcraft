@@ -14,7 +14,7 @@ DefenseManager::DefenseManager(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbi
 	this->buildOrderManager = buildOrderManager;
 	this->baseManager = baseManager;
 
-	buildOrderManager->build(10, UnitTypes::Protoss_Photon_Cannon, 40);
+	calledInitialOnExpand = false;
 }
 
 void DefenseManager::onOffer(std::set<BWAPI::Unit*> units)
@@ -73,7 +73,12 @@ void DefenseManager::onRemoveUnit(BWAPI::Unit* unit)
 }
 
 void DefenseManager::update()
-{
+{	
+	if (!calledInitialOnExpand) {
+		onExpand(baseManager->getBase(*BWTA::getRegion(Broodwar->self()->getStartLocation())->getBaseLocations().begin()));
+		calledInitialOnExpand = true;
+	}
+
 	bidOnMilitaryUnits();
 
 	updateExploredRegions();

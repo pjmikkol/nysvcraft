@@ -49,6 +49,8 @@ private:
 	bool isUnexplored(BWTA::Region* region);
 	bool isExplored(BWTA::Region* region);
 
+	bool calledInitialOnExpand;
+
 	BuildOrderManager* buildOrderManager;
 	BaseManager* baseManager;
 	Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
