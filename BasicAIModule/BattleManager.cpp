@@ -1,6 +1,9 @@
 #include "BattleManager.h"
 
-const double releaseDist = 300;
+//TODO: fix this hard-coded numbers
+const double maxDist = 150; //How near enemy has to be that we take control over the dragoons and zealots 
+const double releaseDist = 300; // How far enemy has to be that we release the control of dragoons and zealots 
+const double probeControl = 2*TILE_SIZE; // How near enemy has to be that we take control over probes
 
 BattleManager::BattleManager(Arbitrator::Arbitrator<BWAPI::Unit*, double>* arbitrator)
 {
@@ -45,16 +48,17 @@ bool BattleManager::doWeWantUnit(Unit* unit)
 {
 	if (!unit) return false;
 
-	//TODO: fix this hard-coded number
-	const double maxDist = 150;
-
 	UnitType t = unit->getType();
+	Unit* enemy = getClosestEnemy(unit, Broodwar->enemy()->getUnits());
+
 	if ( t == UnitTypes::Protoss_Zealot || t == UnitTypes::Protoss_Dragoon) {
-		Unit* enemy = getClosestEnemy(unit, Broodwar->enemy()->getUnits());
 
 		if (enemy && enemy->getPosition().getDistance(unit->getPosition()) < maxDist)
 			return true;
 	}
+	// Get probes also
+	else if (t == UnitTypes::Protoss_Probe && enemy && enemy->getPosition().getDistance(unit->getPosition()) < probeControl)
+		return true;
 	return false;
 }
 
@@ -163,14 +167,17 @@ void BattleManager::handleFlee(Unit* unit, map<Unit*, set<Unit*> >* attackedBy) 
 	// TODO add smarter flee
 	// Parameterize on unit type
 	set<Unit*> attackers = (*attackedBy)[unit];
+	
+	UnitType t = unit->getType();
 
-	if (shouldFlee(unit, attackers)) {	
+	if (shouldFlee(unit, attackers) || t == UnitTypes::Protoss_Probe ) {	
 		Position runTo = fleeTo(unit, &attackers);
 		
 		data->state = flee;
 		data->fleeCounter = getFleeDuration(unit, &attackers);
 
-		unit->rightClick(runTo);
+		if (data->fleeCounter != 0) unit->rightClick(runTo);
+		else data->state = fight;
 	}
 }
 
