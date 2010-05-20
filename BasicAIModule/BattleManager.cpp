@@ -1,9 +1,9 @@
 #include "BattleManager.h"
 
 //TODO: fix this hard-coded numbers
-const double maxDist = 150; //How near enemy has to be that we take control over the dragoons and zealots 
-const double releaseDist = 300; // How far enemy has to be that we release the control of dragoons and zealots 
-const double probeControl = 4*TILE_SIZE; // How near enemy has to be that we take control over probes
+const double maxDist = 10*TILE_SIZE; //How near enemy has to be that we take control over the dragoons and zealots 
+const double releaseDist = 10*TILE_SIZE; // How far enemy has to be that we release the control of dragoons and zealots 
+const double probeControl = 5*TILE_SIZE; // How near enemy has to be that we take control over probes
 
 BattleManager::BattleManager(Arbitrator::Arbitrator<BWAPI::Unit*, double>* arbitrator)
 {
@@ -151,6 +151,11 @@ void BattleManager::decideActions(map<Unit*, set<Unit*> >* attackedBy) {
 		handleFlee(unit, attackedBy);
 		handleAttack(unit);
 	}
+	set<Unit*> enemies = Broodwar->enemy()->getUnits();
+	foreach(Unit* u, enemies) {
+		Position pos = u->getPosition();
+		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 16, "%s", u->getType().getName().c_str());
+	}
 }
 
 
@@ -189,7 +194,7 @@ Position BattleManager::fleeTo(Unit* unit, const set<Unit*>* attackers) {
 
 	set<double>* angles = calculateAngles(unit, attackers);
 	double mid = midAngle(angles);
-	Position direction = vecFromAngle(reverseAngle(mid), 2);
+	Position direction = vecFromAngle(reverseAngle(mid), 4);
 
 	return unit->getPosition() + direction;
 }
@@ -227,23 +232,17 @@ double BattleManager::reverseAngle(double angle) {
 
 void BattleManager::handleAttack(Unit* unit) {
 	UnitData* data = &((*fighters)[unit]);
+	set<Unit*> enemies = Broodwar->enemy()->getUnits();
 
-	if (data->state == fight) {
-		set<Unit*> enemies = Broodwar->enemy()->getUnits();
-
-		if (!isAttackingEnemy(unit)) {
+	if (!isAttackingEnemy(unit)) {
+		calculateTarget(unit, enemies);
+	} else {
+		if (data->attackCounter > 0) {
+			data->attackCounter--;
+		} else if (!isInAttackRange(unit, unit->getOrderTarget())) {
 			calculateTarget(unit, enemies);
-		} else {
-			if (data->attackCounter > 0) {
-				data->attackCounter--;
-			} else if (!isInAttackRange(unit, unit->getOrderTarget())) {
-				calculateTarget(unit, enemies);
-			}
 		}
 	}
-	else {
-		//TODO: figure out where to move
-	}	
 }
 
 void BattleManager::calculateTarget(Unit* unit, set<Unit*> enemies) {
@@ -264,7 +263,7 @@ void BattleManager::calculateTarget(Unit* unit, set<Unit*> enemies) {
 		}
 	}
 
-	if (!target && !enemies.empty())
+	if ((!target || target->getPlayer() !=  Broodwar->enemy()) && !enemies.empty())
 		target = weakestEnemyInRange(unit, enemies);
 
 	if (!target && !enemies.empty())

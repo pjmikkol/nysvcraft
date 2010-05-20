@@ -38,6 +38,7 @@ namespace helpers {
 
 	bool isAttackingEnemy(Unit* unit) {
 		Unit* other = unit->getOrderTarget();
+		if (!other) other = unit->getTarget();
 		return other && other->getPlayer() == Broodwar->enemy();
 	}
 
@@ -107,7 +108,8 @@ namespace helpers {
 
 		if (unit->getType() == UnitTypes::Protoss_Dragoon) {
 			foreach (Unit* attacker, attackers)
-				if (attacker->getType() == UnitTypes::Protoss_Zealot)
+				if (attacker->getType() == UnitTypes::Protoss_Zealot && 
+					attacker->getPosition().getDistance(unit->getPosition()) < 3*TILE_SIZE )
 					return true;
 		}
 		return attackers.size() >= fleeThreshold[unit->getType()];				
@@ -130,7 +132,7 @@ namespace helpers {
 			Unit* closest = getClosestEnemy(unit, enemies);
 			UnitType t = closest->getType();
 			if (t == UnitTypes::Protoss_Dragoon || t == UnitTypes::Protoss_Zealot)
-					return 20;
+					return 25;
 			return 0; 
 		}
 		else if (t == UnitTypes::Protoss_Zealot) {
