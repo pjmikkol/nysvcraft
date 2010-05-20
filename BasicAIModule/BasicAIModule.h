@@ -55,4 +55,6 @@ public:
 	ExpansionManager* expansionManager;
 	BattleManager* battleManager;
 	bool showManagerAssignments;
+	int startFrame;
+	bool isUpgrading;
 };
