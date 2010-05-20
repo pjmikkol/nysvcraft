@@ -76,6 +76,13 @@ void BattleManager::update()
 	decideActions(attackedBy);
 
 	delete attackedBy;
+
+	/* Printing names over enemies
+	set<Unit*> enemies = Broodwar->enemy()->getUnits();
+	foreach(Unit* u, enemies) {
+		Position pos = u->getPosition();
+		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 16, "%s", u->getType().getName().c_str());
+	}*/
 }
 
 void BattleManager::onUnitShow(Unit* unit)
@@ -150,11 +157,6 @@ void BattleManager::decideActions(map<Unit*, set<Unit*> >* attackedBy) {
 
 		handleFlee(unit, attackedBy);
 		handleAttack(unit);
-	}
-	set<Unit*> enemies = Broodwar->enemy()->getUnits();
-	foreach(Unit* u, enemies) {
-		Position pos = u->getPosition();
-		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 16, "%s", u->getType().getName().c_str());
 	}
 }
 
@@ -232,6 +234,7 @@ double BattleManager::reverseAngle(double angle) {
 
 void BattleManager::handleAttack(Unit* unit) {
 	UnitData* data = &((*fighters)[unit]);
+	if (data->state != fight) return;
 	set<Unit*> enemies = Broodwar->enemy()->getUnits();
 
 	if (!isAttackingEnemy(unit)) {
@@ -270,7 +273,8 @@ void BattleManager::calculateTarget(Unit* unit, set<Unit*> enemies) {
 		target = getClosestEnemy(unit, enemies);
 
 	if (target) {
-		unit->attackUnit(target);
+		unit->rightClick(target);
+		//unit->attackUnit(target);
 		data->attackCounter = 10;
 	}
 }

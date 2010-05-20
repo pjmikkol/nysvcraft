@@ -1,5 +1,4 @@
 #include "Helpers.h"
-
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
 
@@ -129,10 +128,15 @@ namespace helpers {
 		} 
 		else if (t == UnitTypes::Protoss_Probe) {
 			set<Unit*> enemies = Broodwar->enemy()->getUnits();
-			Unit* closest = getClosestEnemy(unit, enemies);
-			UnitType t = closest->getType();
-			if (t == UnitTypes::Protoss_Dragoon || t == UnitTypes::Protoss_Zealot)
+			Position pos = unit->getPosition();
+			for(int i = 0; i < 3 && enemies.size() > 0; i++) {
+				Unit* closest = getClosestEnemy(unit, enemies);
+				UnitType eType = closest->getType();
+				if (pos.getDistance(closest->getPosition()) < 10*TILE_SIZE &&
+					eType != UnitTypes::Protoss_Probe )
 					return 25;
+				enemies.erase(closest);
+			}
 			return 0; 
 		}
 		else if (t == UnitTypes::Protoss_Zealot) {
