@@ -5,6 +5,7 @@
 #include <limits>
 #include <cmath>
 
+
 /*States are:
 	flee			- for running away from enemy
 	fight			- kicking ass

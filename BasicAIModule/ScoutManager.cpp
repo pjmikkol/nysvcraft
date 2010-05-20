@@ -137,7 +137,7 @@ void ScoutManager::update()
 {
   if (needMoreScouts())
   {
-    requestScout(/* bid = */ 30); // Bid 30.
+    requestScout(/* bid = */ 350); // Bid 30.
   }
   else
   {

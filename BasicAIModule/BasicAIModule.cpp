@@ -1,10 +1,11 @@
 #include "BasicAIModule.h"
+#include <iostream>
 using namespace BWAPI;
+
 
 DWORD WINAPI AnalyzeThread(void* obj) {
 	BWTA::readMap();
 	BWTA::analyze();
-
 	BasicAIModule* ai = (BasicAIModule*) obj;
 
 	ai->buildManager       = new BuildManager(&ai->arbitrator);
