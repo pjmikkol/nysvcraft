@@ -2,6 +2,7 @@
 #include <Arbitrator.h>
 #include <BWAPI.h>
 #include <BaseManager.h>
+#include <BaseManager/Base.h>
 #include <BuildManager.h>
 #include <DefenseManager.h>
 #include <WorkerManager.h>
@@ -42,6 +43,7 @@ private:
 	int mineralCount();
 
 	BaseLocation* baseLocation(Unit* unit);
+	set<Base*> interestingBases();
 
 	Arbitrator::Arbitrator<Unit*, double>* arbitrator;
 	BuildManager* buildManager;
