@@ -37,13 +37,19 @@ private:
 	void defendBase(Unit* base);
 	void releaseDefenders(Unit* base);
 	set<Unit*> getOurBases();
-	bool hasDefenders(Unit* base);
+	void releaseAttackers(Unit* base);
+	void attack(Unit* target);
 
 	Arbitrator::Arbitrator<BWAPI::Unit*, double>* arbitrator;
 	BuildOrderManager* buildOrderManager;
 	BuildManager* buildManager;
 	DefenseManager* defenseManager;
-	map<Unit*, TroopState> attackers;
-	map<Unit*, UnitGroup*> bases;
 	bool builtDragoons;
+
+	set<Unit*> recalled;
+	set<Unit*> recalledAttackers;
+	set<Unit*> defenders;
+	set<Unit*> attackers;
+	set<Unit*> bases;
+	set<Unit*> attackBases;
 };

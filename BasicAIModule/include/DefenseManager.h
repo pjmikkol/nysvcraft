@@ -53,6 +53,7 @@ private:
 	bool isUnexplored(BWTA::Region* region);
 	bool isExplored(BWTA::Region* region);
 	bool isEnemyRegion(BWTA::Region* region);
+	bool isDeadEnd(BWTA::Region* other);
 
 	bool calledInitialOnExpand;
 

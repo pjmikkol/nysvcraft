@@ -32,7 +32,8 @@ void DefenseManager::onOffer(std::set<BWAPI::Unit*> units)
 
 void DefenseManager::onFailedExpansion(Unit* unit) {
 	assert(unit);
-	// TODO
+	
+	onUnitDestroy(unit);
 }
 
 void DefenseManager::onUnitDestroy(Unit* unit) {
@@ -186,7 +187,7 @@ void DefenseManager::onExpand(Base* newBase) {
 		if (isEnemyRegion(other) || isUnexplored(other)) {
 			log << "Other unexplored" << endl;
 			addInterestingChokepoint(chokepoint);
-		} else if (isBaseRegion(other)) {
+		} else if (isBaseRegion(other) || isDeadEnd(other)) {
 			log << "Other base region" << endl;
 			removeInterestingChokepoint(chokepoint);
 		} else if (isExplored(other)) {
@@ -209,9 +210,6 @@ void DefenseManager::onExpand(Base* newBase) {
 				hasManyBaseNeighbours ? "has many base neighbours" : "has one base neighbour");
 
 			foreach (Chokepoint* otherChokepoint, other->getChokepoints()) {
-				/*if (otherChokepoint == chokepoint)
-					continue;*/
-
 				removeInterestingChokepoint(otherChokepoint);			
 
 				Region* neighbour = otherChokepoint->getRegions().first == other ? otherChokepoint->getRegions().second : otherChokepoint->getRegions().first;
@@ -226,6 +224,11 @@ void DefenseManager::onExpand(Base* newBase) {
 	}
 
 	Broodwar->printf("Found %d interesting chokepoints", interestingChokepoints.size());	
+}
+
+bool DefenseManager::isDeadEnd(Region* other) {
+	assert(other);
+	return other->getChokepoints().size() == 1;
 }
 
 bool DefenseManager::isEnemyRegion(Region* region) {
@@ -253,11 +256,14 @@ void DefenseManager::removeInterestingChokepoint(Chokepoint* chokepoint) {
 void DefenseManager::releaseDefenseGroupAt(Chokepoint* chokepoint) {
 	Broodwar->printf("Release defenders at %d, %d", chokepoint->getCenter().x(), chokepoint->getCenter().y());
 
+	if (!defenseGroups.count(chokepoint))
+		return;
+
 	UnitGroup* group = defenseGroups[chokepoint];
 
 	if (group)
 		foreach (Unit* unit, *group)
-		defenders[unit].mode = DefenseData::Idle;
+			defenders[unit].mode = DefenseData::Idle;
 
 	defenseGroups.erase(chokepoint);
 }

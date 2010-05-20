@@ -40,7 +40,7 @@ bool ExpansionManager::shouldExpand() {
 	double workersPerMineral = ((double)workerManager->getWorkerCount())/mineralCount();
 	Broodwar->drawTextScreen(450, 25, "workersPerMinerals: %.2f", workersPerMineral);
 	int framesFromLastExpand = Broodwar->getFrameCount() - lastExpanded;
-	return workersPerMineral > 1.75 && framesFromLastExpand > 2500;
+	return workersPerMineral > 1.9 && framesFromLastExpand > 2500;
 }
 
 int ExpansionManager::mineralCount() {
