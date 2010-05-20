@@ -3,7 +3,7 @@
 //TODO: fix this hard-coded numbers
 const double maxDist = 150; //How near enemy has to be that we take control over the dragoons and zealots 
 const double releaseDist = 300; // How far enemy has to be that we release the control of dragoons and zealots 
-const double probeControl = 2*TILE_SIZE; // How near enemy has to be that we take control over probes
+const double probeControl = 4*TILE_SIZE; // How near enemy has to be that we take control over probes
 
 BattleManager::BattleManager(Arbitrator::Arbitrator<BWAPI::Unit*, double>* arbitrator)
 {
@@ -19,18 +19,21 @@ BattleManager::~BattleManager(void)
 void BattleManager::onOffer(set<Unit*> units)
 {
 	foreach (Unit* unit, units) {
-		if (unit->getType() == UnitTypes::Protoss_Zealot || unit->getType() == UnitTypes::Protoss_Dragoon) {
+		UnitType t = unit->getType();
+		if (t == UnitTypes::Protoss_Zealot || t == UnitTypes::Protoss_Dragoon ||
+			t == UnitTypes::Protoss_Probe) {
 			if (this->arbitrator->accept(this, unit)) {
 				UnitData ud = { fight, 0, 0 };
 				this->fighters->insert(make_pair(unit, ud));
 			} else this->fighters->erase(unit);
 		}
+		else this->arbitrator->decline(this, unit, 0);
 	}
 }
 
 void BattleManager::onRevoke(Unit* unit, double bid)
 {
-	//this->arbitrator->setBid(this, unit, 99999);
+	 this->fighters->erase(unit);
 }
 
 void BattleManager::BidUnits()
