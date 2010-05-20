@@ -36,6 +36,8 @@ public:
 	virtual std::string getShortName() const;	
 	std::set<UnitGroup*> getDefenseGroups();
 
+	void onFailedExpansion(BWAPI::Unit* unit);
+
 private:
 	void drawNeighbourData();
 	void bidOnMilitaryUnits();
@@ -51,7 +53,6 @@ private:
 	bool isUnexplored(BWTA::Region* region);
 	bool isExplored(BWTA::Region* region);
 	bool isEnemyRegion(BWTA::Region* region);
-	void onFailedExpansion(BWAPI::Unit* unit);
 
 	bool calledInitialOnExpand;
 
