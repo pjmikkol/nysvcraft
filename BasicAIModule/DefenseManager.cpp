@@ -152,7 +152,9 @@ void DefenseManager::onUnitShow(Unit* unit) {
 		buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Pylon, 1000, pos);
 		buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Pylon, 65, pos);
 		buildOrderManager->buildAdditional(5, UnitTypes::Protoss_Photon_Cannon, 65, pos);
+		buildOrderManager->buildAdditional(5, UnitTypes::Protoss_Photon_Cannon, 60, pos);
 		buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Gateway, 70, pos);		
+		buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Assimilator, 65, pos);
 	}
 }
 
