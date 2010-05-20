@@ -345,6 +345,7 @@ bool BuildOrderManager::updateUnits()
       this->spendResources(t);//don't need to reserveResources() since we are spending resources instead
       this->reservedUnits.insert(factory);
       TilePosition tp=(*globalUnitSet)[factory->getType()][t]->decrementAdditional();
+
       if (factory->getAddon()==NULL)
         this->buildManager->build(t,tp,true);
       else

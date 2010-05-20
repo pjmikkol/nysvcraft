@@ -1,5 +1,8 @@
 #include <ConstructionManager.h>
 #include <UnitGroupManager.h>
+
+using namespace BWAPI;
+
 ConstructionManager::ConstructionManager(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator, BuildingPlacer* placer)
 {
   this->arbitrator   = arbitrator;
@@ -255,8 +258,9 @@ void ConstructionManager::update()
           }
         }
         //if we didn't find a build location yet, or cannot make the building, skip this building for now
-        if (b->tilePosition==BWAPI::TilePositions::None)
+		if (b->tilePosition==BWAPI::TilePositions::None) {
           continue;
+		}
       }
 
       //if the builder dies, set it to null

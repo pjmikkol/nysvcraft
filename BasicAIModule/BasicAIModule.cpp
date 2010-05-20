@@ -115,7 +115,6 @@ void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
 	this->upgradeManager->onRemoveUnit(unit);
 	this->workerManager->onRemoveUnit(unit);
 	this->scoutManager->onRemoveUnit(unit);
-	this->defenseManager->onRemoveUnit(unit);
 	this->informationManager->onUnitDestroy(unit);
 	this->armyManager->onUnitDestroy(unit);
 	this->battleManager->onUnitDestroy(unit);
@@ -173,8 +172,7 @@ bool BasicAIModule::onSendText(std::string text)
 	{
 		this->buildOrderManager->buildAdditional(1,type,300);
 	}
-	else
-	
+	else {
 		TechType type=TechTypes::getTechType(text);
 		if (type!=TechTypes::Unknown)
 		{

@@ -65,11 +65,11 @@ void DefenseManager::onUnitDestroy(Unit* unit) {
 void DefenseManager::onRevoke(BWAPI::Unit* unit, double bid)
 {
 	defenders.erase(unit);
-}
 
-void DefenseManager::onRemoveUnit(BWAPI::Unit* unit)
-{
-	defenders.erase(unit);
+	pair< Chokepoint*, UnitGroup* > pair;
+
+	foreach (pair, defenseGroups)
+		pair.second->erase(unit);	
 }
 
 void DefenseManager::update()
@@ -119,10 +119,10 @@ bool DefenseManager::isBaseRegion(Region* region) {
 }
 
 void DefenseManager::onUnitShow(Unit* unit) {
-	if (unit->getType() == UnitTypes::Protoss_Nexus) {
+	if (unit->getType() == UnitTypes::Protoss_Nexus && unit->getPlayer() == Broodwar->self()) {
 		TilePosition pos = unit->getTilePosition();
 		buildOrderManager->buildAdditional(2, UnitTypes::Protoss_Pylon, 1000, pos);
-		buildOrderManager->build(5, UnitTypes::Protoss_Photon_Cannon, 70, pos);
+		buildOrderManager->buildAdditional(5, UnitTypes::Protoss_Photon_Cannon, 65, pos);
 		buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Gateway, 70, pos);		
 	}
 }

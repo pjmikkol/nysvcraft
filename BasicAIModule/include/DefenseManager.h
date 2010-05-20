@@ -29,7 +29,6 @@ public:
 	virtual void onOffer(std::set<BWAPI::Unit*> units);
 	virtual void onRevoke(BWAPI::Unit* unit, double bid);
 	void onUnitDestroy(BWAPI::Unit* unit);
-	void onRemoveUnit(BWAPI::Unit* unit);
 	void onExpand(Base* newBase);
 	void onUnitShow(BWAPI::Unit* unit);
 	virtual void update();
