@@ -34,6 +34,7 @@ public:
 	virtual void update();
 	virtual std::string getName() const;
 	virtual std::string getShortName() const;	
+	std::set<UnitGroup*> getDefenseGroups();
 
 private:
 	void drawNeighbourData();
@@ -49,6 +50,7 @@ private:
 	bool isBaseRegion(BWTA::Region* region);
 	bool isUnexplored(BWTA::Region* region);
 	bool isExplored(BWTA::Region* region);
+	bool isEnemyRegion(BWTA::Region* region);
 
 	bool calledInitialOnExpand;
 

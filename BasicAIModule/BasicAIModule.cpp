@@ -19,7 +19,7 @@ DWORD WINAPI AnalyzeThread(void* obj) {
 	ai->informationManager = new InformationManager();
 	ai->unitGroupManager   = new UnitGroupManager();
 	ai->enhancedUI         = new EnhancedUI();
-	ai->armyManager		   = new ArmyManager(&ai->arbitrator, ai->buildOrderManager, ai->buildManager);
+	ai->armyManager		   = new ArmyManager(&ai->arbitrator, ai->buildOrderManager, ai->buildManager, ai->defenseManager);
 	ai->battleManager      = new BattleManager(&ai->arbitrator);
 	ai->expansionManager   = new ExpansionManager(&ai->arbitrator, ai->buildManager, ai->baseManager, ai->defenseManager, ai->workerManager);
 

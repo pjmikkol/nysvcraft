@@ -113,7 +113,11 @@ void ExpansionManager::onUnitDestroy(Unit* unit) {
 BaseLocation* ExpansionManager::baseLocation(Unit* unit) {
 	Region* reg = BWTA::getRegion(unit->getTilePosition());
 	set<BaseLocation*> baseLocations = reg->getBaseLocations();
-	return *(baseLocations.begin());
+	if (baseLocations.size() == 0) {
+		return BWTA::getNearestBaseLocation(unit->getTilePosition());
+	} else {
+		return *(baseLocations.begin());
+	}
 }
 
 //bases that are either active or being constructed

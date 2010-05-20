@@ -150,15 +150,22 @@ void DefenseManager::onUnitShow(Unit* unit) {
 }
 
 void DefenseManager::onExpand(Base* newBase) {
+	ofstream log("nysvcraft.log", fstream::out | fstream::app);
+	log << "onExpand" << endl << "=========" << endl;
+
 	TilePosition pos = newBase->getBaseLocation()->getTilePosition();
+
+	log << "Location: " << newBase->getBaseLocation()->getTilePosition().x() << ", " << newBase->getBaseLocation()->getTilePosition().y() << endl;
 
 	Broodwar->printf("New base at %d, %d", pos.x(), pos.y());
 
 	Region* region = getRegion(newBase->getBaseLocation()->getTilePosition());
-
+	
 	Broodwar->printf("New region at %d, %d", region->getCenter().x(), region->getCenter().y());
 
 	Broodwar->printf("Update chokepoints");
+
+	log << "Chokepoints: " << region->getChokepoints().size() << endl;
 
 	foreach (Chokepoint* chokepoint, region->getChokepoints()) {
 		Region* other;
@@ -168,11 +175,17 @@ void DefenseManager::onExpand(Base* newBase) {
 		else
 			other = chokepoint->getRegions().first;
 
-		if (isUnexplored(other))
+		log << "Other found" << endl;
+
+		if (isEnemyRegion(other) || isUnexplored(other)) {
+			log << "Other unexplored" << endl;
 			addInterestingChokepoint(chokepoint);
-		else if (isBaseRegion(other))
+		} else if (isBaseRegion(other)) {
+			log << "Other base region" << endl;
 			removeInterestingChokepoint(chokepoint);
-		else if (isExplored(other)) {
+		} else if (isExplored(other)) {
+			log << "Other explored" << endl;
+
 			bool hasManyBaseNeighbours = false;
 
 			foreach (Chokepoint* otherChokepoint, other->getChokepoints()) {
@@ -184,6 +197,8 @@ void DefenseManager::onExpand(Base* newBase) {
 				}
 			}
 
+			log << "Other has " << (hasManyBaseNeighbours ? "many base neighbours" : "one base neighbour") << endl;
+
 			Broodwar->printf("Neighbour region at %d, %d %s.", other->getCenter().x(), other->getCenter().y(),
 				hasManyBaseNeighbours ? "has many base neighbours" : "has one base neighbour");
 
@@ -194,7 +209,7 @@ void DefenseManager::onExpand(Base* newBase) {
 				removeInterestingChokepoint(otherChokepoint);			
 
 				Region* neighbour = otherChokepoint->getRegions().first == other ? otherChokepoint->getRegions().second : otherChokepoint->getRegions().first;
-
+				
 				if (!isBaseRegion(neighbour))
 					if (hasManyBaseNeighbours && neighbour != region)
 						addInterestingChokepoint(otherChokepoint);
@@ -205,6 +220,10 @@ void DefenseManager::onExpand(Base* newBase) {
 	}
 
 	Broodwar->printf("Found %d interesting chokepoints", interestingChokepoints.size());	
+}
+
+bool DefenseManager::isEnemyRegion(Region* region) {
+	return false; //Broodwar->unitsOnTile(
 }
 
 bool DefenseManager::isUnexplored(Region* region) {
@@ -239,6 +258,16 @@ void DefenseManager::releaseDefenseGroupAt(Chokepoint* chokepoint) {
 
 bool sortByUnitCount(pair<Chokepoint*, UnitGroup*> a, pair<Chokepoint*, UnitGroup*> b) {
 	return a.second->size() < b.second->size();
+}
+
+set<UnitGroup*> DefenseManager::getDefenseGroups() {
+	set<UnitGroup*> groups;
+	pair<Chokepoint*, UnitGroup*> pair;
+
+	foreach (pair, defenseGroups)
+		groups.insert(pair.second);
+	
+	return groups;
 }
 
 void DefenseManager::giveDefenseOrders() {
