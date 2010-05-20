@@ -27,6 +27,10 @@ void BuildManager::update()
   this->morphManager->update();
 }
 
+ConstructionManager* getConstructionManager() {
+	return this->constructionManager;
+}
+
 std::string BuildManager::getName() const
 {
   return "Build Manager";

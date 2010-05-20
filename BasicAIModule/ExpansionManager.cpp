@@ -82,6 +82,10 @@ BaseLocation* ExpansionManager::expansionLocation() {
 	return location;
 }
 
+void ExpansionManager::expansionFailed(Unit* base) {
+	this->defenseManager->onFailedExpansion(base);
+}
+
 bool ExpansionManager::occupied(BaseLocation* base) {
 	return occupiedBases.find(base) != occupiedBases.end();
 }

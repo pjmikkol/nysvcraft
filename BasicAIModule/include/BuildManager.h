@@ -23,6 +23,7 @@ class BuildManager
     int getCompletedCount(BWAPI::UnitType type) const;
     void setBuildDistance(int distance);
     BWAPI::UnitType getBuildType(BWAPI::Unit* unit) const;
+	ContructionManager* getConstructionManager();
 
   private:
     Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;

@@ -14,6 +14,10 @@ ConstructionManager::ConstructionManager(Arbitrator::Arbitrator<BWAPI::Unit*,dou
   }
 }
 
+void setExpansionManager(ExpansionManager* expansionManager) {
+	this->expansionManager = expansionManager;
+}
+
 void ConstructionManager::onOffer(std::set<BWAPI::Unit*> units)
 {
   //we are being offered some units (hopefully builders).
@@ -264,8 +268,13 @@ void ConstructionManager::update()
       }
 
       //if the builder dies, set it to null
-      if (b->builderUnit!=NULL && !b->builderUnit->exists())
+	  if (b->builderUnit!=NULL && !b->builderUnit->exists()) {
         b->builderUnit=NULL;
+		if (b->buildingUnit->getType() == UnitTypes::Protoss_Nexus) {
+			incompleteBuildings.erase(b);
+			expansionManager->expansionFailed(b->buildingUnit);
+		}
+	  }
 
       //if the building dies, or isn't the right type, set it to null
       if (b->buildingUnit!=NULL && (!b->buildingUnit->exists() || b->buildingUnit->getType()!=b->type))

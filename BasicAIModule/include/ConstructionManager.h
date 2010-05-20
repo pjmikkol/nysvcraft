@@ -29,9 +29,12 @@ class ConstructionManager : public Arbitrator::Controller<BWAPI::Unit*,double>
     int getPlannedCount(BWAPI::UnitType type) const;
     int getStartedCount(BWAPI::UnitType type) const;
 
+	void setExpansionManager(ExpansionManager* expansionManager);
+
   private:
     Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbitrator;
     BuildingPlacer* placer;
+	ExpansionManager* expansionManager;
     std::map<BWAPI::Unit*,Building*> builders;
     std::list<Building> incompleteBuildings;
     std::map<BWAPI::UnitType,std::set<Building*> > buildingsNeedingBuilders;

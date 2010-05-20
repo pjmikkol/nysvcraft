@@ -30,6 +30,7 @@ DWORD WINAPI AnalyzeThread(void* obj) {
 	ai->workerManager->setBaseManager(ai->baseManager);
 	ai->workerManager->setBuildOrderManager(ai->buildOrderManager);
 	ai->baseManager->setBuildOrderManager(ai->buildOrderManager);
+	ai->buildManager->getConstructionManager()->setExpansionManager(ai->expansionManager);
 
 	ai->buildOrderManager->enableDependencyResolver();
 	ai->workerManager->enableAutoBuild();

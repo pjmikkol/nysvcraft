@@ -36,6 +36,7 @@ public:
 	string getShortName() const;
 
 	void expand();
+	void expansionFailed(Unit* base);
 private:
 	bool shouldExpand();
 	BaseLocation* expansionLocation();
