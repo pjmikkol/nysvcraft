@@ -143,7 +143,8 @@ bool DefenseManager::isBaseRegion(Region* region) {
 void DefenseManager::onUnitShow(Unit* unit) {
 	if (unit->getType() == UnitTypes::Protoss_Nexus && unit->getPlayer() == Broodwar->self()) {
 		TilePosition pos = unit->getTilePosition();
-		buildOrderManager->buildAdditional(2, UnitTypes::Protoss_Pylon, 1000, pos);
+		buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Pylon, 1000, pos);
+		buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Pylon, 65, pos);
 		buildOrderManager->buildAdditional(5, UnitTypes::Protoss_Photon_Cannon, 65, pos);
 		buildOrderManager->buildAdditional(1, UnitTypes::Protoss_Gateway, 70, pos);		
 	}

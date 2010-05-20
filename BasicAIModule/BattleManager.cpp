@@ -34,7 +34,7 @@ void BattleManager::BidUnits()
 {
 	foreach (Unit* unit, Broodwar->self()->getUnits()) {
 		if ( doWeWantUnit(unit) ) {
-			this->arbitrator->setBid(this, unit, 30);
+			this->arbitrator->setBid(this, unit, 300);
 		} else {
 			this->arbitrator->removeBid(this, unit);
 		}

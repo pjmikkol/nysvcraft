@@ -44,6 +44,6 @@ private:
 	BuildManager* buildManager;
 	DefenseManager* defenseManager;
 	map<Unit*, TroopState> attackers;
-	map<Unit*, UnitGroup> bases;
+	map<Unit*, UnitGroup*> bases;
 	bool builtDragoons;
 };
