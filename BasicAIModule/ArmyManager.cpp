@@ -24,19 +24,19 @@ ArmyManager::~ArmyManager()
 
 void ArmyManager::onOffer(set<Unit*> units) {
 	foreach (Unit* unit, units) {
-		if (recalled.count(unit)) {
+		if (recalledAttackers.count(unit)) {
+			arbitrator->accept(this, unit, 200);
+			if (!attackBases.empty())
+				unit->attackMove((*attackBases.begin())->getPosition());
+			recalledAttackers.erase(unit);
+			attackers.insert(unit);
+		} else if (recalled.count(unit)) {
 			arbitrator->accept(this, unit, 100);		
 			if (!bases.empty())
 				unit->attackMove((*bases.begin())->getPosition());			
 			recalled.erase(unit);
 			defenders.insert(unit);
-		} else if (recalledAttackers.count(unit)) {
-			arbitrator->accept(this, unit, 100);
-			if (!attackBases.empty())
-				unit->attackMove((*attackBases.begin())->getPosition());
-			recalledAttackers.erase(unit);
-			attackers.insert(unit);
-		}
+		} 
 	}
 }
 
@@ -59,6 +59,13 @@ void ArmyManager::update() {
 
 	foreach (Unit* unit, defenders)
 		arbitrator->setBid(this, unit, 100);
+
+	foreach (Unit* unit, attackers) {
+		arbitrator->setBid(this, unit, 200);
+
+		if (unit->isIdle())
+			unit->attackMove((*attackBases.begin())->getPosition());
+	}
 
 	foreach (Unit* unit, units) 
 		if (unit->isCompleted() && unit->getType() == UnitTypes::Protoss_Zealot || unit->getType() == UnitTypes::Protoss_Dragoon)
@@ -138,7 +145,9 @@ set<Unit*> ArmyManager::getOurBases() {
 }
 
 void ArmyManager::onUnitShow(Unit* unit) {
-	if (unit->getType() == UnitTypes::Protoss_Nexus) {
+	if (unit->getType().isBuilding() && unit->getPlayer() == Broodwar->enemy()) {
+		Broodwar->printf("Saw enemy building!");
+
 		Unit* closestUnit = helpers::getClosestUnitFrom(unit->getPosition(), Broodwar->self()->getUnits());
 
 		if (closestUnit->getType() == UnitTypes::Protoss_Dragoon || closestUnit->getType() == UnitTypes::Protoss_Zealot)
@@ -147,12 +156,15 @@ void ArmyManager::onUnitShow(Unit* unit) {
 }
 
 void ArmyManager::attack(Unit* target) {
+	Broodwar->printf("THIS IS SPARTAAAAAAAAAAAAAA");
+
 	set<UnitGroup*> defGroups = defenseManager->getDefenseGroups();
 
 	foreach (UnitGroup* group, defGroups)
 		foreach (Unit* unit, *group) {
-			arbitrator->setBid(this, unit, 100);	
+			arbitrator->setBid(this, unit, 200);
 			recalledAttackers.insert(unit);
+			attackBases.insert(target);
 		}
 }
 
