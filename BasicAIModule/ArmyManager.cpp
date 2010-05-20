@@ -69,8 +69,12 @@ void ArmyManager::update() {
 
 	foreach (Unit* unit, units) 
 		if (unit->isCompleted() && unit->getType() == UnitTypes::Protoss_Zealot || unit->getType() == UnitTypes::Protoss_Dragoon)
-			if (!(attackers.count(unit) || recalledAttackers.count(unit) || recalled.count(unit) || defenders.count(unit)))
-				arbitrator->setBid(this, unit, 10);
+			if (!(attackers.count(unit) || recalledAttackers.count(unit) || recalled.count(unit) || defenders.count(unit))) {
+				if (!attackBases.empty()) {
+					attack(*attackBases.begin());
+				} else 
+					arbitrator->setBid(this, unit, 10);
+			}
 
 	checkBaseDefenses();
 }
@@ -165,7 +169,8 @@ void ArmyManager::attack(Unit* target) {
 	foreach (UnitGroup* group, defGroups)
 		foreach (Unit* unit, *group) {
 			arbitrator->setBid(this, unit, 200);
-			recalledAttackers.insert(unit);
+			if (!attackers.count(unit))
+				recalledAttackers.insert(unit);
 			attackBases.insert(target);
 		}
 }
