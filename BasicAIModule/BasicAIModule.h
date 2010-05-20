@@ -37,6 +37,7 @@ public:
 	void showStats(); //not part of BWAPI::AIModule
 	void showPlayers();
 	void showForces();
+	int getCurrentUnitCount(BWAPI::UnitType unitType);
 	std::map<BWAPI::Unit*,BWAPI::UnitType> buildings;
 	Arbitrator::Arbitrator<BWAPI::Unit*,double> arbitrator;
 	WorkerManager* workerManager;

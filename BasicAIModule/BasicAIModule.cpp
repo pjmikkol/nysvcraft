@@ -125,9 +125,20 @@ void BasicAIModule::onFrame()
 		Broodwar->drawCircleMap(u->getPosition().x(),u->getPosition().y(),20,Colors::Red);
 	}
 
-	Broodwar->drawTextScreen(450, 50, "%d dragoons", buildManager->getCompletedCount(UnitTypes::Protoss_Dragoon));
-	Broodwar->drawTextScreen(450, 64, "%d probes", buildManager->getCompletedCount(UnitTypes::Protoss_Probe));
-	Broodwar->drawTextScreen(450, 78, "%d zealots", buildManager->getCompletedCount(UnitTypes::Protoss_Zealot));
+	
+	Broodwar->drawTextScreen(450, 50, "%d dragoons", getCurrentUnitCount(UnitTypes::Protoss_Dragoon));
+	Broodwar->drawTextScreen(450, 64, "%d probes", getCurrentUnitCount(UnitTypes::Protoss_Probe));
+	Broodwar->drawTextScreen(450, 78, "%d zealots", getCurrentUnitCount(UnitTypes::Protoss_Zealot));
+}
+
+int BasicAIModule::getCurrentUnitCount(UnitType unitType) {
+	int count = 0;
+
+	foreach (Unit* unit, Broodwar->self()->getUnits())
+		if (unit->getType() == unitType)
+			count++;
+
+	return count;
 }
 
 void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
