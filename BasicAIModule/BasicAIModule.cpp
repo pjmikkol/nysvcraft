@@ -137,6 +137,8 @@ void BasicAIModule::onFrame()
 	Broodwar->drawTextScreen(450, 50, "%d dragoons", getCurrentUnitCount(UnitTypes::Protoss_Dragoon));
 	Broodwar->drawTextScreen(450, 64, "%d probes", getCurrentUnitCount(UnitTypes::Protoss_Probe));
 	Broodwar->drawTextScreen(450, 78, "%d zealots", getCurrentUnitCount(UnitTypes::Protoss_Zealot));
+	Broodwar->drawTextScreen(450, 92, "-----------", getCurrentUnitCount(UnitTypes::Protoss_Zealot));	
+	Broodwar->drawTextScreen(450, 106, "%d total", Broodwar->self()->getUnits().size());
 }
 
 int BasicAIModule::getCurrentUnitCount(UnitType unitType) {

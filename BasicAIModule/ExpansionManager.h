@@ -37,6 +37,8 @@ public:
 
 	void expand();
 	void expansionFailed(Unit* base);
+	double expansionStep;
+
 private:
 	bool shouldExpand();
 	BaseLocation* expansionLocation();
@@ -55,7 +57,6 @@ private:
 	int expansionCount;
 	int lastExpanded;
 	int expansionInterval;
-	double expansionStep;
 
 	set<BaseLocation*> occupiedBases;
 };

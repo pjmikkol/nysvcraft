@@ -52,9 +52,9 @@ void ArmyManager::onOffer(set<Unit*> units) {
 
 Position ArmyManager::getRushTarget() {
 	if (Broodwar->self()->getStartLocation().y() == 8)
-		return Position(63, 117);
+		return Position(63*TILE_SIZE, 117*TILE_SIZE);
 	else
-		return Position(70, 8);
+		return Position(70*TILE_SIZE, 8*TILE_SIZE);
 }
 
 void ArmyManager::onRevoke(Unit* unit, double bid) {
