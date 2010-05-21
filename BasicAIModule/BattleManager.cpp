@@ -1,8 +1,8 @@
 #include "BattleManager.h"
 
 //TODO: fix this hard-coded numbers
-const double maxDist = 10*TILE_SIZE; //How near enemy has to be that we take control over the dragoons and zealots 
-const double releaseDist = 10*TILE_SIZE; // How far enemy has to be that we release the control of dragoons and zealots 
+const double maxDist = 15*TILE_SIZE; //How near enemy has to be that we take control over the dragoons and zealots 
+const double releaseDist = 15*TILE_SIZE; // How far enemy has to be that we release the control of dragoons and zealots 
 const double probeControl = 5*TILE_SIZE; // How near enemy has to be that we take control over probes
 
 BattleManager::BattleManager(Arbitrator::Arbitrator<BWAPI::Unit*, double>* arbitrator)

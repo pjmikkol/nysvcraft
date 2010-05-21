@@ -125,7 +125,9 @@ void BasicAIModule::onFrame()
 		Broodwar->drawCircleMap(u->getPosition().x(),u->getPosition().y(),20,Colors::Red);
 	}
 
-	
+	if (Broodwar->self()->getUnits().size() == 200)
+		armyManager->rush();
+
 	Broodwar->drawTextScreen(450, 50, "%d dragoons", getCurrentUnitCount(UnitTypes::Protoss_Dragoon));
 	Broodwar->drawTextScreen(450, 64, "%d probes", getCurrentUnitCount(UnitTypes::Protoss_Probe));
 	Broodwar->drawTextScreen(450, 78, "%d zealots", getCurrentUnitCount(UnitTypes::Protoss_Zealot));
@@ -142,7 +144,7 @@ int BasicAIModule::getCurrentUnitCount(UnitType unitType) {
 }
 
 void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
-{
+{	if (!analyzed) return;
 	this->arbitrator.onRemoveObject(unit);
 	this->buildManager->onRemoveUnit(unit);
 	this->techManager->onRemoveUnit(unit);
@@ -157,7 +159,7 @@ void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
 }
 
 void BasicAIModule::onUnitShow(BWAPI::Unit* unit)
-{
+{	if (!analyzed) return;
 	this->informationManager->onUnitShow(unit);
 	this->unitGroupManager->onUnitShow(unit);
 	this->armyManager->onUnitShow(unit);
@@ -165,23 +167,23 @@ void BasicAIModule::onUnitShow(BWAPI::Unit* unit)
 	this->expansionManager->onUnitShow(unit);
 }
 void BasicAIModule::onUnitHide(BWAPI::Unit* unit)
-{
+{	if (!analyzed) return;
 	this->informationManager->onUnitHide(unit);
 	this->unitGroupManager->onUnitHide(unit);
 	this->armyManager->onUnitHide(unit);
 }
 
 void BasicAIModule::onUnitMorph(BWAPI::Unit* unit)
-{
+{	if (!analyzed) return;
 	this->unitGroupManager->onUnitMorph(unit);
 }
 void BasicAIModule::onUnitRenegade(BWAPI::Unit* unit)
-{
+{	if (!analyzed) return;
 	this->unitGroupManager->onUnitRenegade(unit);
 }
 
 bool BasicAIModule::onSendText(std::string text)
-{
+{	if (!analyzed) return true;
 	UnitType type=UnitTypes::getUnitType(text);
 	
 	if (text == "fast")

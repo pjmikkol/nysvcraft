@@ -13,6 +13,7 @@ ArmyManager::ArmyManager(Arbitrator::Arbitrator<BWAPI::Unit*, double>* arbitrato
 	this->defenseManager = defenseManager;
 
 	builtDragoons = false;
+	isRush = false;
 
 	buildOrderManager->build(999999, UnitTypes::Protoss_Zealot, 70);
 	buildOrderManager->build(2, UnitTypes::Protoss_Gateway, 70);
@@ -22,8 +23,17 @@ ArmyManager::~ArmyManager()
 {
 }
 
-void ArmyManager::onOffer(set<Unit*> units) {
+void ArmyManager::rush() {
+	Broodwar->printf("Kekekekekeke");
+	isRush = true;
+}
+
+void ArmyManager::onOffer(set<Unit*> units) {	
 	foreach (Unit* unit, units) {
+		if (isRush) {
+			unit->attackMove(Broodwar->enemy()->getStartLocation());
+			continue;
+		} 
 		if (recalledAttackers.count(unit)) {
 			arbitrator->accept(this, unit, 200);
 			if (!attackBases.empty())
@@ -68,12 +78,15 @@ void ArmyManager::update() {
 	}
 
 	foreach (Unit* unit, units) 
-		if (unit->isCompleted() && unit->getType() == UnitTypes::Protoss_Zealot || unit->getType() == UnitTypes::Protoss_Dragoon)
+		if (unit->isCompleted() && unit->getType() == UnitTypes::Protoss_Zealot || unit->getType() == UnitTypes::Protoss_Dragoon)			
 			if (!(attackers.count(unit) || recalledAttackers.count(unit) || recalled.count(unit) || defenders.count(unit))) {
-				if (!attackBases.empty()) {
-					attack(*attackBases.begin());
-				} else 
-					arbitrator->setBid(this, unit, 10);
+				if (isRush)
+					unit->attackMove(Broodwar->enemy()->getStartLocation());
+				else
+					if (!attackBases.empty()) {
+						attack(*attackBases.begin());
+					} else 
+						arbitrator->setBid(this, unit, 10);
 			}
 
 	checkBaseDefenses();
@@ -81,6 +94,8 @@ void ArmyManager::update() {
 
 
 void ArmyManager::checkBaseDefenses() {
+	if (isRush) return;
+
 	foreach (Unit* base, getOurBases()) {
 		if (isUnderAttack(base)) 
 			defendBase(base);
@@ -156,14 +171,14 @@ void ArmyManager::onUnitShow(Unit* unit) {
 
 		Unit* closestUnit = helpers::getClosestUnitFrom(unit->getPosition(), Broodwar->self()->getUnits());
 
-		if (closestUnit->getType() == UnitTypes::Protoss_Dragoon || closestUnit->getType() == UnitTypes::Protoss_Zealot)
+		if (closestUnit->getType() == UnitTypes::Protoss_Dragoon || closestUnit->getType() == UnitTypes::Protoss_Zealot) {
+			Broodwar->printf("THIS IS SPARTAAAAAAAAA!!!!!!!!!");
 			attack(unit);
+		}
 	}
 }
 
 void ArmyManager::attack(Unit* target) {
-	Broodwar->printf("THIS IS SPARTAAAAAAAAAAAAAA");
-
 	set<UnitGroup*> defGroups = defenseManager->getDefenseGroups();
 
 	foreach (UnitGroup* group, defGroups)

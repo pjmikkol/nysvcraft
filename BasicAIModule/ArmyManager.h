@@ -31,6 +31,9 @@ public:
 
 	string getName() const;
 	string getShortName() const;
+
+	void rush();
+
 private:
 	void checkBaseDefenses();
 	bool isUnderAttack(Unit* base);
@@ -45,6 +48,8 @@ private:
 	BuildManager* buildManager;
 	DefenseManager* defenseManager;
 	bool builtDragoons;
+
+	bool isRush;
 
 	set<Unit*> recalled;
 	set<Unit*> recalledAttackers;

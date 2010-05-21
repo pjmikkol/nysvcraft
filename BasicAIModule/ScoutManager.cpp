@@ -237,7 +237,7 @@ void ScoutManager::updateScoutAssignments()
   for(u = scouts.begin(); u != scouts.end(); u++)
   {
     if ( (*u).second.mode == ScoutData::Searching
-      && (*u).first->getPosition().getDistance((*u).second.target) < (*u).first->getType().sightRange())
+      && (*u).first->getPosition().getDistance((*u).second.target) < (*u).first->getType().sightRange()*1.5)
     {
       BWAPI::Position exploredPosition  = (*u).second.target;
       positionsToScout.remove(exploredPosition);
