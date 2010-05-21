@@ -68,8 +68,10 @@ void ArmyManager::onRevoke(Unit* unit, double bid) {
 void ArmyManager::update() {
 	set<Unit*> units = BWAPI::Broodwar->self()->getUnits();
 
-	if (isRush && Broodwar->getFrameCount() >= rushStartedOn + 1.5*60*25)
+	if (isRush && Broodwar->getFrameCount() >= rushStartedOn + 60*25) {
+		Broodwar->printf("Screw you guys, I'm going home >:3");
 		isRush = false;
+	}
 	
 	int completedZealots = buildManager->getCompletedCount(UnitTypes::Protoss_Zealot);
 
@@ -91,8 +93,9 @@ void ArmyManager::update() {
 	foreach (Unit* unit, units) 
 		if (unit->isCompleted() && unit->getType() == UnitTypes::Protoss_Zealot || unit->getType() == UnitTypes::Protoss_Dragoon)			
 			if (!(attackers.count(unit) || recalledAttackers.count(unit) || recalled.count(unit) || defenders.count(unit))) {
-				if (isRush && unit->isIdle())
-					unit->attackMove(getRushTarget());
+				if (isRush /*&& unit->isIdle()*/)
+					/*unit->attackMove(getRushTarget());*/
+					arbitrator->setBid(this, unit, 200);
 				else
 					if (!attackBases.empty()) {
 						attack(*attackBases.begin());
@@ -190,6 +193,9 @@ void ArmyManager::onUnitShow(Unit* unit) {
 }
 
 void ArmyManager::attack(Unit* target) {
+	if (isRush)
+		return;
+
 	set<UnitGroup*> defGroups = defenseManager->getDefenseGroups();
 
 	foreach (UnitGroup* group, defGroups)

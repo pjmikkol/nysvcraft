@@ -36,7 +36,7 @@ public:
 
 	void printAttackerInfo(map<Unit*, set<Unit*> >* attackedBy);
 	void decideActions(map<Unit*, set<Unit*> >* attackedBy);
-	void handleFlee(Unit* unit, map<Unit*, set<Unit*> >* attackedBy);
+	void handleFlee(Unit* unit, set<Unit*> attackedBy);
 	Position fleeTo(Unit* unit, const set<Unit*>* attackers);
 	set<double>* calculateAngles(Unit* unit, const set<Unit*>* attackers);
 	double calculateAngle(Unit* unit, Unit* enemy);

@@ -58,4 +58,5 @@ public:
 	bool showManagerAssignments;
 	int startFrame;
 	bool isUpgrading;
+	int lastRush;
 };

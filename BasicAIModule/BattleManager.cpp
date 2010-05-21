@@ -150,18 +150,20 @@ void BattleManager::printAttackerInfo(map<Unit*, set<Unit*> >* attackedBy) {
 }
 
 void BattleManager::decideActions(map<Unit*, set<Unit*> >* attackedBy) {
-	pair< Unit*, set<Unit*> > p;
+	pair<Unit*, UnitData> pair;
 
-	foreach (p, *attackedBy) {			
-		Unit* unit = p.first;
+	foreach (pair, *fighters) {	
+		Unit* unit = pair.first;
 
-		handleFlee(unit, attackedBy);
+		set<Unit*> attackers = (*attackedBy)[unit];
+
+		handleFlee(unit, attackers);
 		handleAttack(unit);
 	}
 }
 
 
-void BattleManager::handleFlee(Unit* unit, map<Unit*, set<Unit*> >* attackedBy) {
+void BattleManager::handleFlee(Unit* unit, set<Unit*> attackers) {
 	UnitData* data = &((*fighters)[unit]);
 
 	if (data->state == flee) {
@@ -174,13 +176,9 @@ void BattleManager::handleFlee(Unit* unit, map<Unit*, set<Unit*> >* attackedBy) 
 		}
 	}
 
-	// TODO add smarter flee
-	// Parameterize on unit type
-	set<Unit*> attackers = (*attackedBy)[unit];
-	
 	UnitType t = unit->getType();
 
-	if (shouldFlee(unit, attackers) || t == UnitTypes::Protoss_Probe ) {	
+	if (!attackers.empty() && (shouldFlee(unit, attackers) || t == UnitTypes::Protoss_Probe)) {	
 		Position runTo = fleeTo(unit, &attackers);
 		
 		data->state = flee;

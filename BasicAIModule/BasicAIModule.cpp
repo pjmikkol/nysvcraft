@@ -40,6 +40,7 @@ DWORD WINAPI AnalyzeThread(void* obj) {
 	ai->isUpgrading = false;
 	
 	analyzed = true;
+	ai->lastRush = 0;
 
 	return 0;
 }
@@ -100,6 +101,10 @@ void BasicAIModule::onFrame()
 
 	if (!scoutManager->isScouting() && buildManager->getCompletedCount(UnitTypes::Protoss_Nexus) == 2)
 		scoutManager->setScoutCount(1);
+	/*else if (scoutManager->isScouting() && (*scoutManager->scouts.begin()).second.mode == ScoutManager::ScoutData::Idle)
+		scoutManager->setScoutCount(0);*/
+	else if (scoutManager->positionsExplored.size() >= 16)
+		scoutManager->setScoutCount(0);
 
 	std::set<Unit*> units=Broodwar->self()->getUnits();
 	if (this->showManagerAssignments)
@@ -131,8 +136,10 @@ void BasicAIModule::onFrame()
 		Broodwar->drawCircleMap(u->getPosition().x(),u->getPosition().y(),20,Colors::Red);
 	}
 
-	if (!armyManager->isRush && Broodwar->self()->getUnits().size() == 200)
+	if (!armyManager->isRush && Broodwar->self()->getUnits().size() == 200 && Broodwar->getFrameCount() >= lastRush + 25*60*2) {
+		lastRush = Broodwar->getFrameCount();
 		armyManager->rush();	
+	}
 
 	Broodwar->drawTextScreen(450, 50, "%d dragoons", getCurrentUnitCount(UnitTypes::Protoss_Dragoon));
 	Broodwar->drawTextScreen(450, 64, "%d probes", getCurrentUnitCount(UnitTypes::Protoss_Probe));
