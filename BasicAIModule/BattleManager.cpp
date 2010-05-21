@@ -33,6 +33,7 @@ void BattleManager::onOffer(set<Unit*> units)
 
 void BattleManager::onRevoke(Unit* unit, double bid)
 {
+	assert(unit);
 	assert(fighters);
 	this->fighters->erase(unit);
 }
@@ -50,6 +51,7 @@ void BattleManager::BidUnits()
 
 bool BattleManager::doWeWantUnit(Unit* unit)
 {
+	assert(unit);
 	if (!unit) return false;
 
 	UnitType t = unit->getType();
@@ -110,6 +112,7 @@ void BattleManager::setUnitsFree()
 }
 
 bool BattleManager::canWeReleaseUnit(Unit* u) {
+	assert(u);
 	Unit* enemy = getClosestEnemy(u, Broodwar->self()->getUnits());
 	if (enemy && enemy->getPosition().getDistance(u->getPosition()) < releaseDist)
 		return false;
@@ -118,12 +121,14 @@ bool BattleManager::canWeReleaseUnit(Unit* u) {
 
 void BattleManager::onUnitDestroy(Unit* unit)
 {
+	assert(unit);
 	this->fighters->erase(unit);
 	//setUnitsFree();
 }
 
 void BattleManager::onRemoveUnit(Unit* unit)
 {
+	assert(unit);
 	this->fighters->erase(unit);
 }
 
@@ -151,25 +156,21 @@ void BattleManager::printAttackerInfo(map<Unit*, set<Unit*> > attackedBy) {
 void BattleManager::decideActions(map<Unit*, set<Unit*> > attackedBy) {
 	pair<Unit*, UnitData> pair;
 
-	if (!fighters) return;
+	if (fighters)
+		foreach (pair, *fighters) {	
+			Unit* unit = pair.first;
 
-	foreach (pair, *fighters) {	
-		Unit* unit = pair.first;
-
-		if (attackedBy.count(unit) > 0) {
 			set<Unit*> attackers = attackedBy[unit];
 
 			handleFlee(unit, attackers);
 			handleAttack(unit);
 		}
-		else {
-			handleAttack(unit);
-		}
-	}
 }
 
 
 void BattleManager::handleFlee(Unit* unit, set<Unit*> attackers) {
+	assert(unit);
+
 	if (!fighters->count(unit))
 		return;
 
@@ -199,6 +200,7 @@ void BattleManager::handleFlee(Unit* unit, set<Unit*> attackers) {
 }
 
 Position BattleManager::fleeTo(Unit* unit, const set<Unit*> attackers) {
+	assert(unit);
 	assert(!attackers.empty());
 
 	set<double>* angles = calculateAngles(unit, attackers);
@@ -209,6 +211,8 @@ Position BattleManager::fleeTo(Unit* unit, const set<Unit*> attackers) {
 }
 
 set<double>* BattleManager::calculateAngles(Unit* unit, const set<Unit*> attackers) {
+	assert(unit);
+
 	set<double>* angles = new set<double>();
 	for (set<Unit*>::const_iterator iter = attackers.begin(); iter != attackers.end(); ++iter) {
 		Unit* enemy = *iter;
@@ -218,6 +222,9 @@ set<double>* BattleManager::calculateAngles(Unit* unit, const set<Unit*> attacke
 }
 
 double BattleManager::calculateAngle(Unit* unit, Unit* enemy) {
+	assert(unit);
+	assert(enemy);
+
 	Position enemyVec = enemy->getPosition() - unit->getPosition();
 	Position neutralVec = Position(1, 0);
 	return angleBetween(enemyVec, neutralVec);
@@ -225,6 +232,8 @@ double BattleManager::calculateAngle(Unit* unit, Unit* enemy) {
 	
 
 double BattleManager::midAngle(set<double>* angles) {
+	assert(angles);
+	assert(!angles->empty());
 	double sum = 0;
 	for (set<double>::const_iterator iter = angles->begin(); iter != angles->end(); iter++) {
 		sum += *iter;
@@ -240,6 +249,8 @@ double BattleManager::reverseAngle(double angle) {
 }
 
 void BattleManager::handleAttack(Unit* unit) {
+	assert(unit);
+
 	if (!fighters->count(unit))
 		return;
 
@@ -259,6 +270,8 @@ void BattleManager::handleAttack(Unit* unit) {
 }
 
 void BattleManager::calculateTarget(Unit* unit, set<Unit*> enemies) {
+	assert(unit);
+
 	if (!fighters->count(unit))
 		return;
 
@@ -293,6 +306,8 @@ void BattleManager::calculateTarget(Unit* unit, set<Unit*> enemies) {
 }
 
 Unit* BattleManager::weakestEnemyInRange(Unit* unit, set<Unit*> enemies) {
+	assert(unit);
+
 	Unit* weakest = NULL;
 
 	foreach (Unit* enemy, enemies) {
@@ -335,6 +350,10 @@ map< Unit*, set<Unit*> > BattleManager::getAttackers() {
 }
 
 bool BattleManager::isInAttackRange(Unit* attacker, Unit* target) {
+	assert(attacker);
+	if (!target)
+		return false;
+
 	int attackerRange = attacker->getType().groundWeapon()->maxRange();
 
 	if (attacker->getType() == UnitTypes::getUnitType(string("Protoss Dragoon")))
