@@ -151,15 +151,21 @@ void BattleManager::printAttackerInfo(map<Unit*, set<Unit*> > attackedBy) {
 void BattleManager::decideActions(map<Unit*, set<Unit*> > attackedBy) {
 	pair<Unit*, UnitData> pair;
 
-	if (fighters)
-		foreach (pair, *fighters) {	
-			Unit* unit = pair.first;
+	if (!fighters) return;
 
+	foreach (pair, *fighters) {	
+		Unit* unit = pair.first;
+
+		if (attackedBy.count(unit) > 0) {
 			set<Unit*> attackers = attackedBy[unit];
 
 			handleFlee(unit, attackers);
 			handleAttack(unit);
 		}
+		else {
+			handleAttack(unit);
+		}
+	}
 }
 
 

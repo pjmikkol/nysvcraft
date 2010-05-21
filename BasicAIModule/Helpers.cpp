@@ -115,6 +115,7 @@ namespace helpers {
 	}
 		
 	int getFleeDuration(Unit* unit, set<Unit*>* attackers) {
+		if (!unit) return 0;
 		Unit* nearest = getClosestEnemy(unit, *attackers);
 	
 		UnitType t = unit->getType();
@@ -129,10 +130,10 @@ namespace helpers {
 		else if (t == UnitTypes::Protoss_Probe) {
 			set<Unit*> enemies = Broodwar->enemy()->getUnits();
 			Position pos = unit->getPosition();
-			for(int i = 0; i < 3 && enemies.size() > 0; i++) {
+			for(int i = 0; i < 5 && enemies.size() > 0; i++) {
 				Unit* closest = getClosestEnemy(unit, enemies);
 				UnitType eType = closest->getType();
-				if (pos.getDistance(closest->getPosition()) < 10*TILE_SIZE &&
+				if (closest && pos.getDistance(closest->getPosition()) < 10*TILE_SIZE &&
 					eType != UnitTypes::Protoss_Probe )
 					return 25;
 				enemies.erase(closest);
