@@ -231,6 +231,9 @@ double BattleManager::reverseAngle(double angle) {
 }
 
 void BattleManager::handleAttack(Unit* unit) {
+	if (!fighters->count(unit))
+		return;
+
 	UnitData* data = &((*fighters)[unit]);
 	if (data->state != fight) return;
 	set<Unit*> enemies = Broodwar->enemy()->getUnits();
