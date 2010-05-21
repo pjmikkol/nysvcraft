@@ -50,7 +50,7 @@ void BasicAIModule::onStart()
 
 	analyzed = false;
 
-	this->showManagerAssignments = false;
+	this->showManagerAssignments = true;
 
 	if (Broodwar->isReplay()) return;
 

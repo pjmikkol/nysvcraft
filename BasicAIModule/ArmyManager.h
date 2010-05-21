@@ -60,5 +60,5 @@ private:
 	set<Unit*> attackers;
 	set<Unit*> bases;
 	set<Unit*> attackBases;
-	time_t rushStartedOn;
+	int rushStartedOn;
 };
