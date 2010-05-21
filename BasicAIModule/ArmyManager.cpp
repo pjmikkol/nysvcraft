@@ -1,6 +1,7 @@
 #include "ArmyManager.h"
 #include <algorithm>
 #include "Helpers.h"
+#include <ctime>
 
 using namespace BWAPI;
 using namespace std;
@@ -26,6 +27,7 @@ ArmyManager::~ArmyManager()
 void ArmyManager::rush() {
 	Broodwar->printf("Kekekekekeke");
 	isRush = true;
+	rushStartedOn = time(NULL);
 }
 
 void ArmyManager::onOffer(set<Unit*> units) {	
@@ -66,6 +68,9 @@ void ArmyManager::onRevoke(Unit* unit, double bid) {
 
 void ArmyManager::update() {
 	set<Unit*> units = BWAPI::Broodwar->self()->getUnits();
+
+	if (isRush && time(NULL) >= rushStartedOn + 1.5*60)
+		isRush = false;
 	
 	int completedZealots = buildManager->getCompletedCount(UnitTypes::Protoss_Zealot);
 
@@ -87,7 +92,7 @@ void ArmyManager::update() {
 	foreach (Unit* unit, units) 
 		if (unit->isCompleted() && unit->getType() == UnitTypes::Protoss_Zealot || unit->getType() == UnitTypes::Protoss_Dragoon)			
 			if (!(attackers.count(unit) || recalledAttackers.count(unit) || recalled.count(unit) || defenders.count(unit))) {
-				if (isRush)
+				if (isRush && !(unit->getOrderTarget() || unit->getTarget()))
 					unit->attackMove(getRushTarget());
 				else
 					if (!attackBases.empty()) {

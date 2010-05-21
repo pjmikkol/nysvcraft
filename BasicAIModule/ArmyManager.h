@@ -37,6 +37,8 @@ public:
 
 	void rush();
 
+	bool isRush;
+
 private:
 	void checkBaseDefenses();
 	bool isUnderAttack(Unit* base);
@@ -52,12 +54,11 @@ private:
 	DefenseManager* defenseManager;
 	bool builtDragoons;
 
-	bool isRush;
-
 	set<Unit*> recalled;
 	set<Unit*> recalledAttackers;
 	set<Unit*> defenders;
 	set<Unit*> attackers;
 	set<Unit*> bases;
 	set<Unit*> attackBases;
+	time_t rushStartedOn;
 };

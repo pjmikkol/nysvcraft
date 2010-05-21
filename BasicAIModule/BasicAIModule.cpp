@@ -71,7 +71,7 @@ void BasicAIModule::onFrame()
 			Broodwar->printf("We are top cats <3");
 			scoutManager->setScoutCount(1);
 		}
-	}
+	}	
 
 	this->buildManager->update();
 	this->buildOrderManager->update();
@@ -131,8 +131,8 @@ void BasicAIModule::onFrame()
 		Broodwar->drawCircleMap(u->getPosition().x(),u->getPosition().y(),20,Colors::Red);
 	}
 
-	if (Broodwar->self()->getUnits().size() == 200)
-		armyManager->rush();
+	if (!armyManager->isRush && Broodwar->self()->getUnits().size() == 200)
+		armyManager->rush();	
 
 	Broodwar->drawTextScreen(450, 50, "%d dragoons", getCurrentUnitCount(UnitTypes::Protoss_Dragoon));
 	Broodwar->drawTextScreen(450, 64, "%d probes", getCurrentUnitCount(UnitTypes::Protoss_Probe));
