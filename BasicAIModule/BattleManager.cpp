@@ -33,7 +33,8 @@ void BattleManager::onOffer(set<Unit*> units)
 
 void BattleManager::onRevoke(Unit* unit, double bid)
 {
-	 this->fighters->erase(unit);
+	assert(fighters);
+	this->fighters->erase(unit);
 }
 
 void BattleManager::BidUnits()
@@ -70,12 +71,10 @@ void BattleManager::update()
 	BidUnits();
 	/*Micro-level attack code goes here*/
 	//drawUnitInfo();
-	map< Unit*, set<Unit*> > * attackedBy = getAttackers();
+	map< Unit*, set<Unit*> > attackedBy = getAttackers();
 	
 	//printAttackerInfo(attackedBy);
 	decideActions(attackedBy);
-
-	delete attackedBy;
 
 	/* Printing names over enemies
 	set<Unit*> enemies = Broodwar->enemy()->getUnits();
@@ -140,30 +139,34 @@ string BattleManager::getShortName() const
 }
 
 
-void BattleManager::printAttackerInfo(map<Unit*, set<Unit*> >* attackedBy) {
+void BattleManager::printAttackerInfo(map<Unit*, set<Unit*> > attackedBy) {
 	pair< Unit*, set<Unit*> > p;
 	
-	foreach (p, *attackedBy) {	
+	foreach (p, attackedBy) {	
 		Position pos = p.first->getPosition();
 		Broodwar->drawTextMap(pos.x() - 16, pos.y() - 26, "%d", p.second.size());
 	}
 }
 
-void BattleManager::decideActions(map<Unit*, set<Unit*> >* attackedBy) {
+void BattleManager::decideActions(map<Unit*, set<Unit*> > attackedBy) {
 	pair<Unit*, UnitData> pair;
 
-	foreach (pair, *fighters) {	
-		Unit* unit = pair.first;
+	if (fighters)
+		foreach (pair, *fighters) {	
+			Unit* unit = pair.first;
 
-		set<Unit*> attackers = (*attackedBy)[unit];
+			set<Unit*> attackers = attackedBy[unit];
 
-		handleFlee(unit, attackers);
-		handleAttack(unit);
-	}
+			handleFlee(unit, attackers);
+			handleAttack(unit);
+		}
 }
 
 
 void BattleManager::handleFlee(Unit* unit, set<Unit*> attackers) {
+	if (!fighters->count(unit))
+		return;
+
 	UnitData* data = &((*fighters)[unit]);
 
 	if (data->state == flee) {
@@ -179,7 +182,7 @@ void BattleManager::handleFlee(Unit* unit, set<Unit*> attackers) {
 	UnitType t = unit->getType();
 
 	if (!attackers.empty() && (shouldFlee(unit, attackers) || t == UnitTypes::Protoss_Probe)) {	
-		Position runTo = fleeTo(unit, &attackers);
+		Position runTo = fleeTo(unit, attackers);
 		
 		data->state = flee;
 		data->fleeCounter = getFleeDuration(unit, &attackers);
@@ -189,8 +192,8 @@ void BattleManager::handleFlee(Unit* unit, set<Unit*> attackers) {
 	}
 }
 
-Position BattleManager::fleeTo(Unit* unit, const set<Unit*>* attackers) {
-	assert(attackers->size() > 0);
+Position BattleManager::fleeTo(Unit* unit, const set<Unit*> attackers) {
+	assert(!attackers.empty());
 
 	set<double>* angles = calculateAngles(unit, attackers);
 	double mid = midAngle(angles);
@@ -199,9 +202,9 @@ Position BattleManager::fleeTo(Unit* unit, const set<Unit*>* attackers) {
 	return unit->getPosition() + direction;
 }
 
-set<double>* BattleManager::calculateAngles(Unit* unit, const set<Unit*>* attackers) {
+set<double>* BattleManager::calculateAngles(Unit* unit, const set<Unit*> attackers) {
 	set<double>* angles = new set<double>();
-	for (set<Unit*>::const_iterator iter = attackers->begin(); iter != attackers->end(); ++iter) {
+	for (set<Unit*>::const_iterator iter = attackers.begin(); iter != attackers.end(); ++iter) {
 		Unit* enemy = *iter;
 		angles->insert(calculateAngle(unit, enemy));
 	}
@@ -250,6 +253,9 @@ void BattleManager::handleAttack(Unit* unit) {
 }
 
 void BattleManager::calculateTarget(Unit* unit, set<Unit*> enemies) {
+	if (!fighters->count(unit))
+		return;
+
 	UnitData* data = &((*fighters)[unit]);
 	Unit* target = NULL;
 
@@ -298,8 +304,8 @@ Unit* BattleManager::weakestEnemyInRange(Unit* unit, set<Unit*> enemies) {
 	return weakest;
 }
 
-map< Unit*, set<Unit*> > * BattleManager::getAttackers() {
-	map< Unit*, set<Unit*> > * attackedBy = new map< Unit*, set<Unit*> >();
+map< Unit*, set<Unit*> > BattleManager::getAttackers() {
+	map< Unit*, set<Unit*> > attackedBy;
 
 	foreach(Unit* enemy, Broodwar->enemy()->getUnits()) {
 		Unit* target = enemy->getOrderTarget();
@@ -314,9 +320,9 @@ map< Unit*, set<Unit*> > * BattleManager::getAttackers() {
 			(this->fighters->find(target) != this->fighters->end()) ) {
 			
 			/* Have we already made the set of attackers for this unit */
-			if ( attackedBy->find(target) != attackedBy->end() )
-				(*attackedBy)[target] = set<Unit*>();
-			(*attackedBy)[target].insert(enemy);					
+			if ( !attackedBy.count(target) )
+				attackedBy.insert(make_pair(target, set<Unit*>())); //[target] = set<Unit*>();
+			attackedBy[target].insert(enemy);					
 		}
 	}
 	return attackedBy;
