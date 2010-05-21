@@ -40,9 +40,15 @@ void SupplyManager::update()
       productionCapacity += max;
     }
 
-    if (getPlannedSupply() <= BWAPI::Broodwar->self()->supplyUsed() + productionCapacity)
-    {
-      this->buildOrderManager->buildAdditional(1,*BWAPI::Broodwar->self()->getRace().getSupplyProvider(),1000);
+	if (getPlannedSupply() <= BWAPI::Broodwar->self()->supplyUsed() + productionCapacity) {
+		set<Unit*> units = Broodwar->self()->getUnits();
+		int workers = 0;
+		foreach (Unit* unit, units)
+			if (unit->getType() == UnitTypes::Protoss_Probe)
+				workers++;
+
+		if (workers < 100)
+	      this->buildOrderManager->buildAdditional(1,*BWAPI::Broodwar->self()->getRace().getSupplyProvider(),1000);
     }
   }
 }

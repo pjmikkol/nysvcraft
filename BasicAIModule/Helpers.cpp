@@ -1,5 +1,4 @@
 #include "Helpers.h"
-
 #include <boost/foreach.hpp>
 #define foreach BOOST_FOREACH
 
@@ -38,6 +37,7 @@ namespace helpers {
 
 	bool isAttackingEnemy(Unit* unit) {
 		Unit* other = unit->getOrderTarget();
+		if (!other) other = unit->getTarget();
 		return other && other->getPlayer() == Broodwar->enemy();
 	}
 
@@ -107,20 +107,48 @@ namespace helpers {
 
 		if (unit->getType() == UnitTypes::Protoss_Dragoon) {
 			foreach (Unit* attacker, attackers)
-				if (attacker->getType() == UnitTypes::Protoss_Zealot)
+				if (attacker->getType() == UnitTypes::Protoss_Zealot && 
+					attacker->getPosition().getDistance(unit->getPosition()) < 3*TILE_SIZE )
 					return true;
 		}
-
 		return attackers.size() >= fleeThreshold[unit->getType()];				
 	}
 		
 	int getFleeDuration(Unit* unit, set<Unit*>* attackers) {
-		if (unit->getType() == UnitTypes::Protoss_Dragoon)
-			foreach (Unit* attacker, *attackers)
-				if (attacker->getType() == UnitTypes::Protoss_Zealot)
-					return 30;
+		Unit* nearest = getClosestEnemy(unit, *attackers);
+	
+		UnitType t = unit->getType();
 
-		return 25;
+		if ( t == UnitTypes::Protoss_Dragoon ) {
+			if (nearest && nearest->getType() == UnitTypes::Protoss_Zealot
+				&& nearest->getPosition().getDistance(unit->getPosition()) < 2*TILE_SIZE) {
+				return 5;
+			}
+			else return 0;
+		} 
+		else if (t == UnitTypes::Protoss_Probe) {
+			set<Unit*> enemies = Broodwar->enemy()->getUnits();
+			Position pos = unit->getPosition();
+			for(int i = 0; i < 3 && enemies.size() > 0; i++) {
+				Unit* closest = getClosestEnemy(unit, enemies);
+				UnitType eType = closest->getType();
+				if (pos.getDistance(closest->getPosition()) < 10*TILE_SIZE &&
+					eType != UnitTypes::Protoss_Probe )
+					return 25;
+				enemies.erase(closest);
+			}
+			return 0; 
+		}
+		else if (t == UnitTypes::Protoss_Zealot) {
+			foreach(Unit* enema, *attackers) {
+				UnitType t = enema->getType();
+				if (t == UnitTypes::Protoss_Dragoon)
+					return 10;
+			}
+		}
+		return 0;
+
 	}
+
 
 }

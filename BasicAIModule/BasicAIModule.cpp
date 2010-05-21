@@ -1,10 +1,11 @@
 #include "BasicAIModule.h"
+#include <iostream>
 using namespace BWAPI;
+
 
 DWORD WINAPI AnalyzeThread(void* obj) {
 	BWTA::readMap();
 	BWTA::analyze();
-
 	BasicAIModule* ai = (BasicAIModule*) obj;
 
 	ai->buildManager       = new BuildManager(&ai->arbitrator);
@@ -36,7 +37,7 @@ DWORD WINAPI AnalyzeThread(void* obj) {
 	ai->workerManager->enableAutoBuild();
 	ai->workerManager->setAutoBuildPriority(80); 
 
-	ai->scoutManager->setScoutCount(1);
+	ai->isUpgrading = false;
 	
 	analyzed = true;
 
@@ -63,6 +64,9 @@ void BasicAIModule::onFrame()
 	if (Broodwar->isReplay()) return;
 	if (!analyzed) return;
 
+	if (startFrame == 0) 
+		startFrame = Broodwar->getFrameCount();
+
 	this->buildManager->update();
 	this->buildOrderManager->update();
 	this->baseManager->update();
@@ -78,6 +82,18 @@ void BasicAIModule::onFrame()
 	this->arbitrator.update();
 
 	this->enhancedUI->update();
+
+	if (!isUpgrading && buildManager->getCompletedCount(UnitTypes::Protoss_Dragoon) == 10) {
+		Broodwar->printf("Researching upgrades");
+		upgradeManager->upgrade(UpgradeTypes::Singularity_Charge);
+		upgradeManager->upgrade(UpgradeTypes::Protoss_Ground_Weapons);
+		upgradeManager->upgrade(UpgradeTypes::Protoss_Plasma_Shields);
+		upgradeManager->upgrade(UpgradeTypes::Protoss_Armor);
+		this->isUpgrading = true;
+	}
+
+	if (!scoutManager->isScouting() && buildManager->getCompletedCount(UnitTypes::Protoss_Nexus) == 2)
+		scoutManager->setScoutCount(1);
 
 	std::set<Unit*> units=Broodwar->self()->getUnits();
 	if (this->showManagerAssignments)
@@ -108,6 +124,21 @@ void BasicAIModule::onFrame()
 	{
 		Broodwar->drawCircleMap(u->getPosition().x(),u->getPosition().y(),20,Colors::Red);
 	}
+
+	
+	Broodwar->drawTextScreen(450, 50, "%d dragoons", getCurrentUnitCount(UnitTypes::Protoss_Dragoon));
+	Broodwar->drawTextScreen(450, 64, "%d probes", getCurrentUnitCount(UnitTypes::Protoss_Probe));
+	Broodwar->drawTextScreen(450, 78, "%d zealots", getCurrentUnitCount(UnitTypes::Protoss_Zealot));
+}
+
+int BasicAIModule::getCurrentUnitCount(UnitType unitType) {
+	int count = 0;
+
+	foreach (Unit* unit, Broodwar->self()->getUnits())
+		if (unit->getType() == unitType)
+			count++;
+
+	return count;
 }
 
 void BasicAIModule::onUnitDestroy(BWAPI::Unit* unit)
@@ -168,7 +199,8 @@ bool BasicAIModule::onSendText(std::string text)
 		this->buildOrderManager->enableDebugMode();
 		this->scoutManager->enableDebugMode();
 		return true;
-	}
+	} 
+	
 	if (text=="expand")
 	{
 		this->expansionManager->expand();
