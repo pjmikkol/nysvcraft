@@ -196,8 +196,11 @@ void ArmyManager::attack(Unit* target) {
 	foreach (UnitGroup* group, defGroups)
 		foreach (Unit* unit, *group) {
 			arbitrator->setBid(this, unit, 200);
-			if (!attackers.count(unit))
+			if (!attackers.count(unit)) {
 				recalledAttackers.insert(unit);
+				defenders.erase(unit);
+				recalled.erase(unit);
+			}
 			attackBases.insert(target);
 		}
 }
