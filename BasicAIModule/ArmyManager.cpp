@@ -31,7 +31,7 @@ void ArmyManager::rush() {
 void ArmyManager::onOffer(set<Unit*> units) {	
 	foreach (Unit* unit, units) {
 		if (isRush) {
-			unit->attackMove(Broodwar->enemy()->getStartLocation());
+			unit->attackMove(getRushTarget());
 			continue;
 		} 
 		if (recalledAttackers.count(unit)) {
@@ -48,6 +48,13 @@ void ArmyManager::onOffer(set<Unit*> units) {
 			defenders.insert(unit);
 		} 
 	}
+}
+
+Position ArmyManager::getRushTarget() {
+	if (Broodwar->self()->getStartLocation().y() == 8)
+		return Position(63, 117);
+	else
+		return Position(70, 8);
 }
 
 void ArmyManager::onRevoke(Unit* unit, double bid) {
@@ -81,7 +88,7 @@ void ArmyManager::update() {
 		if (unit->isCompleted() && unit->getType() == UnitTypes::Protoss_Zealot || unit->getType() == UnitTypes::Protoss_Dragoon)			
 			if (!(attackers.count(unit) || recalledAttackers.count(unit) || recalled.count(unit) || defenders.count(unit))) {
 				if (isRush)
-					unit->attackMove(Broodwar->enemy()->getStartLocation());
+					unit->attackMove(getRushTarget());
 				else
 					if (!attackBases.empty()) {
 						attack(*attackBases.begin());

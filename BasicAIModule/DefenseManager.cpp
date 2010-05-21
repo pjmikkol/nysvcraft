@@ -14,6 +14,7 @@ DefenseManager::DefenseManager(Arbitrator::Arbitrator<BWAPI::Unit*,double>* arbi
 	this->buildOrderManager = buildOrderManager;
 	this->baseManager = baseManager;
 
+	minesBuilt = false;
 	calledInitialOnExpand = false;
 }
 
@@ -83,6 +84,11 @@ void DefenseManager::update()
 	if (!calledInitialOnExpand) {
 		onExpand(baseManager->getBase(*BWTA::getRegion(Broodwar->self()->getStartLocation())->getBaseLocations().begin()));
 		calledInitialOnExpand = true;
+	}
+
+	if (!minesBuilt && Broodwar->self()->minerals() >= 10000) {
+		buildOrderManager->buildAdditional(50, UnitTypes::Protoss_Photon_Cannon, 80, TilePosition(Broodwar->mapWidth() / TILE_SIZE, Broodwar->mapHeight() / TILE_SIZE));
+		minesBuilt = true;
 	}
 
 	bidOnMilitaryUnits();

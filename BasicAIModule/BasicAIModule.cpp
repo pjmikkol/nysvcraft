@@ -64,8 +64,14 @@ void BasicAIModule::onFrame()
 	if (Broodwar->isReplay()) return;
 	if (!analyzed) return;
 
-	if (startFrame == 0) 
+	if (startFrame == 0) {
 		startFrame = Broodwar->getFrameCount();
+
+		if (Broodwar->self()->getStartLocation().y() == 8) {
+			Broodwar->printf("We are top cats <3");
+			scoutManager->setScoutCount(1);
+		}
+	}
 
 	this->buildManager->update();
 	this->buildOrderManager->update();

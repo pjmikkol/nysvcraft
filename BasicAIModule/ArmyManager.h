@@ -21,6 +21,9 @@ public:
 	enum TroopState { IdleTroop, AttackingTroop };
 
 	void onOffer(set<Unit*> units);
+
+	Position getRushTarget();
+
 	void onRevoke(Unit* unit, double bid);
 
 	void update();

@@ -64,4 +64,5 @@ private:
 	std::set<BWTA::Chokepoint*> interestingChokepoints;
 	std::map<BWTA::Chokepoint*, UnitGroup*> defenseGroups;
 	std::set<BWTA::Region*> exploredRegions;
+	bool minesBuilt;
 };
