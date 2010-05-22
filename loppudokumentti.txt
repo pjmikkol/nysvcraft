@@ -1,0 +1,41 @@
+AI For Games II: Loppuraportti
+==============================
+
+Ryhmä: 
+    
+    Nysvääjät
+
+Jäsenet:
+
+    Nimi                GitHub-tunnus   Opiskelijanumero
+    ----------------------------------------------------
+    Pekka Mikkola       epokal
+    Juhana Laurinharju  Fingerzam
+    Laura Leppänen      Lateks
+    Ilmari Vacklin      wolverian       013182847
+
+Tekoäly(t) ja sen koko versiohistoria on saatavilla osoitteista:
+
+    http://github.com/epokal/nysvcraft
+    http://github.com/Fingerzam/nysvcraft
+    http://github.com/Lateks/nysvcraft
+    http://github.com/wolverian/nysvcraft
+
+Työn jakaantuminen
+==================
+
+Kuvaus tekoälystä
+=================
+
+- Korkean tason strategia
+- Rakenne, osat
+- Miten päätökset tehtiin
+
+Mikä meni pieleen
+=================
+
+Mitä jäi toteuttamatta
+======================
+
+META
+====
