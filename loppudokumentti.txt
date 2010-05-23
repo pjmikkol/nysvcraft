@@ -21,8 +21,8 @@ Tekoäly(t) ja sen koko versiohistoria on saatavilla osoitteista:
     http://github.com/Lateks/nysvcraft
     http://github.com/wolverian/nysvcraft
 
-Työn jakaantuminen
-==================
+Työn jakautuminen
+=================
 
 Kaikki ryhmän jäsenet tekivät töitä. Työskentelimme pääasiassa parikoodaten.
 Käytimme hajautettua versionhallintaa (git), mikä salli rinnakkaisen
@@ -33,18 +33,89 @@ ainoita ryhmän jäseniä, jotka olivat pelanneet Starcraftia. Pekka oli ainoa
 ryhmän jäsen, jolla oli C++-kokemusta. Juhanalla ja Ilmarilla oli kokemusta
 C-kielestä, mikä ehkä helpotti C++:n opettelua.
 
-Kuvaus tekoälystä
-=================
+Kuvaus ensimmäisen viikon tekoälystä
+====================================
 
-- Korkean tason strategia
-- Rakenne, osat
-- Miten päätökset tehtiin
+TODO.
+
+Kuvaus toisen viikon tekoälystä
+===============================
+
+Korkean tason strategia
+-----------------------
+
+* Laajennutaan aggressiivisesti
+* Lasketaan, mitä chokepointteja kannattaa vartioida
+* Jaetaan puolustajat vartioitaviin chokepointteihin
+* Hyökätään kun nähdään vihollisen rakennus
+    - Kaikki taisteluyksiköt hyökkäävät
+    - Palaavat puolustuspaikoilleen kun ei enää vihollisia näkyvissä
+* Kutsutaan kaikki puolustajat hyökkäyksen alla olevaan tukikohtaan
+* Kun yksikköraja saavutetaan, hyökätään kaikilla taisteluyksiköillä
+  vihollisen aloitustukikohtaan. Kökitään siellä N vuoroa, sitten palataan
+  normaaliin strategiaan
+    - Piilossa olevat vihollisyksiköt löydetään laajentumisen ansiosta
+
+Rakenne, osat
+-------------
+
+* BWSAL
+* Laajennettiin omilla Manager-luokilla
+    - Expansion
+    - Battle
+        * Osia ensimmäisen viikon mikrobattlekoodista
+    - Army (Attack)
+    - Defense
+
+Miten päätökset tehtiin
+-----------------------
+
+* BWSAL (joka käyttää BWTA:ta) päätti rakennusten paikat
+* ExpansionManager päätti minne laajennutaan seuraavaksi
+    - TODO: Juhana kertoo miten
+* Battle
+    - Dragoon vs Zealot
+    - Autetaan kaveria jos itsellä vähän hipareja
+    - Heikoin joka on rangessa
+    - Muuten lähin
+* Army
+    - (Olisi pitänyt olla kaksi erillistä Manageria -Ilmari)
+    - Hoiti hyökkäyksen ja paniikkipuolustuksen
+        * Paniikki: vihollisen taisteluyksikkö N etäisyydellä omasta
+          rakennuksesta (vai Nexuksesta?)
+        * Hyökkäys kun nähdään vihollisen rakennus (myös rakenteilla oleva)
+* Defense
+    - Yksikköjen asettelu (vartiointi)
 
 Mikä meni pieleen
 =================
 
+* BWSAL olikin kasa paskaa
+    - Olisi pitänyt koodata itse uudestaan mm. prioriteettijärjestelmä ja
+      InformationManager
+    - Buginen
+* Toinen viikko lähti hitaasti käyntiin
+* Ensimmäisellä viikolla puolet ryhmästä koodasi muodostelmakoodia joka ei
+  valmistunut ajoissa. Tehtiin yksinkertainen rivissä eteneminen viimeisenä
+  iltana korvikkeena. Yksinpeliversiossa turnauskartasta (Aleksi!!!!11)
+  zealotit aloittivat edestä ja dragoonit takaa; oikeassa versiossa zealotit
+  aloittivat ylhäältä ja dragoonit alhaalta (tai toisinpäin TODO). Haittasi
+  rivin muodostamista.
+* Laajennuttiin hieman liian nopeasti; alkupään zealot rush oli fataalia
+* Probet hyökkäsivät taisteluyksikköjen kimppuun vaikka ei pitänyt (Battle)
+* Random-bugeja, ikuinen looppi turnauksessa (omglol bwsal)
+* Löydettiin bugi battlekoodista viime hetkillä, viimeinen tunti ennen
+  turnausta meni segfaultin etsimiseen (NULL-pointteri)
+    - Segfaulttasi silti kerran turnauksessa (loopin lisäksi)
+
 Mitä jäi toteuttamatta
 ======================
+
+* Muodostelmat (1. vko)
+* Chokepointtien priorisointi
+* Järkevä rush-targetin valinta (ei ehditty ottaa mukaan)
+* Prioriteettijonon korjaus
+* Känkkääminen (molemmat vkot)
 
 META
 ====
