@@ -36,7 +36,12 @@ C-kielestä, mikä ehkä helpotti C++:n opettelua.
 Kuvaus ensimmäisen viikon tekoälystä
 ====================================
 
-TODO.
+* Rivissä eteneminen
+* Vihollisen valinta
+* Känkkäys
+    - Valintakriteerit
+* Dragoonien perääntyminen
+    - Paranneltiin tokalla viikolla? (TODO: Pekka)
 
 Kuvaus toisen viikon tekoälystä
 ===============================
@@ -116,6 +121,10 @@ Mitä jäi toteuttamatta
 * Järkevä rush-targetin valinta (ei ehditty ottaa mukaan)
 * Prioriteettijonon korjaus
 * Känkkääminen (molemmat vkot)
+* Ensimmäisen viikon tekoäly ei osannut etsiä vihollisia kartalta
+    - Yksi tasapeli tämän takia: vihollisella yksi zealot, jolla yksi hipari,
+      meillä 7 tai 8 dragoonia jotka jäivät kökkimään vihollisen
+      aloituspaikkaan, kunnes aikaraja
 
 META
 ====
