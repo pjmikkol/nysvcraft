@@ -2,7 +2,7 @@ AI For Games II: Loppuraportti
 ==============================
 
 Ryhmä: 
-    
+
     Nysvääjät
 
 Jäsenet:
@@ -11,7 +11,7 @@ Jäsenet:
     ----------------------------------------------------
     Pekka Mikkola       epokal
     Juhana Laurinharju  Fingerzam
-    Laura Leppänen      Lateks
+    Laura Leppänen      Lateks          013302782
     Ilmari Vacklin      wolverian       013182847
 
 Tekoäly(t) ja sen koko versiohistoria on saatavilla osoitteista:
@@ -23,6 +23,15 @@ Tekoäly(t) ja sen koko versiohistoria on saatavilla osoitteista:
 
 Työn jakaantuminen
 ==================
+
+Kaikki ryhmän jäsenet tekivät töitä. Työskentelimme pääasiassa parikoodaten.
+Käytimme hajautettua versionhallintaa (git), mikä salli rinnakkaisen
+kehitystyön.
+
+Suunnittelu oli pääasiassa Juhanan ja Lauran harteilla, koska he olivat
+ainoita ryhmän jäseniä, jotka olivat pelanneet Starcraftia. Pekka oli ainoa
+ryhmän jäsen, jolla oli C++-kokemusta. Juhanalla ja Ilmarilla oli kokemusta
+C-kielestä, mikä ehkä helpotti C++:n opettelua.
 
 Kuvaus tekoälystä
 =================
