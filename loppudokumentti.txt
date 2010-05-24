@@ -9,7 +9,7 @@ Jäsenet:
 
     Nimi                GitHub-tunnus   Opiskelijanumero
     ----------------------------------------------------
-    Pekka Mikkola       epokal
+    Pekka Mikkola       epokal          013181783
     Juhana Laurinharju  Fingerzam
     Laura Leppänen      Lateks          013302782
     Ilmari Vacklin      wolverian       013182847
@@ -30,18 +30,34 @@ kehitystyön.
 
 Suunnittelu oli pääasiassa Juhanan ja Lauran harteilla, koska he olivat
 ainoita ryhmän jäseniä, jotka olivat pelanneet Starcraftia. Pekka oli ainoa
-ryhmän jäsen, jolla oli C++-kokemusta. Juhanalla ja Ilmarilla oli kokemusta
-C-kielestä, mikä ehkä helpotti C++:n opettelua.
+ryhmän jäsen, jolla oli jotain C++-kokemusta. Juhanalla ja Ilmarilla oli 
+kokemusta C-kielestä, mikä helpotti C++:n opettelua.
 
 Kuvaus ensimmäisen viikon tekoälystä
 ====================================
 
 * Rivissä eteneminen
+    - Varsinainen muodostelmia kontrolloiva koodi ei koskaan valmistunut, 
+      joten ensimmäisen viikon turnauste varten kokoon parsittiin kiireellä
+      suoraviivaisempi ratkaisu.
+    - Yksiköt siirtyivät alussa riviin, jonka jälkeen ne lähtevät etenemään.
+    - Turnauskartta oli lievästi erilainen kuin testauksessa käyttämämme kartta
+      (yksiköt aloittivat eri asetelmasta), jonka johdosta muodostelmat hajosivat.
+* Perääntyminen
+    - Jos vihollisia oli liikaa tai tilanne näytti pahalta niin yksikkö asetettiin
+      juoksemaan karkuun.
+    - Valintaan vaikutti vihollisjoukkojen lisäksi omien joukkojen lukumäärä ja 
+      yksikön tyyppi.
+    - Pakenemissuunta valittiin seuraavasti: Kustakin yksikköä kohtaan hyökkävistä 
+      vihollisyksiköistä laskettiin yksikön ja vihollisen välinen kulma. Tämän jälkeen 
+      kulmista otettiin keskiarvo. Saadusta kulmasta saatiin pakenemissuunta lisäämällä
+      siihen pii. 
+    - Pakosuunta tuotti ongelmia lähellä seiniä (etenkin toisella viikolla).
 * Vihollisen valinta
+    - Ensimmäisellä viikolla sekä dragooneilla että zealoteilla valittiin hyökkäyksen
+      kohteet samoilla perusteilla.
 * Känkkäys
     - Valintakriteerit
-* Dragoonien perääntyminen
-    - Paranneltiin tokalla viikolla? (TODO: Pekka)
 
 Kuvaus toisen viikon tekoälystä
 ===============================
@@ -69,6 +85,9 @@ Rakenne, osat
     - Expansion
     - Battle
         * Osia ensimmäisen viikon mikrobattlekoodista
+        * Uusien yksiköiden ja rakennusten johdosta päätösten tekemislogiikkaa
+          muutettiin hiukan.
+        * Parametreja ehdittiin jonkin verran parantamaan edellisestä viikosta.
     - Army (Attack)
     - Defense
 
@@ -79,7 +98,10 @@ Miten päätökset tehtiin
 * ExpansionManager päätti minne laajennutaan seuraavaksi
     - TODO: Juhana kertoo miten
 * Battle
-    - Dragoon vs Zealot
+    - Dragoon, zealot ja probe -yksiköiden toiminta taistelussa
+      päätettiin oman yksikön tyypin ja vastustajien yksiköiden tyyppien
+      ja lukumäärän perusteella. Olisi voinut olla hiotumpikin: mm. probet oli
+      helppo houkutella alussa järjettömään hyökkäykseen vastustajan tukikohtaan.
     - Autetaan kaveria jos itsellä vähän hipareja
     - Heikoin joka on rangessa
     - Muuten lähin
@@ -106,7 +128,7 @@ Mikä meni pieleen
   zealotit aloittivat edestä ja dragoonit takaa; oikeassa versiossa zealotit
   aloittivat ylhäältä ja dragoonit alhaalta (tai toisinpäin TODO). Haittasi
   rivin muodostamista.
-* Laajennuttiin hieman liian nopeasti; alkupään zealot rush oli fataalia
+* Laajennuttiin hieman liian nopeasti; alkupään zealot rush oli varma tappio
 * Probet hyökkäsivät taisteluyksikköjen kimppuun vaikka ei pitänyt (Battle)
 * Random-bugeja, ikuinen looppi turnauksessa (omglol bwsal)
 * Löydettiin bugi battlekoodista viime hetkillä, viimeinen tunti ennen
@@ -123,8 +145,9 @@ Mitä jäi toteuttamatta
 * Känkkääminen (molemmat vkot)
 * Ensimmäisen viikon tekoäly ei osannut etsiä vihollisia kartalta
     - Yksi tasapeli tämän takia: vihollisella yksi zealot, jolla yksi hipari,
-      meillä 7 tai 8 dragoonia jotka jäivät kökkimään vihollisen
-      aloituspaikkaan, kunnes aikaraja
+      meillä 8 dragoonia jotka jäivät kökkimään vihollisen aloituspaikkaan, 
+      kunnes sovittiin tasapeliksi
+* Parametrien viilailu sopivaan laajentumistahtiin ja taisteluun
 
 META
 ====
